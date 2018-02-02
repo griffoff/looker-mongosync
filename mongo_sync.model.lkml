@@ -1,4 +1,4 @@
-connection: "bigquery-prod"
+connection: "snowflake_dev"
 
 # include all the views
 include: "*.view"
@@ -12,3 +12,8 @@ datagroup: mongo_sync_default_datagroup {
 }
 
 persist_with: mongo_sync_default_datagroup
+
+
+explore: activitytake {}
+
+explore: course {}
