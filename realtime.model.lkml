@@ -6,14 +6,9 @@ include: "*.view"
 # include all the dashboards
 include: "*.dashboard"
 
-datagroup: mongo_sync_default_datagroup {
+datagroup: realtime_default_datagroup {
   # sql_trigger: SELECT MAX(id) FROM etl_log;;
-  max_cache_age: "1 hour"
+  max_cache_age: "24 hours"
 }
 
-persist_with: mongo_sync_default_datagroup
-
-
-explore: activitytake {}
-
-explore: course {}
+persist_with: realtime_default_datagroup
