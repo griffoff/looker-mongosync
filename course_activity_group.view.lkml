@@ -1,5 +1,29 @@
 view: course_activity_group {
-  sql_table_name: REALTIME.COURSE_ACTIVITY_GROUP ;;
+  #sql_table_name: REALTIME.COURSE_ACTIVITY_GROUP ;;
+  derived_table: {
+    sql:
+      with data as (
+        select
+          hash(course_uri, activity_group_uri) as business_key
+          ,hash(course_uri, activity_group_uri, last_update_date) as primary_key
+          ,case when lead(last_update_date) over(partition by business_key order by last_update_date) is null then 1 end as latest
+          ,*
+        from realtime.course_activity_group
+      )
+      select *
+      from data
+      where latest = 1
+      order by course_uri, activity_group_uri
+      ;;
+
+      datagroup_trigger: realtime_default_datagroup
+  }
+
+  dimension: primary_key {
+    type: string
+    hidden: yes
+    primary_key: yes
+  }
 
   dimension_group: _ldts {
     type: time

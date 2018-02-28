@@ -16,14 +16,14 @@ view: course_enrollment {
       order by course_uri, user_sso_guid
       ;;
 
-      datagroup_trigger: realtime_default_datagroup
-    }
+    datagroup_trigger: realtime_default_datagroup
+  }
 
-    dimension: primary_key {
-      type: string
-      hidden: yes
-      primary_key: yes
-    }
+  dimension: primary_key {
+    type: string
+    hidden: yes
+    primary_key: yes
+  }
 
   dimension_group: _ldts {
     type: time
