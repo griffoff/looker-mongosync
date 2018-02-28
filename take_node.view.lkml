@@ -13,7 +13,7 @@ view: take_node {
       select *
       from data
       where latest = 1
-      --order by course_uri, activity_uri, user_identifier
+      order by course_uri, activity_uri, user_identifier
     ;;
 
       datagroup_trigger: realtime_default_datagroup
@@ -92,8 +92,15 @@ view: take_node {
   measure: final_grade_score_avg {
     group_label: "Final Grade"
     type: average
-    sql: ${final_grade}::score ;;
+    sql: ${final_grade}:normalScore::float ;;
     value_format_name: percent_1
+  }
+
+  measure: final_grade_timespent_avg {
+    group_label: "Final Grade"
+    type: average
+    sql: ${final_grade}:timeSpent::float / 60 / 60 / 24 ;;
+    value_format_name: duration_hms
   }
 
   dimension: hash {

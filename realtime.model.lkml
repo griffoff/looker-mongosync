@@ -1,5 +1,7 @@
 connection: "snowflake_int"
 
+include: "/core/common.lkml"
+
 # include all the views
 include: "*.view"
 
@@ -55,13 +57,13 @@ explore: course {
   }
 
   join: course_enrollment{
-    sql_on: ${course_enrollment.course_uri} = ${course_enrollment.course_uri} ;;
+    sql_on: ${course.course_uri} = ${course_enrollment.course_uri} ;;
     relationship: one_to_many
   }
 
   join: take_node {
-   sql_on: (${course.course_uri}, ${course_enrollment.user_sso_guid}, ${course_activity.activity_uri})
-       = (${take_node.course_uri}, ${take_node.user_identifier}, ${take_node.activity_uri});;
+   sql_on: (${course_activity.course_uri}, ${course_activity.activity_uri}, ${course_enrollment.user_sso_guid})
+       = (${take_node.course_uri}, ${take_node.activity_uri}, ${take_node.user_identifier});;
    relationship: one_to_many
   }
 
