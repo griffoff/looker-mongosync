@@ -62,6 +62,15 @@ view: node_summary {
   dimension: correct_percentage {
     type: number
     sql: ${TABLE}.CORRECT_PERCENTAGE ;;
+    value_format_name: percent_1
+  }
+
+  dimension: correct_percentage_tier {
+    type: tier
+    sql: ${correct_percentage} ;;
+    tiers: [0.25, 0.5, 0.75]
+    style: relational
+    value_format_name: percent_0
   }
 
   dimension: difficulty {
@@ -111,6 +120,43 @@ view: node_summary {
     type: string
     sql: ${TABLE}.NORMAL_SCORE_SUMMARY ;;
   }
+#
+#   {
+#   "count": {
+#     "$numberLong": "204"
+#   },
+#   "mean": 0.6813725490196079,
+#   "standardDeviation": 0.465944201017815,
+#   "sum": 139,
+#   "sumOfSquares": 139
+# }
+
+  dimension: normal_score_count {
+    group_label: "Normal Score Metrics"
+    hidden: yes
+    type: number
+    sql: ${normal_score_summary}:count:$numberLong::int  ;;
+  }
+
+  dimension: normal_score_mean {
+    group_label: "Normal Score Metrics"
+    hidden: yes
+    type: number
+    sql: nullif(${normal_score_summary}:mean, 'NaN')::float  ;;
+  }
+
+  dimension: normal_score_stdev {
+    group_label: "Normal Score Metrics"
+    hidden: yes
+    type: number
+    sql: nullif(${normal_score_summary}:standardDeviation, 'NaN')::float  ;;
+  }
+
+  measure: normal_score_count_average {
+    group_label: "Normal Score Metrics"
+    type: average
+    sql: ${normal_score_count}  ;;
+  }
 
   dimension: possible_score_summary {
     type: string
@@ -132,6 +178,19 @@ view: node_summary {
     sql: ${TABLE}.SUCCESSFUL_USER_COUNT ;;
   }
 
+  dimension: successful_percent {
+    type: number
+    sql: ${successful_user_count} / nullif(${scored_count}, 0) ;;
+    value_format_name: percent_1
+  }
+
+  dimension: successful_percent_tier {
+    type: tier
+    tiers: [0.25, 0.5, 0.75]
+    sql: ${successful_percent} ;;
+    value_format_name: percent_0
+  }
+
   dimension: time_spent_count {
     type: number
     sql: ${TABLE}.TIME_SPENT_COUNT ;;
@@ -140,6 +199,27 @@ view: node_summary {
   dimension: time_spent_summary {
     type: string
     sql: ${TABLE}.TIME_SPENT_SUMMARY ;;
+  }
+
+#   dimension: time_spent_count {
+#     group_label: "Time Spent Metrics"
+#     hidden: yes
+#     type: number
+#     sql: ${time_spent_summary}:count:$numberLong::int  ;;
+#   }
+
+  dimension: time_spent_mean {
+    group_label: "Time Spent Metrics"
+    hidden: yes
+    type: number
+    sql: nullif(${time_spent_summary}:mean, 'NaN')::float  ;;
+  }
+
+  dimension: time_spent_stdev {
+    group_label: "Time Spent Metrics"
+    hidden: yes
+    type: number
+    sql: nullif(${time_spent_summary}:standardDeviation, 'NaN')::float  ;;
   }
 
   dimension: total_take_count {
@@ -164,6 +244,6 @@ view: node_summary {
 
   measure: count {
     type: count
-    drill_fields: []
+    drill_fields: [activity_node_uri, latest_submission_date, unique_user_count, successful_percent, normal_score_mean, mastery_item, difficulty]
   }
 }

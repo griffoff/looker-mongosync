@@ -5,7 +5,8 @@ view: take_node {
       with data as (
         select
           hash(course_uri, activity_uri, activity_node_uri, user_identifier) as business_key
-          ,hash(course_uri, activity_uri, activity_node_uri, user_identifier, last_update_date) as primary_key
+          --,hash(course_uri, activity_uri, activity_node_uri, user_identifier, last_update_date) as primary_key
+          ,_hash as primary_key
           ,case when lead(last_update_date) over(partition by business_key order by last_update_date) is null then 1 end as latest
           ,*
         from realtime.take_node
@@ -13,7 +14,7 @@ view: take_node {
       select *
       from data
       where latest = 1
-      order by course_uri, activity_uri, user_identifier
+      order by course_uri, activity_uri, activity_node_uri, user_identifier
     ;;
 
       datagroup_trigger: realtime_default_datagroup

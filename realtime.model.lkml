@@ -62,7 +62,7 @@ explore: course {
   }
 
   join: take_node {
-   sql_on: (${course_activity.course_uri}, ${course_activity.activity_uri}, ${course_enrollment.user_sso_guid})
+   sql_on: (${course_activity.course_uri}, ${course_activity.activity_uri}, ${course_enrollment.user_identifier})
        = (${take_node.course_uri}, ${take_node.activity_uri}, ${take_node.user_identifier});;
    relationship: one_to_many
   }

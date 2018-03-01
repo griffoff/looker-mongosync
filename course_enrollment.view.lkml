@@ -4,8 +4,8 @@ view: course_enrollment {
     sql:
       with data as (
         select
-          hash(course_uri, user_sso_guid) as business_key
-          ,hash(course_uri, user_sso_guid, last_update_date) as primary_key
+          hash(course_uri, user_identifier) as business_key
+          ,hash(course_uri, user_identifier, last_update_date) as primary_key
           ,case when lead(last_update_date) over(partition by business_key order by last_update_date) is null then 1 end as latest
           ,*
         from realtime.course_enrollment
@@ -13,7 +13,7 @@ view: course_enrollment {
       select *
       from data
       where latest = 1
-      order by course_uri, user_sso_guid
+      order by course_uri, user_identifier
       ;;
 
     datagroup_trigger: realtime_default_datagroup
@@ -73,9 +73,9 @@ view: course_enrollment {
     sql: ${TABLE}.USER_GROUPS ;;
   }
 
-  dimension: user_sso_guid {
+  dimension: user_identifier {
     type: string
-    sql: ${TABLE}.USER_SSO_GUID ;;
+    sql: ${TABLE}.user_identifier ;;
   }
 
   measure: count {
