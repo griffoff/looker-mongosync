@@ -6,7 +6,7 @@ view: take_node {
         select
           hash(course_uri, activity_uri, activity_node_uri, user_identifier) as business_key
           --,hash(course_uri, activity_uri, activity_node_uri, user_identifier, last_update_date) as primary_key
-          ,_hash as primary_key
+          ,"HASH" as primary_key
           ,case when lead(last_update_date) over(partition by business_key order by last_update_date) is null then 1 end as latest
           ,*
         from realtime.take_node
