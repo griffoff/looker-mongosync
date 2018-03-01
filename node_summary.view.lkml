@@ -133,21 +133,19 @@ view: node_summary {
 
   dimension: normal_score_count {
     group_label: "Normal Score Metrics"
-    hidden: yes
     type: number
     sql: ${normal_score_summary}:count:$numberLong::int  ;;
   }
 
   dimension: normal_score_mean {
     group_label: "Normal Score Metrics"
-    hidden: yes
     type: number
     sql: nullif(${normal_score_summary}:mean, 'NaN')::float  ;;
+    value_format_name: percent_2
   }
 
   dimension: normal_score_stdev {
     group_label: "Normal Score Metrics"
-    hidden: yes
     type: number
     sql: nullif(${normal_score_summary}:standardDeviation, 'NaN')::float  ;;
   }
@@ -212,7 +210,8 @@ view: node_summary {
     group_label: "Time Spent Metrics"
     hidden: yes
     type: number
-    sql: nullif(${time_spent_summary}:mean, 'NaN')::float  ;;
+    sql: nullif(${time_spent_summary}:mean, 'NaN')::float / 60 / 60 / 24  ;;
+    value_format_name: duration_hms
   }
 
   dimension: time_spent_stdev {
@@ -244,6 +243,6 @@ view: node_summary {
 
   measure: count {
     type: count
-    drill_fields: [activity_node_uri, latest_submission_date, unique_user_count, successful_percent, normal_score_mean, mastery_item, difficulty]
+    drill_fields: [activity_node_uri, latest_submission_date, unique_user_count, successful_percent, time_spent_mean, normal_score_mean, mastery_item, difficulty]
   }
 }
