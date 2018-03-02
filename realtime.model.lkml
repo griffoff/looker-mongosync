@@ -101,3 +101,7 @@ explore: product_toc_metadata {
 explore: node_summary {
   label: "All Items (including CXP)"
 }
+
+explore: take_node {
+  label: "All Take Nodes"
+}
