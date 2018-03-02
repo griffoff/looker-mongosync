@@ -1,5 +1,28 @@
 view: product_toc_metadata {
-  sql_table_name: REALTIME.PRODUCT_TOC_METADATA ;;
+#   sql_table_name: REALTIME.PRODUCT_TOC_METADATA ;;
+  derived_table: {
+    sql:
+      with data as (
+        select
+          _hash as business_key
+          ,case when lead(last_update_date) over(partition by business_key order by last_update_date) is null then 1 end as latest
+          ,*
+        from REALTIME.PRODUCT_TOC_METADATA
+      )
+      select *
+      from data
+      where latest = 1
+      order by source_system, product_code
+      ;;
+
+      datagroup_trigger: realtime_default_datagroup
+  }
+
+  dimension: business_key {
+    type: string
+    hidden: yes
+    primary_key: yes
+  }
 
   dimension_group: _ldts {
     type: time

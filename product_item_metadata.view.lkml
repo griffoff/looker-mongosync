@@ -1,5 +1,28 @@
 view: product_item_metadata {
-  sql_table_name: REALTIME.PRODUCT_ITEM_METADATA ;;
+#   sql_table_name: REALTIME.PRODUCT_ITEM_METADATA ;;
+  derived_table: {
+    sql:
+      with data as (
+        select
+          _hash as business_key
+          ,case when lead(last_update_date) over(partition by business_key order by last_update_date) is null then 1 end as latest
+          ,*
+        from REALTIME.PRODUCT_ITEM_METADATA
+      )
+      select *
+      from data
+      where latest = 1
+      order by item_id, item_uri
+      ;;
+
+      datagroup_trigger: realtime_default_datagroup
+    }
+
+  dimension: business_key {
+    type: string
+    hidden: yes
+    primary_key: yes
+  }
 
   dimension_group: _ldts {
     type: time

@@ -4,8 +4,7 @@ view: node_summary {
 #     sql:
 #       with data as (
 #         select
-#           hash(activity_node_uri) as business_key
-#           ,hash(activity_node_uri, last_update_date) as primary_key
+#           _hash as business_key
 #           ,case when lead(last_update_date) over(partition by business_key order by last_update_date) is null then 1 end as latest
 #           ,*
 #         from realtime.node_summary
@@ -19,7 +18,7 @@ view: node_summary {
 #     datagroup_trigger: realtime_default_datagroup
 #   }
 
-  dimension: primary_key {
+  dimension: business_key {
     type: string
     sql:  ${hash};;
     hidden: yes

@@ -4,8 +4,7 @@ view: course_activity_group {
     sql:
       with data as (
         select
-          hash(course_uri, activity_group_uri) as business_key
-          ,hash(course_uri, activity_group_uri, last_update_date) as primary_key
+          _hash as business_key
           ,case when lead(last_update_date) over(partition by business_key order by last_update_date) is null then 1 end as latest
           ,*
         from realtime.course_activity_group
@@ -19,7 +18,7 @@ view: course_activity_group {
       datagroup_trigger: realtime_default_datagroup
   }
 
-  dimension: primary_key {
+  dimension: business_key {
     type: string
     hidden: yes
     primary_key: yes
