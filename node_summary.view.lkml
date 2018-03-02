@@ -1,26 +1,27 @@
 view: node_summary {
-  #sql_table_name: REALTIME.NODE_SUMMARY ;;
-  derived_table: {
-    sql:
-      with data as (
-        select
-          hash(activity_node_uri) as business_key
-          ,hash(activity_node_uri, last_update_date) as primary_key
-          ,case when lead(last_update_date) over(partition by business_key order by last_update_date) is null then 1 end as latest
-          ,*
-        from realtime.node_summary
-      )
-      select *
-      from data
-      where latest = 1
-      order by activity_node_uri
-      ;;
-
-    datagroup_trigger: realtime_default_datagroup
-  }
+  sql_table_name: REALTIME.NODE_SUMMARY ;;
+#   derived_table: {
+#     sql:
+#       with data as (
+#         select
+#           hash(activity_node_uri) as business_key
+#           ,hash(activity_node_uri, last_update_date) as primary_key
+#           ,case when lead(last_update_date) over(partition by business_key order by last_update_date) is null then 1 end as latest
+#           ,*
+#         from realtime.node_summary
+#       )
+#       select *
+#       from data
+#       where latest = 1
+#       order by activity_node_uri
+#       ;;
+#
+#     datagroup_trigger: realtime_default_datagroup
+#   }
 
   dimension: primary_key {
     type: string
+    sql:  ${hash};;
     hidden: yes
     primary_key: yes
   }
@@ -224,6 +225,16 @@ view: node_summary {
   dimension: total_take_count {
     type: number
     sql: ${TABLE}.TOTAL_TAKE_COUNT ;;
+  }
+
+  measure: total_take_count_sum {
+    type: sum
+    sql: ${total_take_count} ;;
+  }
+
+  measure: total_take_count_avg {
+    type: average
+    sql: ${total_take_count} ;;
   }
 
   dimension: tried_summary {
