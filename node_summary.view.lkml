@@ -1,26 +1,25 @@
 view: node_summary {
-  sql_table_name: REALTIME.NODE_SUMMARY ;;
-#   derived_table: {
-#     sql:
-#       with data as (
-#         select
-#           _hash as business_key
-#           ,case when lead(last_update_date) over(partition by business_key order by last_update_date) is null then 1 end as latest
-#           ,*
-#         from realtime.node_summary
-#       )
-#       select *
-#       from data
-#       where latest = 1
-#       order by activity_node_uri
-#       ;;
-#
-#     datagroup_trigger: realtime_default_datagroup
-#   }
+#   sql_table_name: REALTIME.NODE_SUMMARY ;;
+  derived_table: {
+    sql:
+      with data as (
+        select
+          hash as business_key
+          ,case when lead(last_update_date) over(partition by business_key order by last_update_date) is null then 1 end as latest
+          ,*
+        from realtime.node_summary
+      )
+      select *
+      from data
+      where latest = 1
+      order by activity_node_uri
+      ;;
+
+    datagroup_trigger: realtime_default_datagroup
+  }
 
   dimension: business_key {
     type: string
-    sql:  ${hash};;
     hidden: yes
     primary_key: yes
   }
@@ -81,6 +80,18 @@ view: node_summary {
   dimension: hash {
     type: string
     sql: ${TABLE}.HASH ;;
+  }
+
+  dimension_group: batch_key_date {
+    type: time
+    timeframes: [
+      raw,
+      week,
+      month,
+      quarter,
+      year
+    ]
+    sql: ${TABLE}.batch_key_date ;;
   }
 
   dimension_group: last_update {
