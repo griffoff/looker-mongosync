@@ -54,9 +54,25 @@ explore: course {
   extends: [dim_course, product_item_metadata, course_activity]
 
   join: dim_course {
-    relationship: many_to_one
     sql_on: ${course.course_key} = ${dim_course.coursekey} ;;
+    relationship: one_to_one
   }
+
+#   join: take_node {
+#     sql_on: ${course.course_uri} = ${take_node.course_uri};;
+#     relationship: one_to_many
+#   }
+#
+#   join: course_activity {
+#     sql_on: (${take_node.course_uri}, ${take_node.activity_uri}) = (${course_activity.course_uri}, ${course_activity.activity_uri}) ;;
+#     relationship: many_to_one
+#   }
+#
+#   join: course_enrollment{
+#     sql_on: (${take_node.course_uri}, ${take_node.user_identifier}) = (${course_enrollment.course_uri}, ${course_enrollment.user_identifier}) ;;
+#     relationship: many_to_one
+#   }
+
 
   join: course_activity {
     sql_on: ${course.course_uri} = ${course_activity.course_uri} ;;
@@ -115,4 +131,25 @@ explore: node_summary {
 
 explore: take_node {
   label: "All Take Nodes"
+  extends: [dim_course]
+
+  join: course {
+    relationship: many_to_one
+    sql_on: ${take_node.course_uri} = ${course.course_uri} ;;
+  }
+
+  join: dim_course {
+    sql_on: ${course.course_key} = ${dim_course.coursekey} ;;
+    relationship: one_to_one
+  }
+
+  join: course_activity {
+    sql_on: (${take_node.course_uri}, ${take_node.activity_uri}) = (${course_activity.course_uri}, ${course_activity.activity_uri}) ;;
+    relationship: one_to_many
+  }
+
+  join: course_enrollment{
+    sql_on: (${take_node.course_uri}, ${take_node.user_identifier}) = (${course_enrollment.course_uri}, ${course_enrollment.user_identifier}) ;;
+    relationship: many_to_one
+  }
 }

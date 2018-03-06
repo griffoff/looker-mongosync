@@ -7,12 +7,13 @@ view: take_node {
           "HASH" as business_key
           ,case when lead(last_update_date) over(partition by business_key order by last_update_date) is null then 1 end as latest
           ,*
+          ,split_part(COURSE_URI, ':', -1)::string as course_key
         from realtime.take_node
       )
       select *
       from data
       where latest = 1
-      order by course_uri, activity_uri, activity_node_uri, user_identifier
+      order by course_uri, activity_uri, user_identifier, activity_node_uri
     ;;
 
       datagroup_trigger: realtime_default_datagroup
@@ -80,7 +81,7 @@ view: take_node {
 
   dimension: course_key {
     type: string
-    sql: split_part(${TABLE}.COURSE_URI, ':', -1)::string ;;
+    #sql: split_part(${TABLE}.COURSE_URI, ':', -1)::string ;;
   }
 
   dimension: external_take_uri {
@@ -129,7 +130,7 @@ view: take_node {
     group_label: "Final Grade"
     label: "Score (Buckets)"
     type: tier
-    tiers: [0.25, 0.5, 0.75, 0.9]
+    tiers: [0.1, 0.25, 0.4, 0.6, 0.75, 0.9, 0.95]
     style: relational
     sql: ${final_grade_score} ;;
     value_format_name: percent_1
