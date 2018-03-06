@@ -57,6 +57,11 @@ view: take_node {
   dimension: activity_node_uri {
     type: string
     sql: ${TABLE}.ACTIVITY_NODE_URI ;;
+    link: {
+      label: "Scores Across Discipline"
+#       url: "/explore/realtime/take_node?fields=take_node.count,take_node.final_grade_score_avg, dim_product,discipline&f[take_node.activity_node_uri]={{ value }}"#
+      url: "/looks/1882?f[take_node.activity_node_uri]={{ value }}"
+    }
   }
 
   dimension: activity_type_uri {
