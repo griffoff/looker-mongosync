@@ -1,6 +1,7 @@
 connection: "snowflake_int"
 
 include: "/core/common.lkml"
+include: "/cube/dims.model.lkml"
 
 # include all the views
 include: "*.view"
@@ -50,7 +51,12 @@ explore: course_activity {
 }
 
 explore: course {
-  extends: [product_item_metadata, course_activity]
+  extends: [dim_course, product_item_metadata, course_activity]
+
+  join: dim_course {
+    relationship: many_to_one
+    sql_on: ${course.course_key} = ${dim_course.coursekey} ;;
+  }
 
   join: course_activity {
     sql_on: ${course.course_uri} = ${course_activity.course_uri} ;;
@@ -76,23 +82,27 @@ explore: course {
 }
 
 explore: product_toc_metadata {
-  extends: [product_item_metadata]
+  extends: [product_item_metadata, dim_product]
   label: "CXP Item Analysis"
   join: product_item_metadata {
     sql_on: (${product_toc_metadata.source_system}, ${product_toc_metadata.product_code})
-        = (${product_item_metadata.product_code}, ${product_item_metadata.product_code})
+        = (${product_item_metadata.source_system}, ${product_item_metadata.product_code})
           ;;
     relationship: one_to_many
   }
+  join: dim_product {
+    sql_on: ${product_toc_metadata.isbn} = ${dim_product.isbn13} ;;
+    relationship: many_to_one
+  }
   join: product_activity_metadata {
     sql_on: (${product_toc_metadata.source_system}, ${product_toc_metadata.product_code})
-        = (${product_activity_metadata.product_code}, ${product_activity_metadata.product_code})
+        = (${product_activity_metadata.source_system}, ${product_activity_metadata.product_code})
           ;;
     relationship: one_to_many
   }
   join: product_mastery_group {
     sql_on: (${product_toc_metadata.source_system}, ${product_toc_metadata.product_code})
-        = (${product_mastery_group.product_code}, ${product_mastery_group.product_code})
+        = (${product_mastery_group.source_system}, ${product_mastery_group.product_code})
           ;;
     relationship: one_to_many
   }

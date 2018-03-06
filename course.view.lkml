@@ -48,6 +48,11 @@ view: course {
     sql: ${TABLE}.COURSE_URI ;;
   }
 
+  dimension: course_key {
+    type: string
+    sql: split_part(${course_uri}, ':', -1) ;;
+  }
+
   dimension_group: end {
     type: time
     timeframes: [

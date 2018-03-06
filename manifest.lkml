@@ -6,3 +6,6 @@ project_name: "mongo_sync"
 local_dependency: {
    project: "core"
  }
+local_dependency: {
+  project: "cube"
+}
