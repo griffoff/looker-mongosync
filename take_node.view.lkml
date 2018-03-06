@@ -78,6 +78,11 @@ view: take_node {
     sql: ${TABLE}.COURSE_URI ;;
   }
 
+  dimension: course_key {
+    type: string
+    sql: split_part(${TABLE}.COURSE_URI, ':', -1)::string ;;
+  }
+
   dimension: external_take_uri {
     type: string
     sql: ${TABLE}.EXTERNAL_TAKE_URI ;;
@@ -118,6 +123,17 @@ view: take_node {
     type: number
     sql: ${final_grade}:normalScore::float ;;
     value_format_name: percent_1
+  }
+
+  dimension: final_grade_score_tiers {
+    group_label: "Final Grade"
+    label: "Score (Buckets)"
+    type: tier
+    tiers: [0.25, 0.5, 0.75, 0.9]
+    style: relational
+    sql: ${final_grade_score} ;;
+    value_format_name: percent_1
+
   }
 
   measure: final_grade_score_avg {
@@ -217,4 +233,21 @@ view: take_node {
     type: count
     drill_fields: []
   }
+
+  measure: course_count {
+    type: count_distinct
+    sql: ${course_uri} ;;
+  }
+
+  measure: courses_with_takes {
+    type: count_distinct
+    sql: case when ${final_grade_taken} then ${course_uri} end ;;
+  }
+
+  measure: courses_with_takes_percent {
+    type: number
+    sql: ${courses_with_takes}/nullif(${course_count}, 0) ;;
+    value_format_name: percent_1
+  }
+
 }
