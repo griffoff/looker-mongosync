@@ -17,7 +17,10 @@ view: take_node {
     ;;
 
       datagroup_trigger: realtime_default_datagroup
-    }
+  }
+
+  set: course_details {fields:[course_uri]}
+  set: details {fields:[_rsrc, _ldts_time, course_details*, user_identifier, activity_uri, activity_node_uri, submission_time, activity_grade, interaction_grade, final_grade]}
 
   dimension: business_key {
     type: string
@@ -235,25 +238,40 @@ view: take_node {
     sql: ${TABLE}.USER_IDENTIFIER ;;
   }
 
+  measure: times_taken {
+    label: "# times taken"
+    type: number
+    sql: count(case when ${final_grade_taken} then 1 end);;
+    drill_fields: [details*]
+  }
+
   measure: count {
     type: count
-    drill_fields: []
+    drill_fields: [details*]
   }
 
   measure: course_count {
+    label: "# courses"
     type: count_distinct
     sql: ${course_uri} ;;
+    drill_fields: [course_details*]
   }
 
   measure: courses_with_takes {
+    group_label: "Instructor usage"
+    label: "# times assigned"
     type: count_distinct
     sql: case when ${final_grade_taken} then ${course_uri} end ;;
+    drill_fields: [course_details*]
   }
 
   measure: courses_with_takes_percent {
+    group_label: "Instructor usage"
+    label: "% times assigned"
     type: number
     sql: ${courses_with_takes}/nullif(${course_count}, 0) ;;
     value_format_name: percent_1
+    drill_fields: [course_details*]
   }
 
 }
