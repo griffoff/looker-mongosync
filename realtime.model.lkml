@@ -1,4 +1,4 @@
-connection: "snowflake_int"
+connection: "snowflake_prod"
 
 include: "/core/common.lkml"
 include: "/cube/dims.model.lkml"
