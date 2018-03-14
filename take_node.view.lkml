@@ -134,6 +134,13 @@ view: take_node {
     value_format_name: percent_1
   }
 
+  dimension: final_grade_is_correct {
+    group_label: "Final Grade"
+    label: "Correct?"
+    type: yesno
+    sql: case when ${possible_score} <= 1 then ${final_grade_score} = ${possible_score} end ;;
+  }
+
   dimension: final_grade_score_tiers {
     group_label: "Final Grade"
     label: "Score (Buckets)"
@@ -143,6 +150,14 @@ view: take_node {
     sql: ${final_grade_score} ;;
     value_format_name: percent_1
 
+  }
+
+  measure: final_grade_correct_percent {
+    group_label: "Final Grade"
+    label: "Correct (%)"
+    type: number
+    sql: count(case when ${possible_score} <= 1 and ${final_grade_score} = ${possible_score} then 1 end) / nullif(count(case when ${possible_score} <= 1 then 1 end), 0) ;;
+    value_format_name: percent_1
   }
 
   measure: final_grade_score_avg {
@@ -239,19 +254,27 @@ view: take_node {
   }
 
   measure: times_taken {
-    label: "# times taken"
+    label: "# Times taken"
     type: number
     sql: count(case when ${final_grade_taken} then 1 end);;
     drill_fields: [details*]
   }
 
+  measure: users_taken {
+    label: "# Users taken"
+    type: count_distinct
+    sql: ${user_identifier};;
+    drill_fields: [details*]
+  }
+
   measure: count {
+    label: "# Takes"
     type: count
     drill_fields: [details*]
   }
 
   measure: course_count {
-    label: "# courses"
+    label: "# Courses"
     type: count_distinct
     sql: ${course_uri} ;;
     drill_fields: [course_details*]
