@@ -126,7 +126,8 @@ explore: product_toc_metadata {
 }
 
 explore: node_summary {
-  label: "All Items (including CXP)"
+  label: "Weekly Item Summery"
+  description: "This contains all 'nodes' from realtime, including, items, mastery groups and activities"
 }
 
 explore: take_node {
