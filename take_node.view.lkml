@@ -4,7 +4,7 @@ view: take_node {
     sql:
       with data as (
         select
-          "HASH" as business_key
+          hash as business_key
           ,case when lead(last_update_date) over(partition by business_key order by last_update_date) is null then 1 end as latest
           ,*
           ,split_part(COURSE_URI, ':', -1)::string as course_key
