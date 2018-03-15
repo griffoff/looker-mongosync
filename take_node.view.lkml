@@ -98,13 +98,35 @@ view: take_node {
   }
 
   dimension: external_take_uri {
+    group_label: "External Take Uri"
     type: string
     sql: ${TABLE}.EXTERNAL_TAKE_URI ;;
   }
 
   dimension: activity_system {
+    group_label: "External Take Uri"
     type: string
-    sql:  split_part(${TABLE}.EXTERNAL_TAKE_URI, ':', 1)::string ;;
+    sql:  split_part(${external_take_uri}, ':', 1)::string ;;
+  }
+
+  dimension: activity_product_section {
+    group_label: "External Take Uri"
+    type: string
+    sql:  split_part(${external_take_uri}, ':', -1)::string ;;
+    hidden: yes
+  }
+
+  dimension: activity_product_abbr {
+    group_label: "External Take Uri"
+    type: string
+    sql:  split_part(${activity_product_section}, '/', 1)::string ;;
+    hidden: yes
+  }
+
+  dimension: activity_section_id {
+    group_label: "External Take Uri"
+    type: string
+    sql:  split_part(${activity_product_section}, '/', -1)::string ;;
   }
 
   dimension: final_grade {
