@@ -153,4 +153,9 @@ explore: take_node {
     sql_on: (${take_node.course_uri}, ${take_node.user_identifier}) = (${course_enrollment.course_uri}, ${course_enrollment.user_identifier}) ;;
     relationship: many_to_one
   }
+
+  join: product_activity_metadata {
+    sql_on: (${take_node.activity_product_abbr}, ${take_node.activity_section_id}) = (${product_activity_metadata.product_code}, ${product_activity_metadata.item_id}) ;;
+    relationship: many_to_one
+  }
 }
