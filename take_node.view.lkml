@@ -77,6 +77,11 @@ view: take_node {
     sql: ${TABLE}.ACTIVITY_URI ;;
   }
 
+  dimension: cnowmindapp  {
+    type: yesno
+    sql:  ${TABLE}.ACTIVITY_URI LIKE 'cnow:assignment:/inst/MindApps/%'::string ;;
+  }
+
   dimension: assignable_content_uri {
     type: string
     sql: ${TABLE}.ASSIGNABLE_CONTENT_URI ;;
