@@ -58,6 +58,7 @@ view: take_node {
   }
 
   dimension: activity_node_uri {
+    group_label: "Activity Node Uri"
     type: string
     sql: ${TABLE}.ACTIVITY_NODE_URI ;;
     link: {
@@ -65,6 +66,24 @@ view: take_node {
 #       url: "/explore/realtime/take_node?fields=take_node.count,take_node.final_grade_score_avg, dim_product,discipline&f[take_node.activity_node_uri]={{ value }}"#
       url: "/looks/1882?f[take_node.activity_node_uri]={{ value }}"
     }
+  }
+
+  dimension: activity_node_product_abbr {
+    group_label: "Assignable Content Uri"
+    type: string
+    sql:  split_part(${activity_node_uri}, ':', -2)::string ;;
+  }
+
+  dimension: activity_node_product_section_id {
+    group_label: "Activity Node Uri"
+    type: string
+    sql:  split_part(${activity_node_uri}, ':', -1)::string ;;
+  }
+
+  measure: activity_node_uri_example {
+    group_label: "Activity Node Uri"
+    type: string
+    sql: any_value(${activity_node_uri}) ;;
   }
 
   dimension: activity_type_uri {
@@ -111,6 +130,16 @@ view: take_node {
     group_label: "Assignable Content Uri"
     type: string
     sql:  split_part(${assignable_content_product_section}, '/', -1)::string ;;
+  }
+
+  dimension: product_code {
+    group_label: "geyser identifiers"
+    sql: coalesce(${assignable_content_product_abbr}, ${activity_node_product_abbr}) ;;
+  }
+
+  dimension: item_id {
+    group_label: "geyser identifiers"
+    sql: coalesce(${assignable_content_product_section_id}, ${activity_node_product_section_id}) ;;
   }
 
   dimension: course_uri {
