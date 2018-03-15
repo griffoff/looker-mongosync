@@ -26,6 +26,15 @@ explore: product_item_metadata {
   }
 }
 
+explore: take_node {
+  extension: required
+
+  join: product_activity_metadata {
+    sql_on: (${take_node.assignable_content_product_abbr}, ${take_node.assignable_content_product_section_id}) = (${product_activity_metadata.product_code}, ${product_activity_metadata.item_id}) ;;
+    relationship: many_to_one
+  }
+}
+
 explore: course_activity {
   extension: required
 # this is the way to do it without persisting course_activity_groups, there is a bug in snowflake that makes this fail currently
@@ -51,7 +60,7 @@ explore: course_activity {
 }
 
 explore: course {
-  extends: [dim_course, product_item_metadata, course_activity]
+  extends: [dim_course, product_item_metadata, course_activity, take_node]
 
   join: dim_course {
     sql_on: ${course.course_key} = ${dim_course.coursekey} ;;
@@ -130,9 +139,11 @@ explore: node_summary {
   description: "This contains all 'nodes' from realtime, including, items, mastery groups and activities"
 }
 
-explore: take_node {
+explore: all_take_nodes {
+  from: take_node
+  view_name: take_node
   label: "All Take Nodes"
-  extends: [dim_course]
+  extends: [dim_course, take_node]
 
   join: course {
     relationship: many_to_one
@@ -154,8 +165,4 @@ explore: take_node {
     relationship: many_to_one
   }
 
-  join: product_activity_metadata {
-    sql_on: (${take_node.activity_product_abbr}, ${take_node.activity_section_id}) = (${product_activity_metadata.product_code}, ${product_activity_metadata.item_id}) ;;
-    relationship: many_to_one
-  }
 }

@@ -83,8 +83,34 @@ view: take_node {
   }
 
   dimension: assignable_content_uri {
+    group_label: "Assignable Content Uri"
     type: string
     sql: ${TABLE}.ASSIGNABLE_CONTENT_URI ;;
+  }
+
+  measure: assignable_content_uri_example {
+    group_label: "Assignable Content Uri"
+    type: string
+    sql: any_value(${assignable_content_uri}) ;;
+  }
+
+  dimension: assignable_content_product_section {
+    group_label: "Assignable Content Uri"
+    type: string
+    sql:  split_part(${assignable_content_uri}, ':', -1)::string ;;
+    hidden: yes
+  }
+
+  dimension: assignable_content_product_abbr {
+    group_label: "Assignable Content Uri"
+    type: string
+    sql:  split_part(${assignable_content_product_section}, '/', 1)::string ;;
+  }
+
+  dimension: assignable_content_product_section_id {
+    group_label: "Assignable Content Uri"
+    type: string
+    sql:  split_part(${assignable_content_product_section}, '/', -1)::string ;;
   }
 
   dimension: course_uri {
@@ -107,26 +133,6 @@ view: take_node {
     group_label: "External Take Uri"
     type: string
     sql:  split_part(${external_take_uri}, ':', 1)::string ;;
-  }
-
-  dimension: activity_product_section {
-    group_label: "External Take Uri"
-    type: string
-    sql:  split_part(${external_take_uri}, ':', -1)::string ;;
-    hidden: yes
-  }
-
-  dimension: activity_product_abbr {
-    group_label: "External Take Uri"
-    type: string
-    sql:  split_part(${activity_product_section}, '/', 1)::string ;;
-    hidden: yes
-  }
-
-  dimension: activity_section_id {
-    group_label: "External Take Uri"
-    type: string
-    sql:  split_part(${activity_product_section}, '/', -1)::string ;;
   }
 
   dimension: final_grade {
