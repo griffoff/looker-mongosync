@@ -97,6 +97,11 @@ view: take_node {
     sql: ${TABLE}.EXTERNAL_TAKE_URI ;;
   }
 
+  dimension: activity_system {
+    type: string
+    sql:  split_part(${TABLE}.EXTERNAL_TAKE_URI, ':', 1)::string ;;
+  }
+
   dimension: final_grade {
     group_label: "Final Grade"
     label: "Raw JSON"
