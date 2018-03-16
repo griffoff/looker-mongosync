@@ -68,16 +68,36 @@ view: take_node {
     }
   }
 
-  dimension: activity_node_product_abbr {
-    group_label: "Assignable Content Uri"
+  dimension: activity_node_system {
+    group_label: "Activity Node Uri"
     type: string
-    sql:  split_part(${activity_node_uri}, ':', -2)::string ;;
+    sql:  split_part(${activity_node_uri}, ':', 1)::string;;
+  }
+
+  dimension: activity_node_product_section_cxp {
+    group_label: "Activity Node Uri"
+    type: string
+    sql: split_part(${activity_node_uri}, ':', 3)::string;;
+    hidden: yes
+  }
+
+  dimension: activity_node_product_abbr {
+    group_label: "Activity Node Uri"
+    type: string
+    sql:  case ${activity_node_system}
+      --cnow:item:/book/ell5bms15h/itemid/75003942
+              when 'cnow' then iff(${activity_node_uri} like 'cnow:item:%', split_part(${activity_node_uri}, '/', 3), NULL)
+              when 'cxp' then split_part(${activity_node_product_section_cxp}, '-', 1)
+              end::string;;
   }
 
   dimension: activity_node_product_section_id {
     group_label: "Activity Node Uri"
     type: string
-    sql:  split_part(${activity_node_uri}, ':', -1)::string ;;
+    sql:  case ${activity_node_system}
+            when 'cnow' then split_part(${activity_node_uri}, '/', -1)
+            when 'cxp' then split_part(${activity_node_product_section_cxp}, '-', 2)
+            end ::string;;
   }
 
   measure: activity_node_uri_example {
@@ -113,24 +133,35 @@ view: take_node {
     sql: any_value(${assignable_content_uri}) ;;
   }
 
-  dimension: assignable_content_product_section {
+  dimension: assignable_content_product_section_imilac {
     group_label: "Assignable Content Uri"
     type: string
-    sql:  split_part(${assignable_content_uri}, ':', -1)::string ;;
+    sql: split_part(${assignable_content_uri}, ':', -1)::string;;
     hidden: yes
   }
 
   dimension: assignable_content_product_abbr {
     group_label: "Assignable Content Uri"
     type: string
-    sql:  split_part(${assignable_content_product_section}, '/', 1)::string ;;
+    #cnow:activity:als:/cengage:book:abbr/waac25l/section/162493553
+    sql: case
+            when ${assignable_content_uri} like 'cnow:activity:als:%'
+            then split_part(${assignable_content_uri}, '/', -3)
+            when ${assignable_content_uri} like 'imilac:%'
+            then split_part(${assignable_content_product_section_imilac}, '/', 1)
+            end ::string ;;
+
   }
 
   dimension: assignable_content_product_section_id {
     group_label: "Assignable Content Uri"
     type: string
-    sql:  split_part(${assignable_content_product_section}, '/', -1)::string ;;
-  }
+    sql:   case
+          when ${assignable_content_uri} like 'cnow:activity:als:%' or ${assignable_content_uri} like 'imilac:%'
+          then split_part(${assignable_content_uri}, '/', -1)
+          end ::string ;;
+
+    }
 
   dimension: product_code {
     group_label: "geyser identifiers"
