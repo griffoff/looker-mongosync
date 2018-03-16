@@ -72,32 +72,70 @@ view: take_node {
     group_label: "Activity Node Uri"
     type: string
     sql:  split_part(${activity_node_uri}, ':', 1)::string;;
-  }
-
-  dimension: activity_node_product_section_cxp {
-    group_label: "Activity Node Uri"
-    type: string
-    sql: split_part(${activity_node_uri}, ':', 3)::string;;
     hidden: yes
   }
 
-  dimension: activity_node_product_abbr {
+  #--cxp:activity:masterygroup, 4 parts, -1=cgi
+  #--cxp:activity, 3 parts, 2=book, -1=itemid
+  #--cxp: 4 parts, 2+3, 4 assetid
+
+  dimension: activity_node_product_code {
     group_label: "Activity Node Uri"
     type: string
-    sql:  case ${activity_node_system}
-      --cnow:item:/book/ell5bms15h/itemid/75003942
-              when 'cnow' then iff(${activity_node_uri} like 'cnow:item:%', split_part(${activity_node_uri}, '/', 3), NULL)
-              when 'cxp' then split_part(${activity_node_product_section_cxp}, '-', 1)
+    sql:  case
+              when ${activity}
+                then null
+              when ${activity_node_uri} like 'cxp:activity:masterygroup:%'
+                then null
+              when ${activity_node_uri} like 'cxp:%'
+                then
+                  case
+                    when ${activity_node_uri} like 'cxp:activity:%'
+                      then
+                        case array_size(split(${activity_node_uri},':'))
+                          when 3
+                            then split_part(replace(split_part(${activity_node_uri}, ':', 2), '-', '/'), '/', 1)
+                          when 4
+                            then array_to_string(array_slice(split(${activity_node_uri}, ':'), 1, 2), ':')
+                          end
+                    else split_part(${activity_node_uri}, ':', 2)
+                    end
+              --cnow:item:/book/ell5bms15h/itemid/75003942
+              when ${activity_node_uri} like 'cnow:item:%'
+                then split_part(${activity_node_uri}, '/', 3)
+              when ${activity_node_uri} like 'imilac:%'
+                then split_part(${activity_node_uri}, ':', 2)
               end::string;;
+#sql: 'test' ;;
   }
 
-  dimension: activity_node_product_section_id {
+  dimension: activity_node_item_id {
     group_label: "Activity Node Uri"
     type: string
-    sql:  case ${activity_node_system}
-            when 'cnow' then split_part(${activity_node_uri}, '/', -1)
-            when 'cxp' then split_part(${activity_node_product_section_cxp}, '-', 2)
-            end ::string;;
+    sql:  case
+              when ${activity}
+                then null
+              when ${activity_node_uri} like 'cxp:activity:masterygroup:%'
+                then null
+             when ${activity_node_uri} like 'cxp:%'
+                then
+                  case
+                    when ${activity_node_uri} like 'cxp:activity:%'
+                      then
+                        case array_size(split(${activity_node_uri},':'))
+                          when 3
+                            then split_part(replace(split_part(${activity_node_uri}, ':', 2), '-', '/'), '/', -1)
+                          when 4
+                            then null
+                        end
+                    else split_part(${activity_node_uri}, ':', -1)
+                  end
+              when ${activity_node_uri} like 'cnow:item:%'
+                then split_part(${activity_node_uri}, '/', -1)
+              when ${activity_node_uri} like 'imilac:%'
+                then split_part(${activity_node_uri}, ':', -1)
+              end::string;;
+#     sql: 1 ;;
   }
 
   measure: activity_node_uri_example {
@@ -165,12 +203,17 @@ view: take_node {
 
   dimension: product_code {
     group_label: "geyser identifiers"
-    sql: coalesce(${assignable_content_product_abbr}, ${activity_node_product_abbr}) ;;
+    sql: coalesce(${activity_node_product_code}, ${assignable_content_product_abbr}) ;;
   }
 
   dimension: item_id {
     group_label: "geyser identifiers"
-    sql: coalesce(${assignable_content_product_section_id}, ${activity_node_product_section_id}) ;;
+    sql: ${activity_node_item_id} ;;
+  }
+
+  dimension: section_id {
+    group_label: "geyser identifiers"
+    sql: ${assignable_content_product_section_id} ;;
   }
 
   dimension: course_uri {

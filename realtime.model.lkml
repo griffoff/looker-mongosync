@@ -30,7 +30,7 @@ explore: take_node {
   extension: required
 
   join: product_activity_metadata {
-    sql_on: (${take_node.product_code}, ${take_node.item_id}) = (${product_activity_metadata.product_code}, ${product_activity_metadata.item_id}) ;;
+    sql_on: (${take_node.product_code}, ${take_node.section_id}) = (${product_activity_metadata.product_code}, ${product_activity_metadata.item_id}) ;;
     relationship: many_to_one
   }
 }
