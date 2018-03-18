@@ -108,7 +108,7 @@ explore: course {
 
 explore: product_toc_metadata {
   extends: [product_item_metadata, dim_product]
-  label: "CXP Item Analysis"
+  label: "CXP Content Service"
   join: product_item_metadata {
     sql_on: (${product_toc_metadata.source_system}, ${product_toc_metadata.product_code})
         = (${product_item_metadata.source_system}, ${product_item_metadata.product_code})
@@ -131,18 +131,18 @@ explore: product_toc_metadata {
           ;;
     relationship: one_to_many
   }
-
 }
 
 explore: node_summary {
   label: "Weekly Item Summery"
-  description: "This contains all 'nodes' from realtime, including, items, mastery groups and activities"
+  description: "This contains all 'nodes' from realtime, including, items, mastery groups and activities, summerized into per week usage."
 }
 
 explore: all_take_nodes {
   from: take_node
   view_name: take_node
   label: "All Take Nodes"
+  description: "All taken 'nodes' linked back to course information and to content books."
   extends: [dim_course, take_node]
 
   join: course {
@@ -162,6 +162,21 @@ explore: all_take_nodes {
 
   join: course_enrollment{
     sql_on: (${take_node.course_uri}, ${take_node.user_identifier}) = (${course_enrollment.course_uri}, ${course_enrollment.user_identifier}) ;;
+    relationship: many_to_one
+  }
+
+  join: product_toc_metadata {
+    sql_on: (${take_node.product_code}) = (${product_toc_metadata.product_code}) ;;
+    relationship: many_to_one
+  }
+
+  join: product_activity_metadata {
+    sql_on: (${take_node.product_code}, ${take_node.assignable_content_product_section_id}) = (${product_activity_metadata.product_code}, ${product_activity_metadata.item_id}) ;;
+    relationship: many_to_one
+  }
+
+  join: product_item_metadata {
+    sql_on: (${take_node.product_code}, ${take_node.item_id}) = (${product_item_metadata.product_code}, ${product_item_metadata.item_id}) ;;
     relationship: many_to_one
   }
 
