@@ -72,7 +72,11 @@ view: take_node {
     group_label: "Activity Node Uri"
     label: "Activity Platform"
     type: string
-    sql:  split_part(${activity_node_uri}, ':', 1)::string;;
+    sql:  case
+            when array_size(split(${activity_node_uri}, ':')) = 1
+              then 'UNKNOWN'
+            else split_part(${activity_node_uri}, ':', 1)::string
+          end;;
     hidden: no
   }
 
