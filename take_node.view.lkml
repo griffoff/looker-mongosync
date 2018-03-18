@@ -320,7 +320,7 @@ view: take_node {
     style: relational
     sql: ${final_grade_score} ;;
     value_format_name: percent_1
-
+    drill_fields: [details*]
   }
 
   measure: final_grade_correct_percent {
@@ -329,6 +329,7 @@ view: take_node {
     type: number
     sql: count(case when ${possible_score} <= 1 and ${final_grade_score} = ${possible_score} then 1 end) / nullif(count(case when ${possible_score} <= 1 then 1 end), 0) ;;
     value_format_name: percent_1
+    drill_fields: [details*]
   }
 
   measure: final_grade_score_avg {
@@ -337,6 +338,7 @@ view: take_node {
     type: average
     sql: ${final_grade_score} ;;
     value_format_name: percent_1
+    drill_fields: [details*]
   }
 
   measure: final_grade_score_min {
@@ -345,6 +347,7 @@ view: take_node {
     type: min
     sql: ${final_grade_score} ;;
     value_format_name: percent_1
+    drill_fields: [details*]
   }
 
   measure: final_grade_score_max {
@@ -353,6 +356,7 @@ view: take_node {
     type: max
     sql: ${final_grade_score} ;;
     value_format_name: percent_1
+    drill_fields: [details*]
   }
 
   measure: final_grade_score_sd {
@@ -361,6 +365,7 @@ view: take_node {
     type: number
     sql: stdev( ${final_grade_score}) ;;
     value_format_name: percent_1
+    drill_fields: [details*]
   }
 
   measure: final_grade_timespent_avg {
@@ -369,6 +374,7 @@ view: take_node {
     type: average
     sql: ${final_grade_timespent};;
     value_format_name: duration_hms
+    drill_fields: [details*]
   }
 
   dimension: hash {
@@ -422,6 +428,7 @@ view: take_node {
   measure: latest_submission_date {
     type: max
     sql: ${submission_raw} ;;
+    drill_fields: [details*]
   }
 
   dimension: user_identifier {
