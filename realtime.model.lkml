@@ -72,22 +72,6 @@ explore: course {
     relationship: one_to_one
   }
 
-#   join: take_node {
-#     sql_on: ${course.course_uri} = ${take_node.course_uri};;
-#     relationship: one_to_many
-#   }
-#
-#   join: course_activity {
-#     sql_on: (${take_node.course_uri}, ${take_node.activity_uri}) = (${course_activity.course_uri}, ${course_activity.activity_uri}) ;;
-#     relationship: many_to_one
-#   }
-#
-#   join: course_enrollment{
-#     sql_on: (${take_node.course_uri}, ${take_node.user_identifier}) = (${course_enrollment.course_uri}, ${course_enrollment.user_identifier}) ;;
-#     relationship: many_to_one
-#   }
-
-
   join: course_activity {
     sql_on: ${course.course_uri} = ${course_activity.course_uri} ;;
     relationship: one_to_many
