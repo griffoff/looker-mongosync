@@ -116,8 +116,9 @@ view: take_node {
               when ${activity_node_uri} like 'mindtap:item:/book%'
                   or ${activity_node_uri} like 'cnow:alsnode:/book%'
                 then split_part(${activity_node_uri}, '/', 3)
-              when ${activity_node_uri} like 'imilac:%'
-                then split_part(${activity_node_uri}, ':', 2)
+                --imilac:likert:question:daftsaaum09l/qLeadershipBeliefs_question_7
+              when ${activity_node_uri} like 'imilac:likert:%'
+                then split_part(split_part(${activity_node_uri}, ':', 4), '/', 1)
               end::string;;
 #sql: 'test' ;;
   }
@@ -149,8 +150,8 @@ view: take_node {
               when ${activity_node_uri} like 'mindtap:item:/book%'
                 --or ${activity_node_uri} like 'cnow:alsnode:/book%' --section id
                 then split_part(${activity_node_uri}, '/', 5)
-              when ${activity_node_uri} like 'imilac:%'
-                then split_part(${activity_node_uri}, ':', -1)
+              --when ${activity_node_uri} like 'imilac:%'
+              --  then split_part(${activity_node_uri}, ':', -1)
               end::string;;
 #     sql: 1 ;;
   }
