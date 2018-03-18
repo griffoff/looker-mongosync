@@ -102,9 +102,12 @@ view: take_node {
                     end
               when ${activity_node_uri} like 'link:%'
                 then split_part(split_part(${activity_node_uri}, ':', 2), '-', 1)
-              --cnow:item:/book/ell5bms15h/itemid/75003942
+              -- cnow:item:/book/ell5bms15h/itemid/75003942
+              -- ils://cnow/books/esmt07t/itemid/752573077
               when ${activity_node_uri} like 'cnow:item:/book%'
-                then split_part(${activity_node_uri}, '/', 3)
+                  or ${activity_node_uri} like 'cnow:alsnode:/book%'
+                  or ${activity_node_uri} like 'ils://%'
+                then split_part(${activity_node_uri}, '/', -3)
               when ${activity_node_uri} like 'imilac:%'
                 then split_part(${activity_node_uri}, ':', 2)
               end::string;;
@@ -133,6 +136,8 @@ view: take_node {
                     else split_part(${activity_node_uri}, ':', -1)
                   end
               when ${activity_node_uri} like 'cnow:item:/book%'
+                  --or ${activity_node_uri} like 'cnow:alsnode:/book%' --section id
+                  or ${activity_node_uri} like 'ils://%'
                 then split_part(${activity_node_uri}, '/', -1)
               when ${activity_node_uri} like 'imilac:%'
                 then split_part(${activity_node_uri}, ':', -1)
