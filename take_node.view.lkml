@@ -70,9 +70,10 @@ view: take_node {
 
   dimension: activity_node_system {
     group_label: "Activity Node Uri"
+    label: "Activity Platform"
     type: string
     sql:  split_part(${activity_node_uri}, ':', 1)::string;;
-    hidden: yes
+    hidden: no
   }
 
   #--cxp:activity:masterygroup, 4 parts, -1=cgi
@@ -108,6 +109,9 @@ view: take_node {
                   or ${activity_node_uri} like 'cnow:alsnode:/book%'
                   or ${activity_node_uri} like 'ils://%'
                 then split_part(${activity_node_uri}, '/', -3)
+              -- mindtap:item:/book/waac24h/itemid/1481067391/global:1de67454-dc0c-486d-9f49-4be509370846
+              when ${activity_node_uri} like 'mindtap:item:/book%'
+                then split_part(${activity_node_uri}, '/', 3)
               when ${activity_node_uri} like 'imilac:%'
                 then split_part(${activity_node_uri}, ':', 2)
               end::string;;
@@ -139,6 +143,8 @@ view: take_node {
                   --or ${activity_node_uri} like 'cnow:alsnode:/book%' --section id
                   or ${activity_node_uri} like 'ils://%'
                 then split_part(${activity_node_uri}, '/', -1)
+              when ${activity_node_uri} like 'mindtap:item:/book%'
+                then split_part(${activity_node_uri}, '/', 5)
               when ${activity_node_uri} like 'imilac:%'
                 then split_part(${activity_node_uri}, ':', -1)
               end::string;;
@@ -240,7 +246,7 @@ view: take_node {
   }
 
   dimension: activity_system {
-    group_label: "External Take Uri"
+    label: "Activity Engine"
     type: string
     sql:  split_part(${external_take_uri}, ':', 1)::string ;;
   }
@@ -394,6 +400,11 @@ view: take_node {
       year
     ]
     sql: ${TABLE}.SUBMISSION_DATE ;;
+  }
+
+  measure: latest_submission_date {
+    type: max
+    sql: ${submission_raw} ;;
   }
 
   dimension: user_identifier {
