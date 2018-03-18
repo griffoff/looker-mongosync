@@ -106,11 +106,11 @@ view: take_node {
               -- cnow:item:/book/ell5bms15h/itemid/75003942
               -- ils://cnow/books/esmt07t/itemid/752573077
               when ${activity_node_uri} like 'cnow:item:/book%'
-                  or ${activity_node_uri} like 'cnow:alsnode:/book%'
                   or ${activity_node_uri} like 'ils://%'
                 then split_part(${activity_node_uri}, '/', -3)
               -- mindtap:item:/book/waac24h/itemid/1481067391/global:1de67454-dc0c-486d-9f49-4be509370846
               when ${activity_node_uri} like 'mindtap:item:/book%'
+                  or ${activity_node_uri} like 'cnow:alsnode:/book%'
                 then split_part(${activity_node_uri}, '/', 3)
               when ${activity_node_uri} like 'imilac:%'
                 then split_part(${activity_node_uri}, ':', 2)
@@ -140,15 +140,27 @@ view: take_node {
                     else split_part(${activity_node_uri}, ':', -1)
                   end
               when ${activity_node_uri} like 'cnow:item:/book%'
-                  --or ${activity_node_uri} like 'cnow:alsnode:/book%' --section id
                   or ${activity_node_uri} like 'ils://%'
                 then split_part(${activity_node_uri}, '/', -1)
               when ${activity_node_uri} like 'mindtap:item:/book%'
+                --or ${activity_node_uri} like 'cnow:alsnode:/book%' --section id
                 then split_part(${activity_node_uri}, '/', 5)
               when ${activity_node_uri} like 'imilac:%'
                 then split_part(${activity_node_uri}, ':', -1)
               end::string;;
 #     sql: 1 ;;
+  }
+
+  dimension: activity_node_product_type {
+    group_label: "Activity Node Uri"
+    type: string
+    sql: case right(${activity_node_product_code}, 1)
+          when 'q' then 'Quiz'
+          when 'a' then 'Assessment'
+          when 'h' then 'Homework'
+          else right(${activity_node_product_code}, 1)
+          end;;
+
   }
 
   measure: activity_node_uri_example {
