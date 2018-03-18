@@ -33,6 +33,11 @@ explore: take_node {
     sql_on: (${take_node.product_code}, ${take_node.section_id}) = (${product_activity_metadata.product_code}, ${product_activity_metadata.item_id}) ;;
     relationship: many_to_one
   }
+
+  join: product_item_metadata {
+    sql_on: ${take_node.activity_node_uri} = ${product_item_metadata.item_uri} ;;
+    relationship: many_to_one
+  }
 }
 
 explore: course_activity {
@@ -97,11 +102,6 @@ explore: course {
    sql_on: (${course_activity.course_uri}, ${course_activity.activity_uri}, ${course_enrollment.user_identifier})
        = (${take_node.course_uri}, ${take_node.activity_uri}, ${take_node.user_identifier});;
    relationship: one_to_many
-  }
-
-  join: product_item_metadata {
-    sql_on: ${take_node.activity_node_uri} = ${product_item_metadata.item_id} ;;
-    relationship: many_to_one
   }
 
 }
