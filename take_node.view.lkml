@@ -94,14 +94,16 @@ view: take_node {
                       then
                         case array_size(split(${activity_node_uri},':'))
                           when 3
-                            then split_part(replace(split_part(${activity_node_uri}, ':', 2), '-', '/'), '/', 1)
+                            then split_part(replace(split_part(${activity_node_uri}, ':', -1), '-', '/'), '/', 1)
                           when 4
                             then array_to_string(array_slice(split(${activity_node_uri}, ':'), 1, 2), ':')
                           end
                     else split_part(${activity_node_uri}, ':', 2)
                     end
+              when ${activity_node_uri} like 'link:%'
+                then split_part(split_part(${activity_node_uri}, ':', 2), '-', 1)
               --cnow:item:/book/ell5bms15h/itemid/75003942
-              when ${activity_node_uri} like 'cnow:item:%'
+              when ${activity_node_uri} like 'cnow:item:/book%'
                 then split_part(${activity_node_uri}, '/', 3)
               when ${activity_node_uri} like 'imilac:%'
                 then split_part(${activity_node_uri}, ':', 2)
@@ -124,13 +126,13 @@ view: take_node {
                       then
                         case array_size(split(${activity_node_uri},':'))
                           when 3
-                            then split_part(replace(split_part(${activity_node_uri}, ':', 2), '-', '/'), '/', -1)
+                            then split_part(replace(split_part(${activity_node_uri}, ':', -1), '-', '/'), '/', -1)
                           when 4
                             then null
                         end
                     else split_part(${activity_node_uri}, ':', -1)
                   end
-              when ${activity_node_uri} like 'cnow:item:%'
+              when ${activity_node_uri} like 'cnow:item:/book%'
                 then split_part(${activity_node_uri}, '/', -1)
               when ${activity_node_uri} like 'imilac:%'
                 then split_part(${activity_node_uri}, ':', -1)
