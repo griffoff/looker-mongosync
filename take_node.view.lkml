@@ -234,6 +234,14 @@ view: take_node {
   dimension: product_code {
     group_label: "geyser identifiers"
     sql: coalesce(${activity_node_product_code}, ${assignable_content_product_abbr}) ;;
+    link: {
+      label: "Geyser: PreProd"
+      url: "https://preprod.geyser.cl-cms.com/nav-toc.xqy/{{ value }}"
+    }
+    link: {
+      label: "Geyser: Prod"
+      url: "https://prod.geyser.cl-cms.com/nav-toc.xqy/{{ value }}"
+    }
   }
 
   dimension: item_id {
