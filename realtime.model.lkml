@@ -18,8 +18,10 @@ datagroup: realtime_default_datagroup {
 persist_with: realtime_default_datagroup
 
 
+explore: product_activity_metadata {}
+
 explore: product_item_metadata {
-  extension: required
+  #extension: required
   join: node_summary {
     sql_on: (${product_item_metadata.item_uri}) = (${node_summary.activity_node_uri}) ;;
     relationship: one_to_one
@@ -36,6 +38,11 @@ explore: take_node {
 
   join: product_item_metadata {
     sql_on: ${take_node.activity_node_uri} = ${product_item_metadata.item_uri} ;;
+    relationship: many_to_one
+  }
+
+  join: product_mastery_group {
+    sql_on: ${take_node.activity_node_uri_masterygroup_cgid} = ${product_mastery_group.cgid} ;;
     relationship: many_to_one
   }
 }

@@ -48,8 +48,17 @@ view: take_node {
   }
 
   dimension: activity {
+    group_label: "Record type"
+    description: "Activity or Item level data?"
     type: yesno
     sql: ${TABLE}.ACTIVITY ;;
+  }
+
+  dimension: item {
+    group_label: "Record type"
+    description: "Activity or Item level data?"
+    type: yesno
+    sql: not ${activity} ;;
   }
 
   dimension: activity_grade {
@@ -166,6 +175,25 @@ view: take_node {
           else right(${activity_node_product_code}, 1)
           end;;
 
+  }
+
+  dimension: activity_node_cgid {
+    group_label: "Activity Node Uri"
+    type: string
+    sql: case
+          when ${activity_node_uri} like 'cas:view:%'
+              or ${activity_node_uri} like 'soa:prod:activity:%'
+              or ${activity_node_uri} like 'cgi:%'
+            then split_part(${activity_node_uri}, ':', -1)
+         end::string;;
+  }
+
+  dimension: activity_node_uri_masterygroup_cgid {
+    group_label: "Activity Node Uri"
+    type: string
+    sql:  case when ${activity_node_uri} like 'cxp:activity:masterygroup:%'
+            then split_part(${activity_node_uri}, ':', -1)
+            end::string;;
   }
 
   measure: activity_node_uri_example {
