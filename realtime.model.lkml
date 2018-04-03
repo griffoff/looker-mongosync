@@ -1,7 +1,9 @@
 connection: "snowflake_prod"
 
 include: "/core/common.lkml"
-include: "/cube/dims.model.lkml"
+include: "/cube/dims.lkml"
+
+include: "/project_source/*.view.lkml"
 
 # include all the views
 include: "*.view"
@@ -71,21 +73,21 @@ explore: course_activity {
   }
 }
 
-explore: course {
+explore: realtime_course {
   extends: [dim_course, product_item_metadata, course_activity, take_node]
 
   join: dim_course {
-    sql_on: ${course.course_key} = ${dim_course.coursekey} ;;
+    sql_on: ${realtime_course.course_key} = ${dim_course.coursekey} ;;
     relationship: one_to_one
   }
 
   join: course_activity {
-    sql_on: ${course.course_uri} = ${course_activity.course_uri} ;;
+    sql_on: ${realtime_course.course_uri} = ${course_activity.course_uri} ;;
     relationship: one_to_many
   }
 
   join: course_enrollment{
-    sql_on: ${course.course_uri} = ${course_enrollment.course_uri} ;;
+    sql_on: ${realtime_course.course_uri} = ${course_enrollment.course_uri} ;;
     relationship: one_to_many
   }
 
@@ -136,13 +138,13 @@ explore: all_take_nodes {
   description: "All taken 'nodes' linked back to course information and to content books."
   extends: [dim_course, take_node]
 
-  join: course {
+  join: realtime_course {
     relationship: many_to_one
-    sql_on: ${take_node.course_uri} = ${course.course_uri} ;;
+    sql_on: ${take_node.course_uri} = ${realtime_course.course_uri} ;;
   }
 
   join: dim_course {
-    sql_on: ${course.course_key} = ${dim_course.coursekey} ;;
+    sql_on: ${realtime_course.course_key} = ${dim_course.coursekey} ;;
     relationship: one_to_one
   }
 
