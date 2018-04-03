@@ -1,4 +1,4 @@
-view: course {
+view: realtime_course {
   #sql_table_name: REALTIME.COURSE ;;
   derived_table: {
     sql:
