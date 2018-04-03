@@ -61,6 +61,14 @@ view: product_item_metadata {
   dimension: item_id {
     type: string
     sql: ${TABLE}.ITEM_ID ;;
+    link: {
+      label: "Geyser: PreProd"
+      url: "https://preprod.geyser.cl-cms.com/nav-item.xqy?item=%2Fgeyser%2F{{ product_toc_metadata.discipline._value }}%2Fitems%2F {{ product_code._value }} %2F{{ name._value }}.xml&modal=1&reload=0"
+    }
+    link: {
+      label: "Geyser: Prod"
+      url: "https://prod.geyser.cl-cms.com/nav-item.xqy?item=%2Fgeyser%2F{{ product_toc_metadata.discipline._value }}%2Fitems%2F {{ product_code._value }} %2F{{ name._value }}.xml&modal=1&reload=0"
+    }
   }
 
   dimension: item_uri {
@@ -85,6 +93,14 @@ view: product_item_metadata {
   dimension: name {
     type: string
     sql: ${TABLE}.NAME ;;
+    link: {
+      label: "Geyser: PreProd"
+      url: "https://preprod.geyser.cl-cms.com/nav-item.xqy?item=%2Fgeyser%2F{{ product_toc_metadata.discipline._value }}%2Fitems%2F {{ product_code._value }} %2F{{ name._value }}.xml&modal=1&reload=0"
+    }
+    link: {
+      label: "Geyser: Prod"
+      url: "https://prod.geyser.cl-cms.com/nav-item.xqy?item=%2Fgeyser%2F{{ product_toc_metadata.discipline._value }}%2Fitems%2F {{ product_code._value }} %2F{{ name._value }}.xml&modal=1&reload=0"
+    }
   }
 
   dimension: parent_id {

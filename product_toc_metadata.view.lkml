@@ -1,5 +1,29 @@
 view: product_toc_metadata {
-   sql_table_name: REALTIME.PRODUCT_TOC_METADATA ;;
+   #sql_table_name: REALTIME.PRODUCT_TOC_METADATA ;;
+    derived_table: {
+      sql:
+      select
+        DATE_PROCESSED
+        ,_HASH
+        ,NAME
+        ,SIBLING_ORDER
+        ,FORMAT
+        ,PRODUCT
+        ,_LDTS
+        ,PRODUCT_CODE
+        ,ABBR
+        ,LINK
+        ,PARENT_ID
+        ,CGID
+        ,ISBN
+        ,NODE_ID
+        ,SOURCE_SYSTEM
+        --,DISCIPLINE
+        ,max(DISCIPLINE) over (partition by PRODUCT_CODE) as DISCIPLINE
+        ,ANCESTOR_IDS
+        ,_RSRC
+      from REALTIME.PRODUCT_TOC_METADATA ;;
+    }
 #   derived_table: {
 #     sql:
 #       with data as (
@@ -116,6 +140,14 @@ view: product_toc_metadata {
   dimension: product_code {
     type: string
     sql: ${TABLE}.PRODUCT_CODE ;;
+    link: {
+      label: "Geyser: PreProd"
+      url: "https://preprod.geyser.cl-cms.com/nav-toc.xqy/{{ value }}"
+    }
+    link: {
+      label: "Geyser: Prod"
+      url: "https://prod.geyser.cl-cms.com/nav-toc.xqy/{{ value }}"
+    }
   }
 
   dimension: sibling_order {

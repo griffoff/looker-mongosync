@@ -1,4 +1,4 @@
-connection: "snowflake_int"
+connection: "snowflake_prod"
 
 include: "/core/common.lkml"
 include: "/cube/dims.model.lkml"
@@ -18,11 +18,32 @@ datagroup: realtime_default_datagroup {
 persist_with: realtime_default_datagroup
 
 
+explore: product_activity_metadata {}
+
 explore: product_item_metadata {
-  extension: required
+  #extension: required
   join: node_summary {
     sql_on: (${product_item_metadata.item_uri}) = (${node_summary.activity_node_uri}) ;;
     relationship: one_to_one
+  }
+}
+
+explore: take_node {
+  extension: required
+
+  join: product_activity_metadata {
+    sql_on: (${take_node.product_code}, ${take_node.section_id}) = (${product_activity_metadata.product_code}, ${product_activity_metadata.item_id}) ;;
+    relationship: many_to_one
+  }
+
+  join: product_item_metadata {
+    sql_on: ${take_node.activity_node_uri} = ${product_item_metadata.item_uri} ;;
+    relationship: many_to_one
+  }
+
+  join: product_mastery_group {
+    sql_on: ${take_node.activity_node_uri_masterygroup_cgid} = ${product_mastery_group.cgid} ;;
+    relationship: many_to_one
   }
 }
 
@@ -51,28 +72,12 @@ explore: course_activity {
 }
 
 explore: course {
-  extends: [dim_course, product_item_metadata, course_activity]
+  extends: [dim_course, product_item_metadata, course_activity, take_node]
 
   join: dim_course {
     sql_on: ${course.course_key} = ${dim_course.coursekey} ;;
     relationship: one_to_one
   }
-
-#   join: take_node {
-#     sql_on: ${course.course_uri} = ${take_node.course_uri};;
-#     relationship: one_to_many
-#   }
-#
-#   join: course_activity {
-#     sql_on: (${take_node.course_uri}, ${take_node.activity_uri}) = (${course_activity.course_uri}, ${course_activity.activity_uri}) ;;
-#     relationship: many_to_one
-#   }
-#
-#   join: course_enrollment{
-#     sql_on: (${take_node.course_uri}, ${take_node.user_identifier}) = (${course_enrollment.course_uri}, ${course_enrollment.user_identifier}) ;;
-#     relationship: many_to_one
-#   }
-
 
   join: course_activity {
     sql_on: ${course.course_uri} = ${course_activity.course_uri} ;;
@@ -90,16 +95,11 @@ explore: course {
    relationship: one_to_many
   }
 
-  join: product_item_metadata {
-    sql_on: ${take_node.activity_node_uri} = ${product_item_metadata.item_id} ;;
-    relationship: many_to_one
-  }
-
 }
 
 explore: product_toc_metadata {
   extends: [product_item_metadata, dim_product]
-  label: "CXP Item Analysis"
+  label: "CXP Content Service"
   join: product_item_metadata {
     sql_on: (${product_toc_metadata.source_system}, ${product_toc_metadata.product_code})
         = (${product_item_metadata.source_system}, ${product_item_metadata.product_code})
@@ -122,16 +122,19 @@ explore: product_toc_metadata {
           ;;
     relationship: one_to_many
   }
-
 }
 
 explore: node_summary {
-  label: "All Items (including CXP)"
+  label: "Weekly Item Summery"
+  description: "This contains all 'nodes' from realtime, including, items, mastery groups and activities, summerized into per week usage."
 }
 
-explore: take_node {
+explore: all_take_nodes {
+  from: take_node
+  view_name: take_node
   label: "All Take Nodes"
-  extends: [dim_course]
+  description: "All taken 'nodes' linked back to course information and to content books."
+  extends: [dim_course, take_node]
 
   join: course {
     relationship: many_to_one
@@ -152,4 +155,20 @@ explore: take_node {
     sql_on: (${take_node.course_uri}, ${take_node.user_identifier}) = (${course_enrollment.course_uri}, ${course_enrollment.user_identifier}) ;;
     relationship: many_to_one
   }
+
+  join: product_toc_metadata {
+    sql_on: (${take_node.product_code}) = (${product_toc_metadata.product_code}) ;;
+    relationship: many_to_one
+  }
+
+  join: product_activity_metadata {
+    sql_on: (${take_node.product_code}, ${take_node.assignable_content_product_section_id}) = (${product_activity_metadata.product_code}, ${product_activity_metadata.item_id}) ;;
+    relationship: many_to_one
+  }
+
+  join: product_item_metadata {
+    sql_on: (${take_node.product_code}, ${take_node.item_id}) = (${product_item_metadata.product_code}, ${product_item_metadata.item_id}) ;;
+    relationship: many_to_one
+  }
+
 }
