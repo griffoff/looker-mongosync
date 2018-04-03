@@ -1,5 +1,5 @@
 view: product_toc_metadata {
-   #sql_table_name: REALTIME.PRODUCT_TOC_METADATA ;;
+#   sql_table_name: REALTIME.PRODUCT_TOC_METADATA ;;
     derived_table: {
       sql:
       select
