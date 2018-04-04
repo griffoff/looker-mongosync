@@ -399,7 +399,7 @@ view: take_node {
     group_label: "Final Grade"
     label: "Score (sd)"
     type: number
-    sql: stdev( ${final_grade_score}) ;;
+    sql: stddev( ${final_grade_score}) ;;
     value_format_name: percent_1
     drill_fields: [details*]
   }
