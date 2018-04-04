@@ -23,6 +23,7 @@ persist_with: realtime_default_datagroup
 explore: product_activity_metadata {}
 
 explore: product_item_metadata {
+  fields: [ALL_FIELDS*, -product_item_metadata.discipline]
   #extension: required
   join: node_summary {
     sql_on: (${product_item_metadata.item_uri}) = (${node_summary.activity_node_uri}) ;;
