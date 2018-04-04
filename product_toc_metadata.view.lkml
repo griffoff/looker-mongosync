@@ -23,6 +23,8 @@ view: product_toc_metadata {
         ,ANCESTOR_IDS
         ,_RSRC
       from REALTIME.PRODUCT_TOC_METADATA ;;
+
+      datagroup_trigger: realtime_default_datagroup
     }
 #   derived_table: {
 #     sql:

@@ -268,7 +268,7 @@ view: take_node {
     }
     link: {
       label: "Geyser: Prod"
-      url: "https://prod.geyser.cl-cms.com/nav-toc.xqy/{{ value }}"
+      url: "https://geyser.cl-cms.com/nav-toc.xqy/{{ value }}"
     }
   }
 

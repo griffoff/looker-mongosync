@@ -179,10 +179,10 @@ explore: all_take_nodes {
     relationship: many_to_one
   }
 
-  join: product_toc_metadata2 {
-    from: product_toc_metadata
-    sql_on: (${product_item_metadata.product_code}) = (${product_toc_metadata2.product_code}) ;;
-    relationship: many_to_one
-  }
+#   join: product_toc_metadata2 {
+#     from: product_toc_metadata
+#     sql_on: (${product_item_metadata.product_code}) = (${product_toc_metadata2.product_code}) ;;
+#     relationship: many_to_one
+#   }
 
 }
