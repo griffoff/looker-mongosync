@@ -43,8 +43,13 @@ explore: take_node {
     relationship: many_to_one
   }
 
+  join: product_toc_metadata {
+    sql_on: (${product_item_metadata.product_code}) = (${product_toc_metadata.product_code}) ;;
+    relationship: many_to_one
+  }
+
   join: product_mastery_group {
-    sql_on: ${take_node.activity_node_uri_masterygroup_cgid} = ${product_mastery_group.cgid} ;;
+    sql_on: ${take_node.activity_node_uri_masterygroup_cgid} = ${product_mastery_group.computed_hash} ;;
     relationship: many_to_one
   }
 }
@@ -74,6 +79,7 @@ explore: course_activity {
 }
 
 explore: realtime_course {
+  view_label: "Course"
   extends: [dim_course, product_item_metadata, course_activity, take_node]
 
   join: dim_course {
@@ -170,6 +176,12 @@ explore: all_take_nodes {
 
   join: product_item_metadata {
     sql_on: (${take_node.product_code}, ${take_node.item_id}) = (${product_item_metadata.product_code}, ${product_item_metadata.item_id}) ;;
+    relationship: many_to_one
+  }
+
+  join: product_toc_metadata2 {
+    from: product_toc_metadata
+    sql_on: (${product_item_metadata.product_code}) = (${product_toc_metadata2.product_code}) ;;
     relationship: many_to_one
   }
 
