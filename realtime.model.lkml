@@ -2,6 +2,7 @@ connection: "snowflake_prod"
 
 include: "/core/common.lkml"
 include: "/cube/dims.lkml"
+include: "datagroups.lkml"
 
 include: "/project_source/*.view.lkml"
 
@@ -10,12 +11,6 @@ include: "*.view"
 
 # include all the dashboards
 include: "*.dashboard"
-
-datagroup: realtime_default_datagroup {
-  #sql_trigger: SELECT current_date();;
-  sql_trigger: select floor(datediff(hour, '2018-01-22 06:00:00', current_timestamp())) / 24 ;;
-  #max_cache_age: "24 hours"
-}
 
 persist_with: realtime_default_datagroup
 
