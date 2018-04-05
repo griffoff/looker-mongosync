@@ -23,6 +23,15 @@ view: curated_user {
     value_format_name: percent_1
     type: number
   }
+  dimension: activity_final_grade_score_avg_bucket {
+    group_label: "Activity metrics"
+    label: "Score buckets (avg)"
+    value_format_name: percent_1
+    type: tier
+    tiers: [0.4, 0.6, 0.7, 0.8, 0.9]
+    style: relational
+    sql: ${activity_final_grade_score_avg} ;;
+  }
   dimension: activity_final_grade_score_max {
     group_label: "Activity metrics"
     label: "Score (max)"
@@ -58,6 +67,15 @@ view: curated_user {
     label: "Correct (%)"
     value_format_name: percent_1
     type: number
+  }
+  dimension: item_final_score_correct_percent_bucket {
+    group_label: "Item metrics"
+    label: "Correct buckets (%)"
+    value_format_name: percent_1
+    type: tier
+    tiers: [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+    style: relational
+    sql: ${item_final_score_correct_percent} ;;
   }
   dimension: item_final_score_timespent_avg {
     group_label: "Item metrics"

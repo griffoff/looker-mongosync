@@ -12,6 +12,8 @@ view: curated_activity_take {
       column: final_grade_timespent {field: take_node.final_grade_timespent}
       column: take_count {field:take_node.count}
       column: hash {field: take_node.hash}
+      sort: {field: take_node.activity_uri}
+      sort: {field: take_node.user_identifier}
     }
     datagroup_trigger: realtime_default_datagroup
   }

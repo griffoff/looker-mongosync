@@ -1,4 +1,5 @@
 connection: "snowflake_prod"
+label: "Realtime - Source"
 
 include: "/core/common.lkml"
 include: "/cube/dims.lkml"

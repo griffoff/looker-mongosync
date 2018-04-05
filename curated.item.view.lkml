@@ -3,11 +3,10 @@ view: curated_item {
     explore_source: take_node_item {
       column: item_final_score_correct_percent { field: take_node.item_final_score_correct_percent }
       column: item_final_score_timespent_avg { field: take_node.item_final_score_timespent_avg }
-      column: activity_node_uri { field: take_node.activity_node_uri }
+      column: activity_item_uri { field: take_node.activity_node_uri }
       column: activity_type_uri { field: take_node.activity_type_uri}
       column: product_code { field: take_node.activity_node_product_code }
       column: item_id { field: take_node.activity_node_item_id }
-      column: mastery_item { field: take_node.mastery_item }
       column: course_count { field: take_node.course_count }
       column: take_count { field: take_node.take_count }
       column: item_handler { field: product_item_metadata.handler }
@@ -56,29 +55,23 @@ view: curated_item {
     type: date_time
   }
 
-  dimension: activity_node_uri {primary_key: yes}
+  dimension: activity_item_uri {primary_key: yes}
   dimension: activity_type_uri {}
   dimension: product_code {}
   dimension: item_id {}
   dimension: item_handler {hidden:yes}
-  dimension: mastery_item {hidden:yes}
   dimension: item_type {
-    sql: case
-            when ${mastery_item} = 'Yes'
-              then 'MASTERY ITEM'
-            else
-              coalesce(${item_handler}, 'UNKNOWN')
-            end;;
+    sql:coalesce(${item_handler}, 'UNKNOWN');;
   }
   dimension: item_source_system {}
   dimension: item_name {}
 
-  dimension: product_discipline {group_label:"Sparse data"}
-  dimension: product {group_label:"Sparse data"}
-  dimension: product_name {group_label:"Sparse data"}
-  dimension: product_source_system {group_label:"Sparse data"}
-  dimension: product_abbr {group_label:"Sparse data"}
-  dimension: product_link {group_label:"Sparse data"}
+  dimension: product_discipline {group_label:"TOC data"}
+  dimension: product {group_label:"TOC data"}
+  dimension: product_name {group_label:"TOC data"}
+  dimension: product_source_system {group_label:"TOC data"}
+  dimension: product_abbr {group_label:"TOC data"}
+  dimension: product_link {group_label:"TOC data"}
 
   dimension: course_count {
     label: "# Courses"

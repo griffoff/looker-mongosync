@@ -18,6 +18,12 @@ view: curated_activity {
       column: activity_product_code { field: product_activity_metadata.product_code }
       column: activity_link { field: product_activity_metadata.link }
       column: activity_name { field: product_activity_metadata.name }
+      column: product_discipline { field: product_toc_metadata.discipline }
+      column: product { field: product_toc_metadata.product }
+      column: product_name { field: product_toc_metadata.name }
+      column: product_source_system { field: product_toc_metadata.source_system }
+      column: product_abbr { field: product_toc_metadata.abbr }
+      column: product_link { field: product_toc_metadata.link }
       column: activity_uri { field: take_node.activity_uri }
       column: activity_type_uri { field: take_node.activity_type_uri }
       column: course_count { field: take_node.course_count }
@@ -94,6 +100,13 @@ view: curated_activity {
   dimension: activity_product_code {}
   dimension: activity_link {}
   dimension: activity_name {}
+
+  dimension: product_discipline {group_label:"TOC data"}
+  dimension: product {group_label:"TOC data"}
+  dimension: product_name {group_label:"TOC data"}
+  dimension: product_source_system {group_label:"TOC data"}
+  dimension: product_abbr {group_label:"TOC data"}
+  dimension: product_link {group_label:"TOC data"}
 
   dimension: course_count {
     label: "# Courses"
