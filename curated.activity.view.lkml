@@ -8,7 +8,7 @@ view: curated_activity {
       column: activity_final_grade_timespent_avg { field: take_node.activity_final_grade_timespent_avg }
       column: activity_final_grade_timespent_max { field: take_node.activity_final_grade_timespent_max }
       column: activity_final_grade_timespent_min { field: take_node.activity_final_grade_timespent_min }
-      column: activity_final_grade_scored { field: take_node.activity_final_grade_scored }
+      #column: activity_final_grade_scored { field: take_node.activity_final_grade_scored }
       column: activity_handler { field: product_activity_metadata.handler }
       column: activity_type { field: product_activity_metadata.activity_type }
       column: activity_engine { field: product_activity_metadata.activity_engine }
@@ -71,10 +71,10 @@ view: curated_activity {
     value_format_name: duration_hms
     type: number
   }
-  dimension: activity_final_grade_scored {
-    type: yesno
-    label: "Scored?"
-  }
+#   dimension: activity_final_grade_scored {
+#     type: yesno
+#     label: "Scored?"
+#   }
   dimension: activity_final_grade_timespent_min {
     group_label: "Activity metrics"
     label: "Time spent (min)"

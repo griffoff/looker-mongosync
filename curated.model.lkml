@@ -105,11 +105,13 @@ explore: item_take {
   join: item {
     from: curated_item
     sql_on: ${item_take.activity_item_uri} = ${item.activity_item_uri} ;;
+    relationship: many_to_one
   }
 
   join: course {
     from: realtime_course
     sql_on: ${item_take.course_uri} = ${course.course_uri} ;;
+    relationship: many_to_one
   }
 }
 
@@ -120,11 +122,13 @@ explore: activity_takes {
   join: activity {
     from: curated_activity
     sql_on: ${activity_takes.activity_uri} = ${activity.activity_uri} ;;
+    relationship: many_to_one
   }
 
   join: course {
     from: realtime_course
     sql_on: ${activity_takes.course_uri} = ${course.course_uri} ;;
+    relationship: many_to_one
   }
 }
 
@@ -162,6 +166,7 @@ explore: course {
     from: curated_activity_take
     sql_on: ${activity.activity_uri} = ${activity_take.activity_uri}
           and ${user.user_identifier} = ${activity_take.user_identifier};;
+    relationship: one_to_many
   }
 
 }
