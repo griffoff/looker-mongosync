@@ -40,7 +40,7 @@ explore: take_node {
   }
 
   join: product_toc_metadata {
-    sql_on: (${product_item_metadata.product_code}) = (${product_toc_metadata.product_code}) ;;
+    sql_on: (${product_item_metadata.product_code}, ${product_item_metadata.item_id}) = (${product_toc_metadata.product_code}, ${product_toc_metadata.node_id}) ;;
     relationship: many_to_one
   }
 

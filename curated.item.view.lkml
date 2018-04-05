@@ -7,9 +7,10 @@ view: curated_item {
       column: activity_type_uri { field: take_node.activity_type_uri}
       column: product_code { field: take_node.activity_node_product_code }
       column: item_id { field: take_node.activity_node_item_id }
+      column: mastery_item { field: take_node.mastery_item }
       column: course_count { field: take_node.course_count }
       column: take_count { field: take_node.take_count }
-      column: item_type { field: product_item_metadata.handler }
+      column: item_handler { field: product_item_metadata.handler }
       column: item_source_system { field: product_item_metadata.source_system }
       column: item_name { field: product_item_metadata.name }
       column: product_discipline { field: product_toc_metadata.discipline }
@@ -59,16 +60,25 @@ view: curated_item {
   dimension: activity_type_uri {}
   dimension: product_code {}
   dimension: item_id {}
-
-  dimension: item_type {}
+  dimension: item_handler {hidden:yes}
+  dimension: mastery_item {hidden:yes}
+  dimension: item_type {
+    sql: case
+            when ${mastery_item}
+              then "MASTERY ITEM"
+            else
+              coalesce(${item_handler}, 'UNKNOWN')
+            end;;
+  }
   dimension: item_source_system {}
   dimension: item_name {}
-  dimension: product_discipline {}
-  dimension: product {}
-  dimension: product_name {}
-  dimension: product_source_system {}
-  dimension: product_abbr {}
-  dimension: product_link {}
+
+  dimension: product_discipline {group_label:"Sparse data"}
+  dimension: product {group_label:"Sparse data"}
+  dimension: product_name {group_label:"Sparse data"}
+  dimension: product_source_system {group_label:"Sparse data"}
+  dimension: product_abbr {group_label:"Sparse data"}
+  dimension: product_link {group_label:"Sparse data"}
 
   dimension: course_count {
     label: "# Courses"

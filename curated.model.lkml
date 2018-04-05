@@ -49,7 +49,7 @@ explore: take_node_item {
   }
 
   join: product_toc_metadata {
-    sql_on: (${product_item_metadata.product_code}) = (${product_toc_metadata.product_code}) ;;
+    sql_on: (${product_item_metadata.product_code}, ${product_item_metadata.item_id}) = (${product_toc_metadata.product_code}, ${product_toc_metadata.node_id}) ;;
     relationship: many_to_one
   }
 
@@ -64,6 +64,7 @@ explore: take_node_item {
 explore: curated_activity_take {
   join: curated_item_take {
     sql_on: (${curated_activity_take.external_take_uri}) = (${curated_item_take.external_take_uri}) ;;
+    relationship: one_to_many
   }
 }
 

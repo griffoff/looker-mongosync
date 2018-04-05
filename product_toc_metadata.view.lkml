@@ -2,27 +2,35 @@ view: product_toc_metadata {
 #   sql_table_name: REALTIME.PRODUCT_TOC_METADATA ;;
     derived_table: {
       sql:
-      select
-        DATE_PROCESSED
-        ,_HASH
-        ,NAME
-        ,SIBLING_ORDER
-        ,FORMAT
-        ,PRODUCT
-        ,_LDTS
-        ,PRODUCT_CODE
-        ,ABBR
-        ,LINK
-        ,PARENT_ID
-        ,CGID
-        ,ISBN
-        ,NODE_ID
-        ,SOURCE_SYSTEM
-        --,DISCIPLINE
-        ,max(DISCIPLINE) over (partition by PRODUCT_CODE) as DISCIPLINE
-        ,ANCESTOR_IDS
-        ,_RSRC
-      from REALTIME.PRODUCT_TOC_METADATA ;;
+        with data as (
+          select
+            _hash as business_key
+            ,case when lead(_ldts) over(partition by business_key order by _ldts) is null then 1 end as latest
+            ,DATE_PROCESSED
+            ,_HASH
+            ,NAME
+            ,SIBLING_ORDER
+            ,FORMAT
+            ,PRODUCT
+            ,_LDTS
+            ,PRODUCT_CODE
+            ,ABBR
+            ,LINK
+            ,PARENT_ID
+            ,CGID
+            ,ISBN
+            ,NODE_ID
+            ,SOURCE_SYSTEM
+            ,max(DISCIPLINE) over (partition by PRODUCT_CODE) as DISCIPLINE
+            ,ANCESTOR_IDS
+            ,_RSRC
+          from REALTIME.PRODUCT_TOC_METADATA
+      )
+      select *
+      from data
+      where latest = 1
+      order by product_code, node_id
+      ;;
 
       datagroup_trigger: realtime_default_datagroup
     }

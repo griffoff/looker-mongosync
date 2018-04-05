@@ -325,6 +325,7 @@ view: take_node {
   dimension: assignable_content_product_section_id {
     group_label: "Assignable Content Uri"
     type: string
+    sql:  ${TABLE}.assignable_content_uri_section_id ;;
 #     sql:   case
 #           when ${assignable_content_uri} like 'cnow:activity:als:%' or ${assignable_content_uri} like 'imilac:%'
 #           then split_part(${assignable_content_uri}, '/', -1)
