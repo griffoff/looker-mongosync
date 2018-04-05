@@ -64,8 +64,8 @@ view: curated_item {
   dimension: mastery_item {hidden:yes}
   dimension: item_type {
     sql: case
-            when ${mastery_item}
-              then "MASTERY ITEM"
+            when ${mastery_item} = 'Yes'
+              then 'MASTERY ITEM'
             else
               coalesce(${item_handler}, 'UNKNOWN')
             end;;
