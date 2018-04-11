@@ -25,12 +25,38 @@ view: curated_activity {
       column: product_abbr { field: product_toc_metadata.abbr }
       column: product_link { field: product_toc_metadata.link }
       column: activity_uri { field: take_node.activity_uri }
-      column: activity_type_uri { field: take_node.activity_type_uri }
+      column: activity_type_uri { field: activity_type_map.activity_type_uri }
+      column: activity_type_system { field: activity_type_map.activity_type_system }
       column: course_count { field: take_node.course_count }
       column: take_count { field: take_node.take_count }
     }
     datagroup_trigger: realtime_default_datagroup
   }
+
+  dimension: activity_key {
+    sql: ${activity_type_uri} || ':' || ${activity_uri} ;;
+    hidden: yes
+    primary_key: yes
+  }
+
+  dimension: activity_uri {}
+  dimension: activity_type_uri {}
+  dimension: activity_handler {}
+  dimension: activity_type {}
+  dimension: activity_engine {sql:coalesce(${TABLE}.activity_engine, ${TABLE}.activity_type_system);;}
+  dimension: activity_source_system {}
+  dimension: activity_core_isbn {}
+  dimension: activity_product {}
+  dimension: activity_product_code {}
+  dimension: activity_link {}
+  dimension: activity_name {}
+
+  dimension: product_discipline {group_label:"TOC data"}
+  dimension: product {group_label:"TOC data"}
+  dimension: product_name {group_label:"TOC data"}
+  dimension: product_source_system {group_label:"TOC data"}
+  dimension: product_abbr {group_label:"TOC data"}
+  dimension: product_link {group_label:"TOC data"}
 
   dimension: activity_final_grade_score_avg {
     group_label: "Activity metrics"
@@ -88,25 +114,6 @@ view: curated_activity {
     value_format_name: duration_hms
     type: number
   }
-
-  dimension: activity_uri {primary_key: yes}
-  dimension: activity_type_uri {}
-  dimension: activity_handler {}
-  dimension: activity_type {}
-  dimension: activity_engine {}
-  dimension: activity_source_system {}
-  dimension: activity_core_isbn {}
-  dimension: activity_product {}
-  dimension: activity_product_code {}
-  dimension: activity_link {}
-  dimension: activity_name {}
-
-  dimension: product_discipline {group_label:"TOC data"}
-  dimension: product {group_label:"TOC data"}
-  dimension: product_name {group_label:"TOC data"}
-  dimension: product_source_system {group_label:"TOC data"}
-  dimension: product_abbr {group_label:"TOC data"}
-  dimension: product_link {group_label:"TOC data"}
 
   dimension: course_count {
     label: "# Courses"

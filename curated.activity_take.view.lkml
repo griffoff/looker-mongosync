@@ -6,6 +6,7 @@ view: curated_activity_take {
       column: course_uri {field:take_node.course_uri}
       column: external_take_uri {field:take_node.external_take_uri}
       column: activity_uri {field:take_node.activity_uri}
+      column: activity_type_uri {field:activity_type_map.activity_type_uri}
       column: final_grade_scored {field: take_node.final_grade_scored}
       column: final_grade_taken {field: take_node.final_grade_taken}
       column: final_grade_score {field: take_node.final_grade_score}
@@ -26,6 +27,7 @@ view: curated_activity_take {
   dimension: course_uri {}
   dimension: external_take_uri {}
   dimension: activity_uri {}
+  dimension: activity_type_uri {}
   dimension: final_grade_score_tiers {
     label: "Score Bucket"
     value_format_name: percent_1

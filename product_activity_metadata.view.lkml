@@ -6,13 +6,26 @@ view: product_activity_metadata {
         select
           _hash as business_key
           ,case when lead(last_update_date) over(partition by business_key order by last_update_date) is null then 1 end as latest
-          ,*
+          ,_LDTS
+          ,_RSRC
+          ,SOURCE_SYSTEM
+          ,PRODUCT_CODE
+          ,ITEM_ID
+          ,CGID
+          ,NAME
+          ,LINK
+          ,ACTIVITY_ENGINE
+          ,any_value(ACTIVITY_TYPE) over (partition by product_code, item_id) as activity_type
+          ,HANDLER
+          ,PRODUCT
+          ,CORE_ISBN
+          ,LAST_UPDATE_DATE
         from REALTIME.PRODUCT_ACTIVITY_METADATA
       )
       select *
       from data
       where latest = 1
-      order by source_system, product_code
+      order by product_code, item_id
       ;;
 
       datagroup_trigger: realtime_default_datagroup
