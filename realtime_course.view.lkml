@@ -48,9 +48,14 @@ view: realtime_course {
     sql: ${TABLE}.COURSE_URI ;;
   }
 
+#   dimension: course_key {
+#     type: string
+#     sql: split_part(${course_uri}, ':', -1) ;;
+#   }
+# transformation to CONCAT 'E-' coursekeys for cnow courses
   dimension: course_key {
     type: string
-    sql: split_part(${course_uri}, ':', -1) ;;
+    sql: CASE WHEN split_part(${course_uri}, ':', 1) like 'cnow' THEN CONCAT ('E-',split_part(${course_uri}, ':', -1)) ELSE split_part(${course_uri}, ':', -1) END ;;
   }
 
   dimension_group: end {

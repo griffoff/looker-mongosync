@@ -500,7 +500,7 @@ view: take_node {
   dimension: item_final_score_score {
     group_label: "Final Grade - Item Score"
     label: "Score"
-    type: string
+    type: number
     sql: ${item_final_score}:normalScore::float ;;
   }
 
