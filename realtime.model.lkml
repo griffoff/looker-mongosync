@@ -146,14 +146,21 @@ explore: all_take_nodes {
     sql_on: ${take_node.course_uri} = ${realtime_course.course_uri} ;;
   }
 
-  join: mindtap_snapshot {
-    relationship: many_to_one
-    sql_on: ${mindtap_snapshot.snapshotid} = ${realtime_course.snapshot_label} ;;
+  join: dim_course {
+    sql_on: ${realtime_course.course_key} = ${dim_course.coursekey} ;;
+    type: left_outer
   }
 
-  join: dim_course {
-    sql_on: coalesce(${realtime_course.course_key},${mindtap_snapshot.coursekey}) = ${dim_course.coursekey} ;;
-    relationship: one_to_one
+  join: mindtap_snapshot {
+    relationship: many_to_one
+    sql_on: ${mindtap_snapshot.snapshotid} = ${realtime_course.snapshot_label};;
+  }
+
+  join: course_two {
+    view_label: "course dup"
+    from: dim_course
+    sql_on:  ${mindtap_snapshot.coursekey} = ${course_two.coursekey} ;;
+    type: left_outer
   }
 
   join: course_activity {
