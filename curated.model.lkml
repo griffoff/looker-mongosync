@@ -113,8 +113,8 @@ explore: courses {
 
   join: activity_take {
     from: curated_activity_take
-    sql_on: ${activity.activity_uri} = ${activity_take.activity_uri}
-          and ${user.user_identifier} = ${activity_take.user_identifier};;
+    sql_on: ${course_activity.activity_uri} = ${activity_take.activity_uri}
+          and ${course_enrollment.user_identifier} = ${activity_take.user_identifier};;
     relationship: one_to_many
   }
 
