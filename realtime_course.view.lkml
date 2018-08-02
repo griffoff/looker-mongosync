@@ -106,6 +106,11 @@ view: realtime_course {
     sql: ${TABLE}.SHORT_LABEL ;;
   }
 
+  dimension: snapshot_label {
+    type: string
+    sql: split_part(${TABLE}.SHORT_LABEL, '.', 3)  ;;
+  }
+
   dimension_group: start {
     type: time
     timeframes: [
