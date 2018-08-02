@@ -17,10 +17,20 @@ explore: course {
   from: realtime_course
   view_name: course
 
+  join: mindtap_snapshot {
+    relationship: one_to_one
+    sql_on: ${course.snapshot_label} = ${mindtap_snapshot.snapshotid};;
+  }
+
   join: dim_course {
-    sql_on: (${course.course_key}) = (${dim_course.coursekey}) ;;
+    sql_on: coalesce(${mindtap_snapshot.coursekey}, ${course.course_key}) = ${dim_course.coursekey} ;;
     relationship: one_to_one
   }
+
+#   join: dim_course {
+#     sql_on: (${course.course_key}) = (${dim_course.coursekey}) ;;
+#     relationship: one_to_one
+#   }
 }
 
 # Models for exploration

@@ -108,7 +108,7 @@ view: realtime_course {
 
   dimension: snapshot_label {
     type: string
-    sql: split_part(${TABLE}.SHORT_LABEL, '.', 3)  ;;
+    sql: try_cast(split_part(${TABLE}.SHORT_LABEL, '.', 3) as int)  ;;
   }
 
   dimension_group: start {
