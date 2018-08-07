@@ -8,10 +8,10 @@ include: "datagroups.lkml"
 include: "/project_source/*.view.lkml"
 
 # include all the views
-include: "*.view"
+include: "/mongo_sync/*.view"
 
 # include all the dashboards
-include: "*.dashboard"
+# include: "*.dashboard"
 
 persist_with: realtime_default_datagroup
 
@@ -129,6 +129,8 @@ explore: product_toc_metadata {
   }
 }
 
+explore: lo_items {}
+
 explore: node_summary {
   label: "Weekly Item Summery"
   description: "This contains all 'nodes' from realtime, including, items, mastery groups and activities, summerized into per week usage."
@@ -149,6 +151,7 @@ explore: all_take_nodes {
   join: dim_course {
     sql_on: ${realtime_course.course_key} = ${dim_course.coursekey} ;;
     type: left_outer
+    relationship: many_to_one
   }
 
   join: mindtap_snapshot {
@@ -156,12 +159,17 @@ explore: all_take_nodes {
     sql_on: ${mindtap_snapshot.snapshotid} = ${realtime_course.snapshot_label};;
   }
 
-  join: course_two {
-    view_label: "course dup"
-    from: dim_course
-    sql_on:  ${mindtap_snapshot.coursekey} = ${course_two.coursekey} ;;
-    type: left_outer
+  join: lo_items {
+    sql_on: ${take_node.activity_node_item_id} = ${lo_items.item_identifier} ;;
+    relationship: many_to_one
   }
+
+#   join: course_two {
+#     view_label: "course dup"
+#     from: dim_course
+#     sql_on:  ${mindtap_snapshot.coursekey} = ${course_two.coursekey} ;;
+#     type: left_outer
+#   }
 
   join: course_activity {
     sql_on: (${take_node.course_uri}, ${take_node.activity_uri}) = (${course_activity.course_uri}, ${course_activity.activity_uri}) ;;
