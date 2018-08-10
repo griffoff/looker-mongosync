@@ -164,6 +164,17 @@ explore: all_take_nodes {
     relationship: many_to_one
   }
 
+  join: tx_state_items {
+    sql_on: ${take_node.activity_node_item_id} = ${tx_state_items.item_identifier} ;;
+    relationship: many_to_one
+  }
+
+  join: snhu_items {
+    sql_on: ${take_node.activity_node_item_id} = ${snhu_items.cnow_item_id} ;;
+    relationship: many_to_one
+  }
+
+
 #   join: course_two {
 #     view_label: "course dup"
 #     from: dim_course
