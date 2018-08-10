@@ -1,5 +1,5 @@
 view: snhu_items {
-  sql_table_name: TX_STATE.SNHU_ITEMS ;;
+  sql_table_name: Uploads.TX_STATE.SNHU_ITEMS ;;
 
   dimension: _fivetran_deleted {
     type: yesno
