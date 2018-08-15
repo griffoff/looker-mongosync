@@ -120,6 +120,16 @@ view: snhu_items {
     sql: ${TABLE}."SNHU_OBJECTIVE_ID" ;;
   }
 
+  dimension: snhu_objective_id_formatted_for_lookup_ {
+    type: string
+    sql: ${TABLE}."SNHU_OBJECTIVE_ID_FORMATTED_FOR_LOOKUP_" ;;
+  }
+
+  dimension: snhu_objective_tag_first_lo_only_ {
+    type: string
+    sql: ${TABLE}."SNHU_OBJECTIVE_TAG_FIRST_LO_ONLY_" ;;
+  }
+
   measure: count {
     type: count
     drill_fields: [display_name, item_name]
