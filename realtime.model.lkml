@@ -1,3 +1,4 @@
+include: "curated_base.model"
 connection: "snowflake_prod"
 label: "Realtime - Source"
 
