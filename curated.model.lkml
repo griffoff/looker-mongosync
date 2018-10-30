@@ -33,23 +33,7 @@ explore: course {
 #   }
 }
 
-# Models for exploration
-explore: item_take {
-  label: "Item Takes"
-  from: curated_item_take
 
-  join: item {
-    from: curated_item
-    sql_on: ${item_take.activity_item_uri} = ${item.activity_item_uri} ;;
-    relationship: many_to_one
-  }
-
-  join: course {
-    from: realtime_course
-    sql_on: ${item_take.course_uri} = ${course.course_uri} ;;
-    relationship: many_to_one
-  }
-}
 
 explore: activity_takes {
   label: "Activity Takes"
