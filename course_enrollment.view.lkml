@@ -78,6 +78,13 @@ view: course_enrollment {
     sql: ${TABLE}.user_identifier ;;
   }
 
+  measure: users_enrolled{
+    label: "# Distinct users"
+    type: count_distinct
+    sql: ${TABLE}.user_identifier ;;
+    drill_fields: []
+  }
+
   measure: count {
     type: count
     drill_fields: []
