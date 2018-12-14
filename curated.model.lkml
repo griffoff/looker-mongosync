@@ -22,10 +22,10 @@ explore: course {
     sql_on: ${course.snapshot_label} = ${mindtap_snapshot.snapshotid};;
   }
 
-  join: dim_course {
-    sql_on: coalesce(${mindtap_snapshot.coursekey}, ${course.course_key}) = ${dim_course.coursekey} ;;
-    relationship: one_to_one
-  }
+#   join: dim_course {
+#     sql_on: coalesce(${mindtap_snapshot.coursekey}, ${course.course_key}) = ${dim_course.coursekey} ;;
+#     relationship: one_to_one
+#   }
 
 #   join: dim_course {
 #     sql_on: (${course.course_key}) = (${dim_course.coursekey}) ;;
@@ -45,16 +45,6 @@ explore: activity_takes {
     from: curated_activity
     sql_on: ${activity_takes.activity_uri} = ${activity.activity_uri}
             and ${activity_takes.activity_type_uri} = ${activity.activity_type_uri};;
-    relationship: many_to_one
-  }
-
-  join: user {
-    sql_on: ${activity_takes.user_identifier} = ${user.source_id} ;;
-    relationship: many_to_one
-  }
-
-  join: dim_party {
-    sql_on: ${activity_takes.user_identifier} = ${dim_party.guid_raw} ;;
     relationship: many_to_one
   }
 
