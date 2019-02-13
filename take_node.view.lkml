@@ -530,7 +530,7 @@ view: take_node {
     label: "Item Score (%)"
     description: "Score on an item by an user, use this against an item dimension"
     type: average
-    sql: ${item_final_score}:normalScore::float ;;
+    sql: try_cast(${item_final_score}:normalScore::string as decimal(10, 6)) ;;
     value_format_name: percent_1
     drill_fields: [details*]
   }
