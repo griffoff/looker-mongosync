@@ -501,14 +501,14 @@ view: take_node {
     group_label: "Final Grade - Item Score"
     label: "Score"
     type: number
-    sql: ${item_final_score}:normalScore::float ;;
+    sql: try_cast(nullif(${item_final_score}:normalScore::string, '') as decimal(10, 6)) ;;
   }
 
   dimension: item_final_score_timespent {
     group_label: "Final Grade - Item Score"
     label: "Time spent"
     type: number
-    sql: ${final_grade}:timeSpent::float / 60 / 60 / 24;;
+    sql: try_cast(nullif(${final_grade}:timeSpent::string, '') as decimal(18, 6)) / 60 / 60 / 24;;
     value_format_name: duration_hms
   }
 
@@ -527,10 +527,11 @@ view: take_node {
   }
 
   measure: item_final_score_percent {
+    group_label: "Final Grade - Item Score"
     label: "Item Score (%)"
     description: "Score on an item by an user, use this against an item dimension"
     type: average
-    sql: try_cast(${item_final_score}:normalScore::string as decimal(10, 6)) ;;
+    sql: ${item_final_score_score} ;;
     value_format_name: percent_1
     drill_fields: [details*]
   }
@@ -569,7 +570,7 @@ view: take_node {
     group_label: "Final Grade - All"
     label: "Time spent"
     type: number
-    sql: ${final_grade}:timeSpent::float / 60 / 60 / 24;;
+    sql: try_cast(nullif(${final_grade}:timeSpent::string, '') to decimal(18, 6)) / 60 / 60 / 24;;
     value_format_name: duration_hms
   }
 
