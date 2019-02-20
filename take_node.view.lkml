@@ -637,7 +637,7 @@ view: take_node {
     group_label: "Final Grade - All"
     label: "N Score (sum)"
     type: sum
-    sql: case when ${final_grade}:normalScore."$numberDouble"::string != null then try_cast(${final_grade}:normalScore."$numberDouble"::string as decimal(10, 6)) else try_cast(${final_grade}:normalScore::string as decimal(10, 6)) end ;;
+    sql: try_cast(coalesce(${final_grade}:normalScore:"$numberDouble", ${final_grade}:normalScore)::string as decimal(10, 6)) ;;
     value_format_name: percent_1
     drill_fields: [details*]
   }
@@ -646,7 +646,7 @@ view: take_node {
     group_label: "Final Grade - All"
     label: "P Score (sum)"
     type: sum
-    sql: case when ${final_grade}:possibleScore."$numberDouble"::string != null then try_cast(${final_grade}:possibleScore."$numberDouble"::string as decimal(10, 6)) else try_cast(${final_grade}:possibleScore::string as decimal(10, 6)) end ;;
+    sql: try_cast(coalesce(${final_grade}:possibleScore:"$numberDouble", ${final_grade}:possibleScore)::string as decimal(10, 6)) ;;
     drill_fields: [details*]
   }
 
@@ -654,7 +654,7 @@ view: take_node {
     group_label: "Final Grade - All"
     label: "S Score (sum)"
     type: sum
-    sql: case when ${final_grade}:scaledScore."$numberDouble"::string != null then try_cast(${final_grade}:scaledScore."$numberDouble"::string as decimal(10, 6)) else try_cast(${final_grade}:scaledScore::string as decimal(10, 6)) end ;;
+    sql: try_cast(coalesce(${final_grade}:scaledScore:"$numberDouble", ${final_grade}:scaledScore)::string as decimal(10, 6)) ;;
     drill_fields: [details*]
   }
 
@@ -806,7 +806,7 @@ view: take_node {
   dimension: interaction_attempts {
     label: "Interaction Attempts"
     type: number
-    sql: try_cast(${TABLE}.INTERACTION_GRADE:attempts."$numberLong"::string as decimal(10, 6));;
+    sql: try_cast(coalesce(${TABLE}.INTERACTION_GRADE:attempts:"$numberLong", ${TABLE}.INTERACTION_GRADE:attempts)::string as decimal(10, 6)) ;;
   }
 
   measure: interaction_attempts_sum{
@@ -819,7 +819,7 @@ view: take_node {
   dimension: interaction_normal_score{
     label: "Interaction Normal Score"
     type: number
-    sql: case when ${TABLE}.INTERACTION_GRADE:normalScore."$numberDouble"::string != null then try_cast(${TABLE}.INTERACTION_GRADE:normalScore."$numberDouble"::string as decimal(10, 6)) else try_cast(${TABLE}.INTERACTION_GRADE:normalScore::string as decimal(10, 6)) end ;;
+    sql: try_cast(coalesce(${TABLE}.INTERACTION_GRADE:normalScore:"$numberDouble", ${TABLE}.INTERACTION_GRADE:normalScore)::string as decimal(10, 6)) ;;
   }
 
   measure: interaction_normal_score_sum{
