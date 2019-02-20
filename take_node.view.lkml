@@ -810,6 +810,13 @@ view: take_node {
     sql: try_cast(coalesce(${TABLE}.INTERACTION_GRADE:attempts:"$numberLong", ${TABLE}.INTERACTION_GRADE:attempts)::string as decimal(10, 6)) ;;
   }
 
+  dimension: interaction_attempts_tier {
+    type: tier
+    style: integer
+    tiers: [0, 1, 2, 3, 5, 10]
+    sql: ${interaction_attempts} ;;
+  }
+
   measure: interaction_attempts_sum{
     label: "Interaction Attempts"
     type: sum
