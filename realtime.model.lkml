@@ -2,11 +2,11 @@ include: "curated_base.model"
 connection: "snowflake_prod"
 label: "Realtime - Source"
 
-include: "/core/common.lkml"
-include: "/cube/dims.lkml"
+include: "//core/common.lkml"
+include: "//cube/dims.lkml"
 include: "datagroups.lkml"
 
-include: "/project_source/*.view.lkml"
+include: "//project_source/*.view.lkml"
 
 # include all the views
 include: "/mongo_sync/*.view"
