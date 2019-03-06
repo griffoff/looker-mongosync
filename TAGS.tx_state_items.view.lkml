@@ -38,6 +38,7 @@ view: tx_state_items {
   dimension: bloom_s_level {
     type: string
     sql: ${TABLE}."BLOOM_S_LEVEL" ;;
+    hidden: yes
   }
 
   dimension: chapter {
@@ -69,6 +70,7 @@ view: tx_state_items {
   dimension: learning_objectives {
     type: string
     sql: ${TABLE}."LEARNING_OBJECTIVES" ;;
+    hidden: yes
   }
 
   dimension: sacs_taxonomy_code {
