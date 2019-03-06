@@ -4,6 +4,7 @@ view: tx_state_items {
   dimension: _fivetran_deleted {
     type: yesno
     sql: ${TABLE}."_FIVETRAN_DELETED" ;;
+    hidden: yes
   }
 
   dimension_group: _fivetran_synced {
@@ -18,11 +19,13 @@ view: tx_state_items {
       year
     ]
     sql: ${TABLE}."_FIVETRAN_SYNCED" ;;
+    hidden:  yes
   }
 
   dimension: _row {
     type: number
     sql: ${TABLE}."_ROW" ;;
+    hidden: yes
   }
 
   dimension: aacsb_taxonomy_code {
