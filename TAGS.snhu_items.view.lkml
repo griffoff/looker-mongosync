@@ -4,6 +4,7 @@ view: snhu_items {
   dimension: _fivetran_deleted {
     type: yesno
     sql: ${TABLE}."_FIVETRAN_DELETED" ;;
+    hidden:  yes
   }
 
   dimension_group: _fivetran_synced {
@@ -18,11 +19,13 @@ view: snhu_items {
       year
     ]
     sql: ${TABLE}."_FIVETRAN_SYNCED" ;;
+    hidden:  yes
   }
 
   dimension: _row {
     type: number
     sql: ${TABLE}."_ROW" ;;
+    hidden:  yes
   }
 
   dimension: acbsp_taxonomy_code {
@@ -78,6 +81,7 @@ view: snhu_items {
   dimension: gaps_between_cengage_s_los_and_snhu_s_los {
     type: string
     sql: ${TABLE}."GAPS_BETWEEN_CENGAGE_S_LOS_AND_SNHU_S_LOS" ;;
+    hidden:  yes
   }
 
   dimension: geyser_generic_taxonomy_tag {
@@ -88,6 +92,7 @@ view: snhu_items {
   dimension: geyser_lo_tag {
     type: string
     sql: ${TABLE}."GEYSER_LO_TAG" ;;
+    hidden:  yes
   }
 
   dimension: industry_standard_aicpa_code {
@@ -103,6 +108,7 @@ view: snhu_items {
   dimension: item_cgid {
     type: string
     sql: ${TABLE}."ITEM_CGID" ;;
+    hidden: yes
   }
 
   dimension: item_name {
