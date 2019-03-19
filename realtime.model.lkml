@@ -175,6 +175,11 @@ explore: all_take_nodes {
     relationship: many_to_one
   }
 
+  join: csu_items {
+    sql_on: ${take_node.activity_node_item_id} = ${csu_items.item_identifier} ;;
+    relationship: many_to_one
+  }
+
 
 #   join: course_two {
 #     view_label: "course dup"
