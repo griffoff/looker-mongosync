@@ -31,11 +31,13 @@ view: csfi_view {
   dimension_group: _ldts {
     type: time
     sql: ${TABLE}."_LDTS" ;;
+    hidden: yes
   }
 
   dimension: _rsrc {
     type: string
     sql: ${TABLE}."_RSRC" ;;
+    hidden: yes
   }
 
   dimension: activity_uri {
@@ -111,6 +113,7 @@ view: csfi_view {
   dimension: hash {
     type: string
     sql: ${TABLE}."HASH" ;;
+    hidden: yes
   }
 
   dimension_group: last_update_date {
@@ -120,7 +123,7 @@ view: csfi_view {
 
   set: detail {
     fields: [
-      prev_applicationusagedate_time,
+      prev_applicationusagedate,
       _ldts_time,
       _rsrc,
       activity_uri,
