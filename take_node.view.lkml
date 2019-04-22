@@ -1,5 +1,5 @@
 view: take_node {
-  #sql_table_name: REALTIME.TAKE_NODE ;;
+  #sql_table_name: REALTIME.TAKE_ITEM ;;
   derived_table: {
     sql:
       with data as (
@@ -82,7 +82,7 @@ view: take_node {
             ,coalesce(activity_node_product_code, assignable_content_product_abbr) as product_code
             ,activity_node_item_id as item_id
             ,assignable_content_uri_section_id as section_id
-        from realtime.take_node
+        from realtime.take_item as take_node
       )
       select *
       from data
