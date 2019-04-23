@@ -3,6 +3,7 @@ view: csfi_view {
   derived_table: {
     sql: Select
           LAG(SUBMISSION_DATE) over (partition by USER_IDENTIFIER,ACTIVITY_TYPE_URI order by SUBMISSION_DATE)  as prev_applicationusagedate
+          ,split_part(COURSE_URI, ':', -1)::string as course_key
           ,*
           from realtime.take_node
           where ACTIVITY_TYPE_URI LIKE 'imilac:als-csfi'
@@ -103,6 +104,11 @@ view: csfi_view {
   dimension: activity_type_uri {
     type: string
     sql: ${TABLE}."ACTIVITY_TYPE_URI" ;;
+  }
+
+  dimension: course_key {
+    type: string
+    #sql: split_part(${TABLE}.COURSE_URI, ':', -1)::string ;;
   }
 
   dimension: assignable_content_uri {
