@@ -5,7 +5,8 @@ view: csfi_view {
           LAG(SUBMISSION_DATE) over (partition by USER_IDENTIFIER,ACTIVITY_TYPE_URI order by SUBMISSION_DATE)  as prev_applicationusagedate
           ,split_part(COURSE_URI, ':', -1)::string as course_key
           ,*
-          from realtime.take_node
+         -- from realtime.take_node
+          from realtime.take_item
           where ACTIVITY_TYPE_URI LIKE 'imilac:als-csfi'
  ;;
   }
