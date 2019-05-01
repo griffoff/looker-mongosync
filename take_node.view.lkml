@@ -865,18 +865,46 @@ view: take_node {
     sql: ${TABLE}.PARENT_PATH:"$[3]" ;;
   }
 
-  dimension: external_properties_a {
+  dimension: parent_path_4 {
     group_label: "Node Selectors"
-    label: "External Property A"
+    label: "Parent Path 4"
+    type:  string
+    sql: ${TABLE}.PARENT_PATH:"$[4]" ;;
+  }
+
+  dimension: parent_path_5 {
+    group_label: "Node Selectors"
+    label: "Parent Path 5"
+    type:  string
+    sql: ${TABLE}.PARENT_PATH:"$[5]" ;;
+  }
+
+  dimension: parent_path_6 {
+    group_label: "Node Selectors"
+    label: "Parent Path 6"
+    type:  string
+    sql: ${TABLE}.PARENT_PATH:"$[6]" ;;
+  }
+
+  dimension: external_properties_activity-type {
+    group_label: "Node Selectors"
+    label: "External Property - activity-type"
     type:  string
     sql: ${TABLE}.EXTERNAL_PROPERTIES:"analytics:activity-type" ;;
   }
 
-  dimension: external_properties_b {
+  dimension: external_properties_node-type {
     group_label: "Node Selectors"
-    label: "External Property B"
+    label: "External Property - node-type"
     type:  string
-    sql: ${TABLE}.EXTERNAL_PROPERTIES:"analytics:property:srcenvironment" ;;
+    sql: ${TABLE}.EXTERNAL_PROPERTIES:"analytics:node-type" ;;
+  }
+
+  dimension: external_properties_container-type {
+    group_label: "Node Selectors"
+    label: "External Property - container-type"
+    type:  string
+    sql: ${TABLE}.EXTERNAL_PROPERTIES:"analytics:container-type" ;;
   }
 
   dimension: external_properties_raw {
