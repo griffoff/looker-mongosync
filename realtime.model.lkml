@@ -181,7 +181,7 @@ explore: all_take_nodes {
   }
 
   join: nwtc_items {
-    sql_on: ${take_node.activity_node_item_id} = ${nwtc_items.item_identifier} ;;
+    sql_on: ${product_item_metadata.cgid} = ${nwtc_items.cgi} ;;
     relationship: many_to_one
   }
 
