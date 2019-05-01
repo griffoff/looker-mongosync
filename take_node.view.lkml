@@ -841,49 +841,49 @@ view: take_node {
     group_label: "Node Selectors"
     label: "Parent Path 0"
     type:  string
-    sql: ${TABLE}.PARENT_PATH:"$[0]" ;;
+    sql: ${TABLE}.PARENT_PATH:"$[0]"::string ;;
   }
 
   dimension: parent_path_1 {
     group_label: "Node Selectors"
     label: "Parent Path 1"
     type:  string
-    sql: ${TABLE}.PARENT_PATH:"$[1]" ;;
+    sql: ${TABLE}.PARENT_PATH:"$[1]"::string ;;
   }
 
   dimension: parent_path_2 {
     group_label: "Node Selectors"
     label: "Parent Path 2"
     type:  string
-    sql: ${TABLE}.PARENT_PATH:"$[2]" ;;
+    sql: ${TABLE}.PARENT_PATH:"$[2]"::string ;;
   }
 
   dimension: parent_path_3 {
     group_label: "Node Selectors"
     label: "Parent Path 3"
     type:  string
-    sql: ${TABLE}.PARENT_PATH:"$[3]" ;;
+    sql: ${TABLE}.PARENT_PATH:"$[3]"::string ;;
   }
 
   dimension: parent_path_4 {
     group_label: "Node Selectors"
     label: "Parent Path 4"
     type:  string
-    sql: ${TABLE}.PARENT_PATH:"$[4]" ;;
+    sql: ${TABLE}.PARENT_PATH:"$[4]"::string ;;
   }
 
   dimension: parent_path_5 {
     group_label: "Node Selectors"
     label: "Parent Path 5"
     type:  string
-    sql: ${TABLE}.PARENT_PATH:"$[5]" ;;
+    sql: ${TABLE}.PARENT_PATH:"$[5]"::string ;;
   }
 
   dimension: parent_path_6 {
     group_label: "Node Selectors"
     label: "Parent Path 6"
     type:  string
-    sql: ${TABLE}.PARENT_PATH:"$[6]" ;;
+    sql: ${TABLE}.PARENT_PATH:"$[6]"::string ;;
   }
 
   dimension: external_properties_activity_type {
