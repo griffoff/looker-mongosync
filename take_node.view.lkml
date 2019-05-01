@@ -837,4 +837,53 @@ view: take_node {
     drill_fields: [details*]
   }
 
+  dimension: parent_path_0 {
+    group_label: "Node Selectors"
+    label: "Parent Path 0"
+    type:  string
+    sql: ${TABLE}.PARENT_PATH:"$[0]" ;;
+  }
+
+  dimension: parent_path_1 {
+    group_label: "Node Selectors"
+    label: "Parent Path 1"
+    type:  string
+    sql: ${TABLE}.PARENT_PATH:"$[1]" ;;
+  }
+
+  dimension: parent_path_2 {
+    group_label: "Node Selectors"
+    label: "Parent Path 2"
+    type:  string
+    sql: ${TABLE}.PARENT_PATH:"$[2]" ;;
+  }
+
+  dimension: parent_path_3 {
+    group_label: "Node Selectors"
+    label: "Parent Path 3"
+    type:  string
+    sql: ${TABLE}.PARENT_PATH:"$[3]" ;;
+  }
+
+  dimension: external_properties_a {
+    group_label: "Node Selectors"
+    label: "External Property A"
+    type:  string
+    sql: ${TABLE}.EXTERNAL_PROPERTIES:"analytics:activity-type" ;;
+  }
+
+  dimension: external_properties_b {
+    group_label: "Node Selectors"
+    label: "External Property B"
+    type:  string
+    sql: ${TABLE}.EXTERNAL_PROPERTIES:"analytics:property:srcenvironment" ;;
+  }
+
+  dimension: external_properties_raw {
+    group_label: "Node Selectors"
+    label: "External Property Raw"
+    type:  string
+    sql: ${TABLE}.EXTERNAL_PROPERTIES ;;
+  }
+
 }
