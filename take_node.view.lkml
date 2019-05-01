@@ -886,21 +886,21 @@ view: take_node {
     sql: ${TABLE}.PARENT_PATH:"$[6]" ;;
   }
 
-  dimension: external_properties_activity-type {
+  dimension: external_properties_activity_type {
     group_label: "Node Selectors"
     label: "External Property - activity-type"
     type:  string
     sql: ${TABLE}.EXTERNAL_PROPERTIES:"analytics:activity-type" ;;
   }
 
-  dimension: external_properties_node-type {
+  dimension: external_properties_node_type {
     group_label: "Node Selectors"
     label: "External Property - node-type"
     type:  string
     sql: ${TABLE}.EXTERNAL_PROPERTIES:"analytics:node-type" ;;
   }
 
-  dimension: external_properties_container-type {
+  dimension: external_properties_container_type {
     group_label: "Node Selectors"
     label: "External Property - container-type"
     type:  string
