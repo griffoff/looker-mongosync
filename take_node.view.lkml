@@ -872,20 +872,6 @@ view: take_node {
     sql: ${TABLE}.PARENT_PATH[4]::string ;;
   }
 
-  dimension: parent_path_5 {
-    group_label: "Node Selectors"
-    label: "Parent Path 5"
-    type:  string
-    sql: ${TABLE}.PARENT_PATH[5]::string ;;
-  }
-
-  dimension: parent_path_6 {
-    group_label: "Node Selectors"
-    label: "Parent Path 6"
-    type:  string
-    sql: ${TABLE}.PARENT_PATH[6]::string ;;
-  }
-
   dimension: external_properties_activity_type {
     group_label: "Node Selectors"
     label: "External Property - activity-type"
