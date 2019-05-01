@@ -180,6 +180,10 @@ explore: all_take_nodes {
     relationship: many_to_one
   }
 
+  join: nwtc_items {
+    sql_on: ${take_node.activity_node_item_id} = ${nwtc_items.item_identifier} ;;
+    relationship: many_to_one
+  }
 
 #   join: course_two {
 #     view_label: "course dup"
