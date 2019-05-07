@@ -1,5 +1,5 @@
 view: nwtc_items {
-  sql_table_name: uploads.TX_STATE.NWTC_ITEMS ;;
+  sql_table_name: uploads.LOTS.NWTC_ITEMS ;;
 
   dimension: _fivetran_deleted {
     type: yesno
