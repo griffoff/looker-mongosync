@@ -1,5 +1,5 @@
 view: tx_state_items {
-  sql_table_name: Uploads.TX_STATE.TX_STATE_ITEMS ;;
+  sql_table_name: Uploads.LOTS.TX_STATE_ITEMS ;;
 
   dimension: _fivetran_deleted {
     type: yesno
