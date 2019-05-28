@@ -121,6 +121,11 @@ view: snhu_items {
     sql: ${TABLE}."MODULE" ;;
   }
 
+  dimension: difficulty {
+    type: string
+    sql: ${TABLE}."DIFFICULTY_RANKING" ;;
+  }
+
   dimension: snhu_objective_id {
     type: string
     sql: ${TABLE}."SNHU_OBJECTIVE_ID" ;;
