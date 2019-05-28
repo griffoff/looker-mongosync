@@ -1,4 +1,5 @@
 view: csu_items {
+  label: "LOTS - CSU"
   sql_table_name: Uploads.LOTS.CSU_ITEMS ;;
 
   dimension: _fivetran_deleted {
@@ -31,6 +32,7 @@ view: csu_items {
   dimension: answers {
     type: string
     sql: ${TABLE}."ANSWERS" ;;
+    hidden: yes
   }
 
   dimension: cgi {
@@ -70,6 +72,7 @@ view: csu_items {
   }
 
   dimension: lo_tag_id_combined_set_1_ {
+    label: "Learning Outcomes"
     type: string
     sql: ${TABLE}."LO_TAG_ID_COMBINED_SET_1_" ;;
   }
@@ -77,29 +80,35 @@ view: csu_items {
   dimension: multiple_los_tag_id_list_all_ {
     type: string
     sql: ${TABLE}."MULTIPLE_LOS_TAG_ID_LIST_ALL_" ;;
+    hidden: yes
   }
 
   dimension: multiple_rollups_tag_id_list_all_ {
     type: string
     sql: ${TABLE}."MULTIPLE_ROLLUPS_TAG_ID_LIST_ALL_" ;;
+    hidden: yes
   }
 
   dimension: question {
     type: string
     sql: ${TABLE}."QUESTION" ;;
+    hidden: yes
   }
 
   dimension: rollup_outcome_id {
     type: string
     sql: ${TABLE}."ROLLUP_OUTCOME_ID" ;;
+    hidden: yes
   }
 
   dimension: rollup_outcome_tag {
     type: string
     sql: ${TABLE}."ROLLUP_OUTCOME_TAG" ;;
+    hidden: yes
   }
 
   dimension: rollup_tag_id_combined {
+    label: "Learning Outcome Standards"
     type: string
     sql: ${TABLE}."ROLLUP_TAG_ID_COMBINED" ;;
   }

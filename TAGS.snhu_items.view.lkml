@@ -1,4 +1,5 @@
 view: snhu_items {
+  label: "LOTS - SNHU"
   sql_table_name: Uploads.LOTS.SNHU_ITEMS ;;
 
   dimension: _fivetran_deleted {

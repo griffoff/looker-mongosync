@@ -185,6 +185,21 @@ explore: all_take_nodes {
     relationship: many_to_one
   }
 
+  join: concorde_items {
+    sql_on: ${take_node.activity_node_item_id} = ${concorde_items.item_identifier} ;;
+    relationship: many_to_one
+  }
+
+  join: rcc_bus_10_items {
+    sql_on: ${take_node.activity_node_item_id} = ${rcc_bus_10_items.item_identifier} ;;
+    relationship: many_to_one
+  }
+
+  join: rcc_mag_51_items {
+    sql_on: ${take_node.activity_node_item_id} = ${rcc_mag_51_items.item_identifier} ;;
+    relationship: many_to_one
+  }
+
 #   join: course_two {
 #     view_label: "course dup"
 #     from: dim_course

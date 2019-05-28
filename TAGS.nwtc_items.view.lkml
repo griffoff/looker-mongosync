@@ -1,4 +1,5 @@
 view: nwtc_items {
+  label: "LOTS - NWTC"
   sql_table_name: uploads.LOTS.NWTC_ITEMS ;;
 
   dimension: _fivetran_deleted {
@@ -79,11 +80,13 @@ view: nwtc_items {
   }
 
   dimension: lo_tag_id_combined_set_1_ {
+    label: "Learning Outcomes - Cost IP"
     type: string
     sql: ${TABLE}."LO_TAG_ID_COMBINED_SET_1_" ;;
   }
 
   dimension: lo_tag_id_combined_set_2_ {
+    label: "Learning Outcomes - Managerial IP"
     type: string
     sql: ${TABLE}."LO_TAG_ID_COMBINED_SET_2_" ;;
   }
