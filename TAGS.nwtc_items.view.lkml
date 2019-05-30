@@ -31,102 +31,103 @@ view: nwtc_items {
 
   dimension: answer {
     type: string
-    group_label: "NWTC"
+    group_label: "NWTC Cost/Managerial"
     sql: ${TABLE}."ANSWER" ;;
   }
 
   dimension: cgi {
     type: string
-    group_label: "NWTC"
+    group_label: "NWTC Cost/Managerial"
     sql: ${TABLE}."CGI" ;;
   }
 
   dimension: chapter {
     type: string
-    group_label: "NWTC"
+    group_label: "NWTC Cost/Managerial"
     sql: ${TABLE}."CHAPTER" ;;
   }
 
   dimension: item_handler {
     type: string
-    group_label: "NWTC"
+    group_label: "NWTC Cost/Managerial"
     sql: ${TABLE}."ITEM_HANDLER" ;;
   }
 
   dimension: item_identifier {
     type: string
-    group_label: "NWTC"
+    group_label: "NWTC Cost/Managerial"
     sql: ${TABLE}."ITEM_IDENTIFIER" ;;
   }
 
   dimension: item_name {
     type: string
-    group_label: "NWTC"
+    group_label: "NWTC Cost/Managerial"
     sql: ${TABLE}."ITEM_NAME" ;;
   }
 
   dimension: learning_outcome_id_set_1_ {
     type: string
     hidden: yes
-    group_label: "NWTC"
+    group_label: "NWTC Cost/Managerial"
     sql: ${TABLE}."LEARNING_OUTCOME_ID_SET_1_" ;;
   }
 
   dimension: learning_outcome_id_set_2_ {
     type: string
     hidden: yes
-    group_label: "NWTC"
+    group_label: "NWTC Cost/Managerial"
     sql: ${TABLE}."LEARNING_OUTCOME_ID_SET_2_" ;;
   }
 
   dimension: learning_outcome_tag_set_1_ {
     type: string
     hidden: yes
-    group_label: "NWTC"
+    group_label: "NWTC Cost/Managerial"
     sql: ${TABLE}."LEARNING_OUTCOME_TAG_SET_1_" ;;
   }
 
   dimension: learning_outcome_tag_set_2_ {
     type: string
     hidden: yes
-    group_label: "NWTC"
+    group_label: "NWTC Cost/Managerial"
     sql: ${TABLE}."LEARNING_OUTCOME_TAG_SET_2_" ;;
   }
 
   dimension: lo_tag_id_combined_set_1_ {
     label: "Learning Outcomes - Cost IP"
     type: string
-    group_label: "NWTC"
+    group_label: "NWTC Cost/Managerial"
     sql: ${TABLE}."LO_TAG_ID_COMBINED_SET_1_" ;;
   }
 
   dimension: lo_tag_id_combined_set_2_ {
     label: "Learning Outcomes - Managerial IP"
     type: string
-    group_label: "NWTC"
+    group_label: "NWTC Cost/Managerial"
     sql: ${TABLE}."LO_TAG_ID_COMBINED_SET_2_" ;;
   }
 
   dimension: question {
     type: string
-    group_label: "NWTC"
+    group_label: "NWTC Cost/Managerial"
     sql: ${TABLE}."QUESTION" ;;
   }
 
   dimension: set_1_multiple_los_tag_id_list_all_ {
     type: string
-    group_label: "NWTC"
+    group_label: "NWTC Cost/Managerial"
     sql: ${TABLE}."SET_1_MULTIPLE_LOS_TAG_ID_LIST_ALL_" ;;
   }
 
   dimension: set_2_multiple_los_tag_id_list_all_ {
     type: string
-    group_label: "NWTC"
+    group_label: "NWTC Cost/Managerial"
     sql: ${TABLE}."SET_2_MULTIPLE_LOS_TAG_ID_LIST_ALL_" ;;
   }
 
   measure: count {
     type: count
     drill_fields: [item_name]
+    group_label: "NWTC Cost/Managerial"
   }
 }
