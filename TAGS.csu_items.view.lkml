@@ -43,37 +43,44 @@ view: csu_items {
 
   dimension: chapter {
     type: string
+    group_label: "CSU"
     sql: ${TABLE}."CHAPTER" ;;
   }
 
   dimension: item_handler {
     type: string
+    group_label: "CSU"
     sql: ${TABLE}."ITEM_HANDLER" ;;
   }
 
   dimension: item_identifier {
     type: string
+    group_label: "CSU"
     sql: ${TABLE}."ITEM_IDENTIFIER" ;;
   }
 
   dimension: item_name {
     type: string
+    group_label: "CSU"
     sql: ${TABLE}."ITEM_NAME" ;;
   }
 
   dimension: learning_outcome_id_set_1_ {
     type: string
+    group_label: "CSU"
     sql: ${TABLE}."LEARNING_OUTCOME_ID_SET_1_" ;;
   }
 
   dimension: learning_outcome_tag_set_1_ {
     type: string
+    group_label: "CSU"
     sql: ${TABLE}."LEARNING_OUTCOME_TAG_SET_1_" ;;
   }
 
   dimension: lo_tag_id_combined_set_1_ {
     label: "Learning Outcomes"
     type: string
+    group_label: "CSU"
     sql: ${TABLE}."LO_TAG_ID_COMBINED_SET_1_" ;;
   }
 
@@ -110,11 +117,13 @@ view: csu_items {
   dimension: rollup_tag_id_combined {
     label: "Learning Outcome Standards"
     type: string
+    group_label: "CSU"
     sql: ${TABLE}."ROLLUP_TAG_ID_COMBINED" ;;
   }
 
   measure: count {
     type: count
+    group_label: "CSU"
     drill_fields: [item_name]
   }
 }

@@ -31,27 +31,32 @@ view: concorde_items {
 
   dimension: cgi {
     type: string
+    group_label: "Concorde"
     sql: ${TABLE}."CGI" ;;
   }
 
   dimension: chapter_name {
     type: string
+    group_label: "Concorde"
     sql: ${TABLE}."CHAPTER_NAME" ;;
   }
 
   dimension: item_handler {
     type: string
+    group_label: "Concorde"
     sql: ${TABLE}."ITEM_HANDLER" ;;
   }
 
   dimension: item_identifier {
     type: number
+    group_label: "Concorde"
     value_format_name: id
     sql: ${TABLE}."ITEM_IDENTIFIER" ;;
   }
 
   dimension: item_name {
     type: string
+    group_label: "Concorde"
     sql: ${TABLE}."ITEM_NAME" ;;
   }
 
@@ -64,17 +69,20 @@ view: concorde_items {
   dimension: learning_outcome_tag_set_1_primary {
     label: "Learning Outcomes - Course Objectives"
     type: string
+    group_label: "Concorde"
     sql: ${TABLE}."LEARNING_OUTCOME_TAG_SET_1_PRIMARY" ;;
   }
 
   dimension: learning_outcome_tag_set_2_primary {
     label: "Learning Outcomes - CAAHEP Cognitive Competencies"
     type: string
+    group_label: "Concorde"
     sql: ${TABLE}."LEARNING_OUTCOME_TAG_SET_2_PRIMARY" ;;
   }
 
   dimension: multiple_los_set_1_ {
     type: string
+    group_label: "Concorde"
     sql: ${TABLE}."MULTIPLE_LOS_SET_1_" ;;
     hidden:  yes
   }
@@ -93,6 +101,7 @@ view: concorde_items {
 
   measure: count {
     type: count
+    hidden: yes
     drill_fields: [chapter_name, item_name]
   }
 }
