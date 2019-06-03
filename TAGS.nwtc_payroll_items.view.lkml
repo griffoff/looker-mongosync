@@ -1,5 +1,5 @@
 view: nwtc_payroll_items {
-  sql_table_name: LOTS.NWTC_PAYROLL_ITEMS ;;
+  sql_table_name: Uploads.LOTS.NWTC_PAYROLL_ITEMS ;;
 
   dimension: _fivetran_deleted {
     type: yesno
@@ -87,9 +87,11 @@ view: nwtc_payroll_items {
     type: string
     sql: ${TABLE}."LEARNING_OBJECTIVES" ;;
     group_label: "NWTC Payroll"
+    hidden: yes
   }
 
   dimension: learning_outcome_tag_set_1_primary {
+    label: "Learning Outcomes"
     type: string
     sql: ${TABLE}."LEARNING_OUTCOME_TAG_SET_1_PRIMARY" ;;
     group_label: "NWTC Payroll"
