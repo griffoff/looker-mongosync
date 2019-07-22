@@ -219,6 +219,12 @@ explore: all_take_nodes {
     relationship: many_to_one
   }
 
+  join: snu_items {
+    view_label: "LOTS"
+    sql_on: ${take_node.activity_node_item_id} = ${snu_items.item_identifier} ;;
+    relationship: many_to_one
+  }
+
   join: all_users {
     view_label: "User Mutation Info"
     sql_on: ${take_node.user_identifier} = ${all_users.user_sso_guid} ;;
