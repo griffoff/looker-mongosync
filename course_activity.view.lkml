@@ -7,6 +7,7 @@ view: course_activity {
           _hash as business_key
           ,case when lead(last_update_date) over(partition by business_key order by last_update_date) is null then 1 end as latest
           ,*
+          ,LAG(external_properties) OVER (PARTITION BY business_key ORDER BY last_update_date) AS prev_external_properties
         from realtime.course_activity
       )
       select *
@@ -76,6 +77,24 @@ view: course_activity {
   dimension: external_properties {
     type: string
     sql: ${TABLE}.EXTERNAL_PROPERTIES ;;
+  }
+
+  dimension: prev_external_properties {
+    type: string
+    sql: ${TABLE}.PREV_EXTERNAL_PROPERTIES ;;
+    hidden: yes
+  }
+
+  dimension: max_takes {
+    description: "external_properties.soa:property:maxTakes"
+    type: number
+    sql:  TRY_CAST(${external_properties}:"soa:property:maxTakes":value:"$numberLong"::STRING as DECIMAL(3, 0)) ;;
+  }
+
+  dimension: prev_max_takes {
+    description: "previous external_properties.soa:property:maxTakes"
+    type: number
+    sql:  TRY_CAST(${prev_external_properties}:"soa:property:maxTakes":value:"$numberLong"::STRING as DECIMAL(3, 0)) ;;
   }
 
   dimension: label {

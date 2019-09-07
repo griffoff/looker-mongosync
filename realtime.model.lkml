@@ -14,7 +14,7 @@ include: "/mongo_sync/*.view"
 # include all the dashboards
 # include: "*.dashboard"
 
-persist_with: realtime_default_datagroup
+# persist_with: realtime_default_datagroup
 
 
 explore: product_activity_metadata {}
