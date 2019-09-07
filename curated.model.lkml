@@ -1,5 +1,6 @@
 include: "curated_base.model"
 label: "RealTime Data - Curated"
+include: "/cube/dims.lkml"
 
 # Models for extension
 explore: activity_take {
@@ -38,6 +39,7 @@ explore: course {
 explore: item_take {
   label: "Item Takes"
   from: curated_item_take
+  extends: [dim_course]
 
   join: item {
     from: curated_item
@@ -51,7 +53,10 @@ explore: item_take {
     relationship: many_to_one
   }
 
-
+  join: dim_course {
+    sql_on: ${course.course_key} = ${dim_course.coursekey} ;;
+    relationship: one_to_one
+  }
 
 }
 
