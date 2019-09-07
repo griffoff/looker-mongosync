@@ -123,6 +123,7 @@ explore: course {
 explore: item_take {
   label: "Item Takes"
   from: curated_item_take
+  extends: [dim_course]
 
   join: item {
     from: curated_item
@@ -135,6 +136,12 @@ explore: item_take {
     sql_on: ${item_take.course_uri} = ${course.course_uri} ;;
     relationship: many_to_one
   }
+
+  join: dim_course {
+    sql_on: ${course.course_key} = ${dim_course.coursekey} ;;
+    relationship: one_to_one
+  }
+
 }
 
 explore: activity_takes {
