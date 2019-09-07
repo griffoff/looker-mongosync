@@ -570,7 +570,7 @@ view: take_node {
     group_label: "Final Grade - All"
     label: "Time spent"
     type: number
-    sql: try_cast(nullif(${final_grade}:timeSpent::string, '') to decimal(18, 6)) / 60 / 60 / 24;;
+    sql: try_cast(nullif(${final_grade}:timeSpent::string, '') to_decimal(18, 6)) / 60 / 60 / 24;;
     value_format_name: duration_hms
   }
 
