@@ -1,5 +1,5 @@
 view: take_node {
-  #sql_table_name: REALTIME.TAKE_NODE ;;
+  #sql_table_name: REALTIME.TAKE_ITEM ;;
   derived_table: {
     sql:
       with data as (
@@ -82,7 +82,7 @@ view: take_node {
             ,coalesce(activity_node_product_code, assignable_content_product_abbr) as product_code
             ,activity_node_item_id as item_id
             ,assignable_content_uri_section_id as section_id
-        from realtime.take_node
+        from realtime.take_item as take_node
       )
       select *
       from data
@@ -501,14 +501,14 @@ view: take_node {
     group_label: "Final Grade - Item Score"
     label: "Score"
     type: number
-    sql: ${item_final_score}:normalScore::float ;;
+    sql: try_cast(nullif(${item_final_score}:normalScore::string, '') as decimal(10, 6)) ;;
   }
 
   dimension: item_final_score_timespent {
     group_label: "Final Grade - Item Score"
     label: "Time spent"
     type: number
-    sql: ${final_grade}:timeSpent::float / 60 / 60 / 24;;
+    sql: try_cast(nullif(${final_grade}:timeSpent::string, '') as decimal(18, 6)) / 60 / 60 / 24;;
     value_format_name: duration_hms
   }
 
@@ -522,6 +522,16 @@ view: take_node {
     label: "Correct (%)"
     type: number
     sql: count(case when ${item_possible_score} <= 1 and ${item_final_score_score} = ${item_possible_score} then 1 end) / nullif(count(case when ${item_possible_score} <= 1 then 1 end), 0) ;;
+    value_format_name: percent_1
+    drill_fields: [details*]
+  }
+
+  measure: item_final_score_percent {
+    group_label: "Final Grade - Item Score"
+    label: "Item Score (%)"
+    description: "Score on an item by an user, use this against an item dimension"
+    type: average
+    sql: ${item_final_score_score} ;;
     value_format_name: percent_1
     drill_fields: [details*]
   }
@@ -560,7 +570,7 @@ view: take_node {
     group_label: "Final Grade - All"
     label: "Time spent"
     type: number
-    sql: ${final_grade}:timeSpent::float / 60 / 60 / 24;;
+    sql: try_cast(nullif(${final_grade}:timeSpent::string, '') to decimal(18, 6)) / 60 / 60 / 24;;
     value_format_name: duration_hms
   }
 
@@ -621,6 +631,31 @@ view: take_node {
     type: number
     sql: stddev( ${final_grade_score}) ;;
     value_format_name: percent_1
+    drill_fields: [details*]
+  }
+
+  measure: final_grade_ns_sum {
+    group_label: "Final Grade - All"
+    label: "N Score (sum)"
+    type: sum
+    sql: try_cast(coalesce(${final_grade}:normalScore:"$numberDouble", ${final_grade}:normalScore)::string as decimal(10, 6)) ;;
+    value_format_name: percent_1
+    drill_fields: [details*]
+  }
+
+  measure: final_grade_ps_sum {
+    group_label: "Final Grade - All"
+    label: "P Score (sum)"
+    type: sum
+    sql: try_cast(coalesce(${final_grade}:possibleScore:"$numberDouble", ${final_grade}:possibleScore)::string as decimal(10, 6)) ;;
+    drill_fields: [details*]
+  }
+
+  measure: final_grade_ss_sum {
+    group_label: "Final Grade - All"
+    label: "S Score (sum)"
+    type: sum
+    sql: try_cast(coalesce(${final_grade}:scaledScore:"$numberDouble", ${final_grade}:scaledScore)::string as decimal(10, 6)) ;;
     drill_fields: [details*]
   }
 
@@ -713,6 +748,12 @@ view: take_node {
     sql: ${TABLE}.USER_IDENTIFIER ;;
   }
 
+  measure: sum_possible_score {
+    label: "Sum possible Score"
+    type: sum
+    sql: ${TABLE}.POSSIBLE_SCORE ;;
+  }
+
   measure: times_taken {
     label: "# Times taken"
     type: number
@@ -761,6 +802,102 @@ view: take_node {
     sql: ${courses_with_takes}/nullif(${course_count}, 0) ;;
     value_format_name: percent_1
     drill_fields: [course_details*]
+  }
+
+  dimension: interaction_attempts {
+    label: "Interaction Attempts"
+    type: number
+    sql: try_cast(coalesce(${TABLE}.INTERACTION_GRADE:attempts:"$numberLong", ${TABLE}.INTERACTION_GRADE:attempts)::string as decimal(10, 6)) ;;
+  }
+
+  dimension: interaction_attempts_tier {
+    type: tier
+    style: integer
+    tiers: [0, 1, 2, 3, 5, 10]
+    sql: ${interaction_attempts} ;;
+  }
+
+  measure: interaction_attempts_sum{
+    label: "Interaction Attempts"
+    type: sum
+    sql: ${interaction_attempts} ;;
+    drill_fields: [details*]
+  }
+
+  dimension: interaction_normal_score{
+    label: "Interaction Normal Score"
+    type: number
+    sql: try_cast(coalesce(${TABLE}.INTERACTION_GRADE:normalScore:"$numberDouble", ${TABLE}.INTERACTION_GRADE:normalScore)::string as decimal(10, 6)) ;;
+  }
+
+  measure: interaction_normal_score_sum{
+    label: "Interaction Normal Score"
+    type: sum
+    sql: ${interaction_normal_score} ;;
+    drill_fields: [details*]
+  }
+
+  dimension: parent_path_0 {
+    group_label: "Node Selectors"
+    label: "Parent Path 0"
+    type:  string
+    sql: ${TABLE}.PARENT_PATH[0]::string ;;
+  }
+
+  dimension: parent_path_1 {
+    group_label: "Node Selectors"
+    label: "Parent Path 1"
+    type:  string
+    sql: ${TABLE}.PARENT_PATH[1]::string ;;
+  }
+
+  dimension: parent_path_2 {
+    group_label: "Node Selectors"
+    label: "Parent Path 2"
+    type:  string
+    sql: ${TABLE}.PARENT_PATH[2]::string ;;
+  }
+
+  dimension: parent_path_3 {
+    group_label: "Node Selectors"
+    label: "Parent Path 3"
+    type:  string
+    sql: ${TABLE}.PARENT_PATH[3]::string ;;
+  }
+
+  dimension: parent_path_4 {
+    group_label: "Node Selectors"
+    label: "Parent Path 4"
+    type:  string
+    sql: ${TABLE}.PARENT_PATH[4]::string ;;
+  }
+
+  dimension: external_properties_activity_type {
+    group_label: "Node Selectors"
+    label: "External Property - activity-type"
+    type:  string
+    sql: ${TABLE}.EXTERNAL_PROPERTIES:"analytics:activity-type" ;;
+  }
+
+  dimension: external_properties_node_type {
+    group_label: "Node Selectors"
+    label: "External Property - node-type"
+    type:  string
+    sql: ${TABLE}.EXTERNAL_PROPERTIES:"analytics:node-type" ;;
+  }
+
+  dimension: external_properties_container_type {
+    group_label: "Node Selectors"
+    label: "External Property - container-type"
+    type:  string
+    sql: ${TABLE}.EXTERNAL_PROPERTIES:"analytics:container-type" ;;
+  }
+
+  dimension: external_properties_raw {
+    group_label: "Node Selectors"
+    label: "External Property Raw"
+    type:  string
+    sql: ${TABLE}.EXTERNAL_PROPERTIES ;;
   }
 
 }

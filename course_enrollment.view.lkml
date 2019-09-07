@@ -8,6 +8,7 @@ view: course_enrollment {
           ,case when lead(last_update_date) over(partition by business_key order by last_update_date) is null then 1 end as latest
           ,*
         from realtime.course_enrollment
+        where user_identifier is not null
       )
       select *
       from data
@@ -75,6 +76,13 @@ view: course_enrollment {
   dimension: user_identifier {
     type: string
     sql: ${TABLE}.user_identifier ;;
+  }
+
+  measure: users_enrolled{
+    label: "# Distinct users"
+    type: count_distinct
+    sql: ${TABLE}.user_identifier ;;
+    drill_fields: []
   }
 
   measure: count {

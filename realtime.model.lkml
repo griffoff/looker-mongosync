@@ -1,17 +1,18 @@
+include: "curated_base.model"
 connection: "snowflake_prod"
 label: "Realtime - Source"
 
-include: "/core/common.lkml"
-include: "/cube/dims.lkml"
+include: "//core/common.lkml"
+include: "//cube/dims.lkml"
 include: "datagroups.lkml"
 
-include: "/project_source/*.view.lkml"
+include: "//project_source/*.view.lkml"
 
 # include all the views
-include: "*.view"
+include: "/mongo_sync/*.view"
 
 # include all the dashboards
-include: "*.dashboard"
+# include: "*.dashboard"
 
 persist_with: realtime_default_datagroup
 
@@ -129,6 +130,8 @@ explore: product_toc_metadata {
   }
 }
 
+explore: lo_items {}
+
 explore: node_summary {
   label: "Weekly Item Summery"
   description: "This contains all 'nodes' from realtime, including, items, mastery groups and activities, summerized into per week usage."
@@ -148,8 +151,92 @@ explore: all_take_nodes {
 
   join: dim_course {
     sql_on: ${realtime_course.course_key} = ${dim_course.coursekey} ;;
-    relationship: one_to_one
+    type: left_outer
+    relationship: many_to_one
   }
+
+  join: mindtap_snapshot {
+    relationship: many_to_one
+    sql_on: ${mindtap_snapshot.snapshotid} = ${realtime_course.snapshot_label};;
+  }
+
+  join: lo_items {
+    sql_on: ${take_node.activity_node_item_id} = ${lo_items.item_identifier} ;;
+    relationship: many_to_one
+  }
+
+  join: tx_state_items {
+    view_label: "LOTS"
+    sql_on: ${take_node.activity_node_item_id} = ${tx_state_items.item_identifier} ;;
+    relationship: many_to_one
+  }
+
+  join: snhu_items {
+    view_label: "LOTS"
+    sql_on: ${take_node.activity_node_item_id} = ${snhu_items.cnow_item_id} ;;
+    relationship: many_to_one
+  }
+
+  join: csu_items {
+    view_label: "LOTS"
+    sql_on: ${take_node.activity_node_item_id} = ${csu_items.item_identifier} ;;
+    relationship: many_to_one
+  }
+
+  join: nwtc_items {
+    view_label: "LOTS"
+    sql_on: ${take_node.activity_node_item_id} = ${nwtc_items.item_identifier} ;;
+    relationship: many_to_one
+  }
+
+  join: nwtc_payroll_items {
+    view_label: "LOTS"
+    sql_on: ${take_node.activity_node_item_id} = ${nwtc_payroll_items.item_identifier};;
+    relationship: many_to_one
+  }
+
+  join: concorde_items {
+    view_label: "LOTS"
+    sql_on: ${take_node.activity_node_item_id} = ${concorde_items.item_identifier} ;;
+    relationship: many_to_one
+  }
+
+  join: rcc_bus_10_items {
+    view_label: "LOTS"
+    sql_on: ${take_node.activity_node_item_id} = ${rcc_bus_10_items.item_identifier} ;;
+    relationship: many_to_one
+  }
+
+  join: rcc_mag_51_items {
+    view_label: "LOTS"
+    sql_on: ${take_node.activity_node_item_id} = ${rcc_mag_51_items.item_identifier} ;;
+    relationship: many_to_one
+  }
+
+  join: hbu_items {
+    view_label: "LOTS"
+    sql_on: ${take_node.activity_node_item_id} = ${hbu_items.item_identifier} ;;
+    relationship: many_to_one
+  }
+
+  join: snu_items {
+    view_label: "LOTS"
+    sql_on: ${take_node.activity_node_item_id} = ${snu_items.item_identifier} ;;
+    relationship: many_to_one
+  }
+
+  join: all_users {
+    view_label: "User Mutation Info"
+    sql_on: ${take_node.user_identifier} = ${all_users.user_sso_guid} ;;
+    relationship: many_to_one
+  }
+
+#   join: course_two {
+#     view_label: "course dup"
+#     from: dim_course
+#     sql_on:  ${mindtap_snapshot.coursekey} = ${course_two.coursekey} ;;
+#     type: left_outer
+#   }
 
   join: course_activity {
     sql_on: (${take_node.course_uri}, ${take_node.activity_uri}) = (${course_activity.course_uri}, ${course_activity.activity_uri}) ;;
@@ -182,4 +269,21 @@ explore: all_take_nodes {
 #     relationship: many_to_one
 #   }
 
+}
+
+explore: item_take {
+  label: "Item Takes"
+  from: curated_item_take
+
+  join: item {
+    from: curated_item
+    sql_on: ${item_take.activity_item_uri} = ${item.activity_item_uri} ;;
+    relationship: many_to_one
+  }
+
+  join: course {
+    from: realtime_course
+    sql_on: ${item_take.course_uri} = ${course.course_uri} ;;
+    relationship: many_to_one
+  }
 }
