@@ -76,41 +76,51 @@ view: course_activity {
   }
 
   dimension: external_properties {
+    group_label: "Current Settings"
     type: string
     sql: ${TABLE}.EXTERNAL_PROPERTIES ;;
   }
 
   dimension: prev_external_properties {
+    group_label: "Previous Settings"
     type: string
     sql: ${TABLE}.PREV_EXTERNAL_PROPERTIES ;;
-    hidden: yes
   }
 
   dimension: initial_external_properties {
+    group_label: "Initial Settings"
     type: string
     sql: ${TABLE}.INITIAL_EXTERNAL_PROPERTIES ;;
-    hidden: yes
   }
 
   dimension: max_takes {
     group_label: "Current Settings"
     description: "external_properties.soa:property:maxTakes"
     type: number
-    sql:  TRY_CAST(${external_properties}:"soa:property:maxTakes":value:"$numberLong"::STRING as DECIMAL(3, 0)) ;;
+    sql:  TRY_CAST(COALESCE(
+                  ${external_properties}:"soa:property:maxTakes":value:"$numberLong"
+                  ,${external_properties}:"cnow:property:allowed-take-count":value:"$numberLong"
+          )::STRING as DECIMAL(3, 0)) ;;
   }
 
   dimension: prev_max_takes {
     group_label: "Previous Settings"
     description: "previous external_properties.soa:property:maxTakes"
     type: number
-    sql:  TRY_CAST(${prev_external_properties}:"soa:property:maxTakes":value:"$numberLong"::STRING as DECIMAL(3, 0)) ;;
+    sql:  TRY_CAST(COALESCE(
+                  ${prev_external_properties}:"soa:property:maxTakes":value:"$numberLong"
+                  ,${prev_external_properties}:"cnow:property:allowed-take-count":value:"$numberLong"
+          )::STRING as DECIMAL(3, 0)) ;;
   }
 
   dimension: initial_max_takes {
     group_label: "Initial Settings"
     description: "previous external_properties.soa:property:maxTakes"
     type: number
-    sql:  TRY_CAST(${initial_external_properties}:"soa:property:maxTakes":value:"$numberLong"::STRING as DECIMAL(3, 0)) ;;
+    sql:  TRY_CAST(COALESCE(
+                  ${initial_external_properties}:"soa:property:maxTakes":value:"$numberLong"
+                  ,${initial_external_properties}:"cnow:property:allowed-take-count":value:"$numberLong"
+          )::STRING as DECIMAL(3, 0)) ;;
   }
 
   dimension: label {
