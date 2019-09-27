@@ -226,7 +226,7 @@ explore: all_take_nodes {
   }
 
   join: all_users {
-    view_label: "User Mutation Info"
+    view_label: "LMS User Info"
     sql_on: ${take_node.user_identifier} = ${all_users.user_sso_guid} ;;
     relationship: many_to_one
   }
