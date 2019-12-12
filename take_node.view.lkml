@@ -900,4 +900,8 @@ view: take_node {
     sql: ${TABLE}.EXTERNAL_PROPERTIES ;;
   }
 
+  dimension: book_item_name {
+    sql: ${TABLE}.EXTERNAL_PROPERTIES:"cengage:book:item:name"::string ;;
+  }
+
 }
