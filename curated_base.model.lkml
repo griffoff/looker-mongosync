@@ -2,7 +2,7 @@ connection: "snowflake_prod"
 label: "RealTime Data - Curated (Simple Raw Views)"
 
 include: "datagroups.lkml"
-include: "/core/common.lkml"
+include: "//core/common.lkml"
 include: "*.view.lkml"
 #include: "*.dashboard.lookml"  # include all dashboards in this project
 

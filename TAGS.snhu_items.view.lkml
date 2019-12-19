@@ -1,5 +1,6 @@
 view: snhu_items {
-  sql_table_name: Uploads.TX_STATE.SNHU_ITEMS ;;
+  label: "LOTS - SNHU"
+  sql_table_name: Uploads.LOTS.SNHU_ITEMS ;;
 
   dimension: _fivetran_deleted {
     type: yesno
@@ -30,51 +31,61 @@ view: snhu_items {
 
   dimension: acbsp_taxonomy_code {
     type: number
+    group_label: "SNHU"
     sql: ${TABLE}."ACBSP_TAXONOMY_CODE" ;;
   }
 
   dimension: acbsp_taxonomy_code_2 {
     type: number
+    group_label: "SNHU"
     sql: ${TABLE}."ACBSP_TAXONOMY_CODE_2" ;;
   }
 
   dimension: acbsp_taxonomy_code_3 {
     type: number
+    group_label: "SNHU"
     sql: ${TABLE}."ACBSP_TAXONOMY_CODE_3" ;;
   }
 
   dimension: acbsp_taxonomy_tag {
     type: string
+    group_label: "SNHU"
     sql: ${TABLE}."ACBSP_TAXONOMY_TAG" ;;
   }
 
   dimension: acbsp_taxonomy_tag_2 {
     type: string
+    group_label: "SNHU"
     sql: ${TABLE}."ACBSP_TAXONOMY_TAG_2" ;;
   }
 
   dimension: acbsp_taxonomy_tag_3 {
     type: string
+    group_label: "SNHU"
     sql: ${TABLE}."ACBSP_TAXONOMY_TAG_3" ;;
   }
 
   dimension: bus_prog_taxonomy_aacsb_code {
     type: number
+    group_label: "SNHU"
     sql: ${TABLE}."BUS_PROG_TAXONOMY_AACSB_CODE" ;;
   }
 
   dimension: bus_prog_taxonomy_aacsb_tag {
     type: string
+    group_label: "SNHU"
     sql: ${TABLE}."BUS_PROG_TAXONOMY_AACSB_TAG" ;;
   }
 
   dimension: cnow_item_id {
     type: number
+    group_label: "SNHU"
     sql: ${TABLE}."CNOW_ITEM_ID" ;;
   }
 
   dimension: display_name {
     type: string
+    group_label: "SNHU"
     sql: ${TABLE}."DISPLAY_NAME" ;;
   }
 
@@ -86,6 +97,7 @@ view: snhu_items {
 
   dimension: geyser_generic_taxonomy_tag {
     type: string
+    group_label: "SNHU"
     sql: ${TABLE}."GEYSER_GENERIC_TAXONOMY_TAG" ;;
   }
 
@@ -97,47 +109,56 @@ view: snhu_items {
 
   dimension: industry_standard_aicpa_code {
     type: number
+    group_label: "SNHU"
     sql: ${TABLE}."INDUSTRY_STANDARD_AICPA_CODE" ;;
   }
 
   dimension: industry_standard_aicpa_tag {
     type: string
+    group_label: "SNHU"
     sql: ${TABLE}."INDUSTRY_STANDARD_AICPA_TAG" ;;
   }
 
   dimension: item_cgid {
     type: string
+    group_label: "SNHU"
     sql: ${TABLE}."ITEM_CGID" ;;
     hidden: yes
   }
 
   dimension: item_name {
     type: string
+    group_label: "SNHU"
     sql: ${TABLE}."ITEM_NAME" ;;
   }
 
   dimension: module {
     type: number
+    group_label: "SNHU"
     sql: ${TABLE}."MODULE" ;;
   }
 
   dimension: snhu_objective_id {
     type: string
+    group_label: "SNHU"
     sql: ${TABLE}."SNHU_OBJECTIVE_ID" ;;
   }
 
   dimension: snhu_objective_id_formatted_for_lookup_ {
     type: string
+    group_label: "SNHU"
     sql: ${TABLE}."SNHU_OBJECTIVE_ID_FORMATTED_FOR_LOOKUP_" ;;
   }
 
   dimension: snhu_objective_tag_first_lo_only_ {
     type: string
+    group_label: "SNHU"
     sql: ${TABLE}."SNHU_OBJECTIVE_TAG_FIRST_LO_ONLY_" ;;
   }
 
   measure: count {
     type: count
+    group_label: "SNHU"
     drill_fields: [display_name, item_name]
   }
 }

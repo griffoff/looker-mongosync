@@ -7,6 +7,8 @@ view: course_activity {
           _hash as business_key
           ,case when lead(last_update_date) over(partition by business_key order by last_update_date) is null then 1 end as latest
           ,*
+          ,LAG(external_properties) OVER (PARTITION BY business_key ORDER BY last_update_date) AS prev_external_properties
+          ,FIRST_VALUE(external_properties) OVER (PARTITION BY business_key ORDER BY last_update_date) AS initial_external_properties
         from realtime.course_activity
       )
       select *
@@ -74,8 +76,51 @@ view: course_activity {
   }
 
   dimension: external_properties {
+    group_label: "Current Settings"
     type: string
     sql: ${TABLE}.EXTERNAL_PROPERTIES ;;
+  }
+
+  dimension: prev_external_properties {
+    group_label: "Previous Settings"
+    type: string
+    sql: ${TABLE}.PREV_EXTERNAL_PROPERTIES ;;
+  }
+
+  dimension: initial_external_properties {
+    group_label: "Initial Settings"
+    type: string
+    sql: ${TABLE}.INITIAL_EXTERNAL_PROPERTIES ;;
+  }
+
+  dimension: max_takes {
+    group_label: "Current Settings"
+    description: "external_properties.soa:property:maxTakes"
+    type: number
+    sql:  TRY_CAST(COALESCE(
+                  ${external_properties}:"soa:property:maxTakes":value:"$numberLong"
+                  ,${external_properties}:"cnow:property:allowed-take-count":value:"$numberLong"
+          )::STRING as DECIMAL(3, 0)) ;;
+  }
+
+  dimension: prev_max_takes {
+    group_label: "Previous Settings"
+    description: "previous external_properties.soa:property:maxTakes"
+    type: number
+    sql:  TRY_CAST(COALESCE(
+                  ${prev_external_properties}:"soa:property:maxTakes":value:"$numberLong"
+                  ,${prev_external_properties}:"cnow:property:allowed-take-count":value:"$numberLong"
+          )::STRING as DECIMAL(3, 0)) ;;
+  }
+
+  dimension: initial_max_takes {
+    group_label: "Initial Settings"
+    description: "previous external_properties.soa:property:maxTakes"
+    type: number
+    sql:  TRY_CAST(COALESCE(
+                  ${initial_external_properties}:"soa:property:maxTakes":value:"$numberLong"
+                  ,${initial_external_properties}:"cnow:property:allowed-take-count":value:"$numberLong"
+          )::STRING as DECIMAL(3, 0)) ;;
   }
 
   dimension: label {

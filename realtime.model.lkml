@@ -14,7 +14,7 @@ include: "/mongo_sync/*.view"
 # include all the dashboards
 # include: "*.dashboard"
 
-persist_with: realtime_default_datagroup
+# persist_with: realtime_default_datagroup
 
 
 explore: product_activity_metadata {}
@@ -166,22 +166,68 @@ explore: all_take_nodes {
   }
 
   join: tx_state_items {
+    view_label: "LOTS"
     sql_on: ${take_node.activity_node_item_id} = ${tx_state_items.item_identifier} ;;
     relationship: many_to_one
   }
 
   join: snhu_items {
+    view_label: "LOTS"
     sql_on: ${take_node.activity_node_item_id} = ${snhu_items.cnow_item_id} ;;
     relationship: many_to_one
   }
 
   join: csu_items {
+    view_label: "LOTS"
     sql_on: ${take_node.activity_node_item_id} = ${csu_items.item_identifier} ;;
     relationship: many_to_one
   }
 
   join: nwtc_items {
-    sql_on: ${product_item_metadata.cgid} = ${nwtc_items.cgi} ;;
+    view_label: "LOTS"
+    sql_on: ${take_node.activity_node_item_id} = ${nwtc_items.item_identifier} ;;
+    relationship: many_to_one
+  }
+
+  join: nwtc_payroll_items {
+    view_label: "LOTS"
+    sql_on: ${take_node.activity_node_item_id} = ${nwtc_payroll_items.item_identifier};;
+    relationship: many_to_one
+  }
+
+  join: concorde_items {
+    view_label: "LOTS"
+    sql_on: ${take_node.activity_node_item_id} = ${concorde_items.item_identifier} ;;
+    relationship: many_to_one
+  }
+
+  join: rcc_bus_10_items {
+    view_label: "LOTS"
+    sql_on: ${take_node.activity_node_item_id} = ${rcc_bus_10_items.item_identifier} ;;
+    relationship: many_to_one
+  }
+
+  join: rcc_mag_51_items {
+    view_label: "LOTS"
+    sql_on: ${take_node.activity_node_item_id} = ${rcc_mag_51_items.item_identifier} ;;
+    relationship: many_to_one
+  }
+
+  join: hbu_items {
+    view_label: "LOTS"
+    sql_on: ${take_node.activity_node_item_id} = ${hbu_items.item_identifier} ;;
+    relationship: many_to_one
+  }
+
+  join: snu_items {
+    view_label: "LOTS"
+    sql_on: ${take_node.activity_node_item_id} = ${snu_items.item_identifier} ;;
+    relationship: many_to_one
+  }
+
+  join: all_users {
+    view_label: "LMS User Info"
+    sql_on: ${take_node.user_identifier} = ${all_users.user_sso_guid} ;;
     relationship: many_to_one
   }
 

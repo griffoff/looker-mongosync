@@ -570,7 +570,7 @@ view: take_node {
     group_label: "Final Grade - All"
     label: "Time spent"
     type: number
-    sql: try_cast(nullif(${final_grade}:timeSpent::string, '') to decimal(18, 6)) / 60 / 60 / 24;;
+    sql: try_cast(nullif(${final_grade}:timeSpent::string, '') AS decimal(18, 6)) / 60 / 60 / 24;;
     value_format_name: duration_hms
   }
 
@@ -898,6 +898,10 @@ view: take_node {
     label: "External Property Raw"
     type:  string
     sql: ${TABLE}.EXTERNAL_PROPERTIES ;;
+  }
+
+  dimension: book_item_name {
+    sql: ${TABLE}.EXTERNAL_PROPERTIES:"cengage:book:item:name"::string ;;
   }
 
 }

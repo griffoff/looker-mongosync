@@ -1,5 +1,5 @@
 view: lo_items {
-  sql_table_name: UPLOADS.TX_STATE.LO_ITEMS ;;
+  sql_table_name: UPLOADS.LOTS.LO_ITEMS ;;
 
   dimension: bloom_s_level {
     type: string
