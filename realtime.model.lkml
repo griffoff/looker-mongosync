@@ -133,8 +133,8 @@ explore: product_toc_metadata {
 explore: lo_items {}
 
 explore: node_summary {
-  label: "Weekly Item Summery"
-  description: "This contains all 'nodes' from realtime, including, items, mastery groups and activities, summerized into per week usage."
+  label: "Weekly Summary of Items"
+  description: "This contains all 'nodes' from realtime, including, items, mastery groups and activities, summarized into per week usage. Use of metrics measures will likely result in NOT the data you want."
 }
 
 explore: all_take_nodes {
