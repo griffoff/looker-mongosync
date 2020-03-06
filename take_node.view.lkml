@@ -536,6 +536,16 @@ view: take_node {
     drill_fields: [details*]
   }
 
+  measure: item_max_score_percent {
+    group_label: "Final Grade - Item Score"
+    label: "Highest Item Score (%)"
+    description: "Score on an item by an user, use this against an item dimension"
+    type: max
+    sql: ${item_final_score_score} ;;
+    value_format_name: percent_1
+    drill_fields: [details*]
+  }
+
   measure: item_final_score_timespent_avg {
     group_label: "Final Grade - Item Score"
     label: "Time spent (avg)"
