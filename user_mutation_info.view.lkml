@@ -6,6 +6,9 @@ view: all_users {
             then right(UID, charindex('-', reverse(uid)) - 1)
             else UID end)
             as LMS_ID
+            ,first_name
+            ,last_name
+            ,email
             from IAM.PROD.USER_MUTATION
  ;;
   }
@@ -14,6 +17,10 @@ view: all_users {
     type: string
     sql: ${TABLE}."USER_SSO_GUID" ;;
   }
+
+  dimension: first_name {}
+  dimension: last_name {}
+  dimension: email {}
 
   dimension: lms_id {
     label: "LMS ID"
@@ -30,6 +37,9 @@ view: all_users {
     fields: [
       lms_id,
       user_sso_guid,
+      first_name,
+      last_name,
+      email,
 
     ]
   }
