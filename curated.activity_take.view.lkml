@@ -5,6 +5,7 @@ view: curated_activity_take {
       column: submission_date {field: take_node.submission_raw}
       column: course_uri {field:take_node.course_uri}
       column: external_take_uri {field:take_node.external_take_uri}
+      column: external_properties_raw {field:take_node.external_properties_raw}
       column: activity_uri {field:take_node.activity_uri}
       column: activity_type_uri {field:activity_type_map.activity_type_uri}
       column: final_grade_scored {field: take_node.final_grade_scored}
@@ -51,7 +52,7 @@ view: curated_activity_take {
   }
   dimension: final_grade_timespent {
     label: "Time spent"
-    value_format_name: duration_hms
+    value_format: "[m]:ss \m\i\n\s"
     type: number
   }
   dimension: take_count {
@@ -64,7 +65,100 @@ view: curated_activity_take {
       primary_key:yes
       hidden:yes
   }
+  dimension: external_properties_raw {
+    group_label: "External Properties"
+    type: string
+  }
+  dimension: problem_type {
+    group_label: "External Properties"
+    type: string
+    sql:  ${external_properties_raw}:"cengage:book:item:difficulty";;
+  }
+  dimension: item_name {
+    group_label: "External Properties"
+    type: string
+    sql:  ${external_properties_raw}:"cengage:book:item:name";;
+  }
+
   measure: count {
+    label: "# takes"
     type: count
   }
+  measure: final_grade_score_average {
+    group_label: "Score"
+    type: average
+    sql: ${final_grade_score} ;;
+    value_format_name: percent_1
+  }
+  measure: final_grade_score_min {
+    group_label: "Score"
+    type: min
+    sql: ${final_grade_score} ;;
+    value_format_name: percent_1
+  }
+  measure: final_grade_score_q1 {
+    group_label: "Score"
+    type: percentile
+    percentile: 25
+    sql: ${final_grade_score} ;;
+    value_format_name: percent_1
+  }
+  measure: final_grade_score_median {
+    group_label: "Score"
+    type: median
+    sql: ${final_grade_score} ;;
+    value_format_name: percent_1
+  }
+  measure: final_grade_score_q3 {
+    group_label: "Score"
+    type: percentile
+    percentile: 75
+    sql: ${final_grade_score} ;;
+    value_format_name: percent_1
+  }
+  measure: final_grade_score_max {
+    group_label: "Score"
+    type: max
+    sql: ${final_grade_score} ;;
+    value_format_name: percent_1
+  }
+
+  measure: final_grade_timespent_average {
+    type: average
+    sql: ${final_grade_timespent} ;;
+    value_format: "[m]:ss \m\i\n\s"
+  }
+  measure: final_grade_timespent_min {
+    group_label: "Time spent"
+    type: min
+    sql: ${final_grade_timespent} ;;
+    value_format: "[m]:ss \m\i\n\s"
+  }
+  measure: final_grade_timespent_q1 {
+    group_label: "Time spent"
+    type: percentile
+    percentile: 25
+    sql: ${final_grade_timespent} ;;
+    value_format: "[m]:ss \m\i\n\s"
+  }
+  measure: final_grade_timespent_median {
+    group_label: "Time spent"
+    type: median
+    sql: ${final_grade_timespent} ;;
+    value_format: "[m]:ss \m\i\n\s"
+  }
+  measure: final_grade_timespent_q3 {
+    group_label: "Time spent"
+    type: percentile
+    percentile: 75
+    sql: ${final_grade_timespent} ;;
+    value_format: "[m]:ss \m\i\n\s"
+  }
+  measure: final_grade_timespent_max {
+    group_label: "Time spent"
+    type: max
+    sql: ${final_grade_timespent} ;;
+    value_format: "[m]:ss \m\i\n\s"
+  }
+
 }
