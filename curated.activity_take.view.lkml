@@ -16,6 +16,7 @@ view: curated_activity_take {
       column: hash {field: take_node.hash}
       #sort: {field: take_node.activity_uri}
       #sort: {field: take_node.user_identifier}
+      filters: [take_node.activity: "yes"]
     }
     datagroup_trigger: realtime_default_datagroup
   }
