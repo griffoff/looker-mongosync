@@ -489,6 +489,12 @@ view: take_node {
     drill_fields: [details*]
   }
 
+  dimension: final_grade {
+    hidden: yes
+    sql:  ${TABLE}.FINAL_GRADE ;;
+    type: string
+  }
+
   dimension: item_final_score {
     group_label: "Final Grade - Item Score"
     hidden: yes
@@ -553,13 +559,6 @@ view: take_node {
     sql: ${item_final_score_timespent};;
     value_format_name: duration_hms
     drill_fields: [details*]
-  }
-
-  dimension: final_grade {
-    group_label: "Final Grade - All"
-    label: "Raw JSON"
-    type: string
-    sql: ${TABLE}.FINAL_GRADE ;;
   }
 
   dimension: final_grade_taken {
