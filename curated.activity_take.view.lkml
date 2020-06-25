@@ -177,9 +177,9 @@ view: curated_activity_take {
     label: "# Scored questions attempted"
     type: number
   }
-  dimension: pecent_questions_attempted {
+  dimension: percent_questions_attempted {
     group_label: "Questions"
-    label: "# Questions attempted"
+    label: "% Questions attempted"
     type: number
     sql: ${questions_attempted} / ${total_questions} ;;
     value_format_name: percent_0
