@@ -8,7 +8,7 @@ view: take_node {
         with latest as (
           select hash h, max(last_update_date) d
           from realtime.take_item
-          where submission_date >= dateadd(year, -1, current_date())
+          where submission_date >= dateadd(year, -3, current_date())
           group by 1
         )
         ,data as (
