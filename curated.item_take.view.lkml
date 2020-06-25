@@ -47,6 +47,15 @@ view: curated_item_take {
     value_format_name: percent_1
   }
 
+  dimension: difficulty {
+    hidden: no
+  }
+  dimension: problem_type {
+    hidden: no
+  }
+  dimension: item_name {
+    hidden: no
+  }
   measure: final_grade_score_average {
     hidden: yes
   }

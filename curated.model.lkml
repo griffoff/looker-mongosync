@@ -117,4 +117,10 @@ explore: courses {
     relationship: one_to_many
   }
 
+  join: item_take {
+    from: curated_item_take
+    sql_on: ${activity_take.external_take_uri} = ${item_take.external_take_uri} ;;
+    relationship: one_to_many
+  }
+
 }
