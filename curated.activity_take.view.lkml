@@ -24,7 +24,6 @@ view: curated_takes {
         UPPER(activity_type_map.activity_type_uri) <> UPPER('als-pete')
         OR activity_type_map.activity_type_uri IS NULL
         )
-      AND NOT is_survey
       AND NOT mastery_item
       --GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
       ;;
