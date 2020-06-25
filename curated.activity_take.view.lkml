@@ -166,7 +166,6 @@ view: curated_activity_take {
     group_label: "Questions"
     label: "Avgerage attempts per question"
     type: number
-    sql:  ;;
   }
   dimension: questions_attempted {
     group_label: "Questions"

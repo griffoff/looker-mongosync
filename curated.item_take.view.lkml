@@ -74,5 +74,38 @@ view: curated_item_take {
   measure: final_grade_score_max {
     hidden: yes
   }
+  dimension: total_questions {
+    hidden: yes
+  }
+  dimension: total_scored_questions {
+    hidden: yes
+  }
+  dimension: total_question_attempts {
+    hidden: yes
+  }
+  dimension: avg_question_attempts {
+    hidden: yes
+  }
+  dimension: questions_attempted {
+    hidden: yes
+  }
+  dimension: scored_questions_attempted {
+    hidden: yes
+  }
+  dimension: pecent_questions_attempted {
+    hidden: yes
+  }
+  dimension: pecent_scored_questions_attempted {
+    hidden: yes
+  }
+  dimension: percent_questions_correct {
+    hidden: yes
+  }
+  dimension: percent_questions_correct_attempt_1 {
+    hidden: yes
+  }
+  dimension: percent_questions_correct_attempt_2 {
+    hidden: yes
+  }
 
 }
