@@ -1,22 +1,84 @@
+view: curated_takes {
+  derived_table: {
+    sql:
+    SELECT
+        take_node.USER_IDENTIFIER  AS user_identifier,
+        take_node.SUBMISSION_DATE  AS submission_date,
+        take_node.COURSE_URI  AS course_uri,
+        take_node.EXTERNAL_TAKE_URI  AS external_take_uri,
+        take_node.EXTERNAL_PROPERTIES  AS external_properties_raw,
+        LOWER(take_node.ACTIVITY_URI)  AS activity_uri,
+        take_node.activity_node_uri as activity_node_uri
+        activity_type_map.activity_type_uri AS activity_type_uri,
+        take_node.FINAL_GRADE:scored::boolean  AS final_grade_scored,
+        take_node.FINAL_GRADE:taken::boolean  AS final_grade_taken,
+        take_node.FINAL_GRADE:normalScore::float  AS final_grade_score,
+        try_cast(nullif(take_node.FINAL_GRADE:timeSpent::string, '') AS decimal(18, 6)) / 60 / 60 / 24 AS final_grade_timespent,
+        take_node.HASH  AS hash,
+        take_node.ACTIVITY
+      FROM ${take_node.SQL_TABLE_NAME} AS take_node
+      LEFT JOIN ${activity_type_map.SQL_TABLE_NAME} AS activity_type_map ON (LOWER(take_node.ACTIVITY_TYPE_URI)) = activity_type_map.activity_type_uri_source
+
+      WHERE
+        (
+        UPPER(activity_type_map.activity_type_uri) <> UPPER('als-pete')
+        OR activity_type_map.activity_type_uri IS NULL
+        )
+      AND NOT is_survey
+      AND NOT mastery_item
+      --GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
+      );;
+  }
+}
+
 view: curated_activity_take {
   derived_table: {
-    explore_source: take_node_activity {
-      column: user_identifier {field:take_node.user_identifier}
-      column: submission_date {field: take_node.submission_raw}
-      column: course_uri {field:take_node.course_uri}
-      column: external_take_uri {field:take_node.external_take_uri}
-      column: external_properties_raw {field:take_node.external_properties_raw}
-      column: activity_uri {field:take_node.activity_uri}
-      column: activity_type_uri {field:activity_type_map.activity_type_uri}
-      column: final_grade_scored {field: take_node.final_grade_scored}
-      column: final_grade_taken {field: take_node.final_grade_taken}
-      column: final_grade_score {field: take_node.final_grade_score}
-      column: final_grade_timespent {field: take_node.final_grade_timespent}
-      column: take_count {field:take_node.count}
-      column: hash {field: take_node.hash}
-      #sort: {field: take_node.activity_uri}
-      #sort: {field: take_node.user_identifier}
-      filters: [take_node.activity: "yes"]
+#     explore_source: take_node_activity {
+#       column: user_identifier {field:take_node.user_identifier}
+#       column: submission_date {field: take_node.submission_raw}
+#       column: course_uri {field:take_node.course_uri}
+#       column: external_take_uri {field:take_node.external_take_uri}
+#       column: external_properties_raw {field:take_node.external_properties_raw}
+#       column: activity_uri {field:take_node.activity_uri}
+#       column: activity_type_uri {field:activity_type_map.activity_type_uri}
+#       column: final_grade_scored {field: take_node.final_grade_scored}
+#       column: final_grade_taken {field: take_node.final_grade_taken}
+#       column: final_grade_score {field: take_node.final_grade_score}
+#       column: final_grade_timespent {field: take_node.final_grade_timespent}
+#       column: take_count {field:take_node.count}
+#       column: hash {field: take_node.hash}
+#       #sort: {field: take_node.activity_uri}
+#       #sort: {field: take_node.user_identifier}
+#       filters: [take_node.activity: "yes"]
+#     }
+    create_process: {
+      sql_step:
+      CREATE OR REPLACE TABLE LOOKER_SCRATCH.curated_activity_take AS (
+      SELECT
+        user_identifier,
+        submission_date,
+        course_uri,
+        external_take_uri,
+        external_properties_raw,
+        activity_uri,
+        activity_type_uri,
+        final_grade_scored,
+        final_grade_taken,
+        final_grade_score,
+        final_grade_timespent,
+        hash,
+        COUNT(*) as take_count
+      FROM ${curated_takes.SQL_TABLE_NAME}
+      WHERE activity
+      GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
+      ORDER BY submission_date
+      ;;
+
+      sql_step: ALTER TABLE looker_scratch.curated_activity_take cluster by (submission_date::date)
+      ;;
+
+      sql_step: create or replace table ${SQL_TABLE_NAME} CLONE looker_scratch.curated_activity_take
+      ;;
     }
     datagroup_trigger: realtime_default_datagroup
   }
@@ -70,19 +132,24 @@ view: curated_activity_take {
     group_label: "External Properties"
     type: string
   }
+  dimension: difficulty {
+    group_label: "External Properties"
+    type: number
+    sql:  ${external_properties_raw}:"cengage:book:item:difficulty"::FLOAT;;
+  }
   dimension: problem_type {
     group_label: "External Properties"
     type: string
-    sql:  ${external_properties_raw}:"cengage:book:item:difficulty";;
+    sql:  ${external_properties_raw}:"cengage:book:item:problem-type"::STRING;;
   }
   dimension: item_name {
     group_label: "External Properties"
     type: string
-    sql:  ${external_properties_raw}:"cengage:book:item:name";;
+    sql:  ${external_properties_raw}:"cengage:book:item:name"::STRING;;
   }
 
   measure: count {
-    label: "# takes"
+    label: "# Takes"
     type: count
   }
   measure: final_grade_score_average {
