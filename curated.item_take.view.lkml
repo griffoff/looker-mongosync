@@ -43,7 +43,7 @@ view: curated_item_take {
   measure: final_grade_percent_correct {
     group_label: "Score"
     type: number
-    sql: COUNT(CASE WHEN ${final_grade_scored} AND ${final_grade_score} != 0 THEN 1 END) / COUNT(CASE WHEN ${final_grade_scored} THEN 1 END);;
+    sql: COUNT(CASE WHEN ${final_grade_scored} AND ${final_grade_score} != 0 THEN 1 END) / NULLIF(COUNT(CASE WHEN ${final_grade_scored} THEN 1 END), 0);;
     value_format_name: percent_1
   }
 

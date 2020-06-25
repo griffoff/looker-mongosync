@@ -1,6 +1,6 @@
 include: "curated_base.model"
 label: "RealTime Data - Curated"
-include: "/cube/dims.lkml"
+include: "//cube/dims.lkml"
 
 # Models for extension
 explore: activity_take {
