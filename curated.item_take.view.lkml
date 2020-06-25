@@ -23,11 +23,12 @@ view: curated_item_take {
         final_grade_taken,
         final_grade_score,
         final_grade_timespent,
+        attempts,
         hash,
         COUNT(*) as take_count
       FROM ${curated_takes.SQL_TABLE_NAME}
       WHERE NOT activity
-      GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13
+      GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
       ORDER BY submission_date
       ;;
 
@@ -40,10 +41,28 @@ view: curated_item_take {
   }
   dimension: activity_item_uri {}
 
+  dimension: attempts {
+    type: number
+  }
+
   measure: final_grade_percent_correct {
     group_label: "Score"
     type: number
-    sql: COUNT(CASE WHEN ${final_grade_scored} AND ${final_grade_score} != 0 THEN 1 END) / NULLIF(COUNT(CASE WHEN ${final_grade_scored} THEN 1 END), 0);;
+    sql: COUNT(CASE WHEN ${final_grade_scored} AND ${final_grade_score} = 1 THEN 1 END) / NULLIF(COUNT(CASE WHEN ${final_grade_scored} THEN 1 END), 0);;
+    value_format_name: percent_1
+  }
+
+  measure: final_grade_percent_correct_attempt_1 {
+    group_label: "Score"
+    type: number
+    sql: COUNT(CASE WHEN ${final_grade_scored} AND ${final_grade_score} = 1 AND ${attempts} = 1 THEN 1 END) / NULLIF(COUNT(CASE WHEN ${final_grade_scored} THEN 1 END), 0);;
+    value_format_name: percent_1
+  }
+
+  measure: final_grade_percent_correct_attempt_2 {
+    group_label: "Score"
+    type: number
+    sql: COUNT(CASE WHEN ${final_grade_scored} AND ${final_grade_score} = 1 AND ${attempts} <= 2 THEN 1 END) / NULLIF(COUNT(CASE WHEN ${final_grade_scored} THEN 1 END), 0);;
     value_format_name: percent_1
   }
 
