@@ -90,6 +90,9 @@ view: curated_item_take {
   measure: final_grade_score_q3 {
     hidden: yes
   }
+  measure: final_grade_score_p90 {
+    hidden: yes
+  }
   measure: final_grade_score_max {
     hidden: yes
   }
