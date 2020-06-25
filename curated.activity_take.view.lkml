@@ -8,7 +8,7 @@ view: curated_takes {
         take_node.EXTERNAL_TAKE_URI  AS external_take_uri,
         take_node.EXTERNAL_PROPERTIES  AS external_properties_raw,
         LOWER(take_node.ACTIVITY_URI)  AS activity_uri,
-        take_node.activity_node_uri as activity_node_uri
+        take_node.activity_node_uri as activity_node_uri,
         activity_type_map.activity_type_uri AS activity_type_uri,
         take_node.FINAL_GRADE:scored::boolean  AS final_grade_scored,
         take_node.FINAL_GRADE:taken::boolean  AS final_grade_taken,
@@ -27,7 +27,7 @@ view: curated_takes {
       AND NOT is_survey
       AND NOT mastery_item
       --GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
-      );;
+      ;;
   }
 }
 

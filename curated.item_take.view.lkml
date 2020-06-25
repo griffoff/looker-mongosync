@@ -8,7 +8,8 @@ view: curated_item_take {
 #     }
     create_process: {
     sql_step:
-      CREATE OR REPLACE TABLE LOOKER_SCRATCH.curated_item_take AS (
+      CREATE OR REPLACE TABLE LOOKER_SCRATCH.curated_item_take
+      AS
       SELECT
         user_identifier,
         submission_date,
