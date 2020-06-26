@@ -45,24 +45,30 @@ view: curated_item_take {
     type: number
   }
 
+  measure: sum_questions_attempted {
+    type: number
+    hidden: yes
+    sql: NULLIF(COUNT(CASE WHEN ${attempts} > 0 THEN 1 END), 0) ;;
+  }
+
   measure: final_grade_percent_correct {
     group_label: "Score"
     type: number
-    sql: COUNT(CASE WHEN ${final_grade_scored} AND ${final_grade_score} = 1 THEN 1 END) / NULLIF(COUNT(CASE WHEN ${final_grade_scored} THEN 1 END), 0);;
+    sql: COUNT(CASE WHEN ${final_grade_score} = 1 THEN 1 END) / ${sum_questions_attempted};;
     value_format_name: percent_1
   }
 
   measure: final_grade_percent_correct_attempt_1 {
     group_label: "Score"
     type: number
-    sql: COUNT(CASE WHEN ${final_grade_scored} AND ${final_grade_score} = 1 AND ${attempts} = 1 THEN 1 END) / NULLIF(COUNT(CASE WHEN ${final_grade_scored} THEN 1 END), 0);;
+    sql: COUNT(CASE WHEN ${final_grade_score} = 1 AND ${attempts} = 1 THEN 1 END) / ${sum_questions_attempted};;
     value_format_name: percent_1
   }
 
   measure: final_grade_percent_correct_attempt_2 {
     group_label: "Score"
     type: number
-    sql: COUNT(CASE WHEN ${final_grade_scored} AND ${final_grade_score} = 1 AND ${attempts} <= 2 THEN 1 END) / NULLIF(COUNT(CASE WHEN ${final_grade_scored} THEN 1 END), 0);;
+    sql: COUNT(CASE WHEN ${final_grade_score} = 1 AND ${attempts} <= 2 THEN 1 END) / ${sum_questions_attempted};;
     value_format_name: percent_1
   }
 
