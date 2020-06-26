@@ -17,7 +17,7 @@ view: curated_takes {
         take_node.FINAL_GRADE:scaledScore::float  AS final_grade_scaledscore,
         take_node.INTERACTION_GRADE:attempts::int  AS attempts,
         --cap time spent at 2 hrs
-        try_cast(least(7200, nullif(take_node.FINAL_GRADE:timeSpent::string, '')) AS decimal(18, 6)) / 60 / 60 / 24 AS final_grade_timespent,
+        least(7200, try_cast(nullif(take_node.FINAL_GRADE:timeSpent::string, '') AS decimal(18, 6))) / 60 / 60 / 24 AS final_grade_timespent,
         take_node.HASH  AS hash,
         take_node.ACTIVITY
       FROM ${take_node.SQL_TABLE_NAME} AS take_node
