@@ -11,6 +11,7 @@ explore: activity_take {
     sql_on: (${activity_take.external_take_uri}) = (${item_take.external_take_uri}) ;;
     relationship: one_to_many
   }
+
 }
 
 explore: course {
@@ -69,7 +70,14 @@ explore: activity_takes {
   join: activity {
     from: curated_activity
     sql_on: ${activity_takes.activity_uri} = ${activity.activity_uri}
-          and ${activity_takes.activity_type_uri} = ${activity.activity_type_uri};;
+          and COALESCE(${activity_takes.activity_type_uri}, '') = COALESCE(${activity.activity_type_uri}, '');;
+    relationship: many_to_one
+  }
+
+  join: course_activity {
+    #fields: []
+    sql_on: ${activity_takes.course_uri} = ${course_activity.course_uri}
+          and ${activity_takes.activity_uri} = ${course_activity.activity_uri};;
     relationship: many_to_one
   }
 
@@ -78,6 +86,7 @@ explore: activity_takes {
     sql_on: ${activity_takes.course_uri} = ${course.course_uri} ;;
     relationship: many_to_one
   }
+
 }
 
 explore: courses {
@@ -85,12 +94,6 @@ explore: courses {
   from: realtime_course
   view_name: course
   extends: [activity_take, course]
-
-  join: course_activity {
-    fields: []
-    sql_on: ${course.course_uri} = ${course_activity.course_uri} ;;
-    relationship: one_to_many
-  }
 
   join: course_enrollment {
     fields: []
@@ -114,12 +117,6 @@ explore: courses {
     from: curated_activity_take
     sql_on: ${course_activity.activity_uri} = ${activity_take.activity_uri}
           and ${course_enrollment.user_identifier} = ${activity_take.user_identifier};;
-    relationship: one_to_many
-  }
-
-  join: item_take {
-    from: curated_item_take
-    sql_on: ${activity_take.external_take_uri} = ${item_take.external_take_uri} ;;
     relationship: one_to_many
   }
 
