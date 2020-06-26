@@ -16,7 +16,8 @@ view: curated_takes {
         take_node.FINAL_GRADE:possibleScore::float  AS final_grade_possiblescore,
         take_node.FINAL_GRADE:scaledScore::float  AS final_grade_scaledscore,
         take_node.INTERACTION_GRADE:attempts::int  AS attempts,
-        try_cast(nullif(take_node.FINAL_GRADE:timeSpent::string, '') AS decimal(18, 6)) / 60 / 60 / 24 AS final_grade_timespent,
+        --cap time spent at 2 hrs
+        try_cast(least(7200, nullif(take_node.FINAL_GRADE:timeSpent::string, '')) AS decimal(18, 6)) / 60 / 60 / 24 AS final_grade_timespent,
         take_node.HASH  AS hash,
         take_node.ACTIVITY
       FROM ${take_node.SQL_TABLE_NAME} AS take_node
@@ -166,6 +167,12 @@ view: curated_activity_take {
     group_label: "Questions"
     label: "Avgerage attempts per question"
     type: number
+  }
+  measure: avg_attempts_per_question {
+    group_label: "Questions"
+    type: number
+    sql: SUM(${total_question_attempts}) / SUM(${questions_attempted}) ;;
+    value_format_name: decimal_1
   }
   dimension: questions_attempted {
     group_label: "Questions"
