@@ -17,7 +17,8 @@ view: curated_takes {
         take_node.FINAL_GRADE:scaledScore::float  AS final_grade_scaledscore,
         take_node.INTERACTION_GRADE:attempts::int  AS attempts,
         --cap time spent at 2 hrs
-        least(7200, try_cast(nullif(take_node.FINAL_GRADE:timeSpent::string, '') AS decimal(18, 6))) / 60 / 60 / 24 AS final_grade_timespent,
+        --least(7200, try_cast(nullif(take_node.FINAL_GRADE:timeSpent::string, '') AS decimal(18, 6))) / 60 / 60 / 24 AS final_grade_timespent,
+        iff(take_node.FINAL_GRADE:timeSpent > 7200, NULL, NULLIF(take_node.FINAL_GRADE:timeSpent::string, ''))::decimal(18, 6) / 60 / 60 / 24 AS final_grade_timespent,
         take_node.HASH  AS hash,
         take_node.ACTIVITY
       FROM ${take_node.SQL_TABLE_NAME} AS take_node
@@ -67,9 +68,9 @@ view: curated_activity_take {
             ,AVG(attempts) as avg_question_attempts
             ,COUNT(NULLIF(attempts, 0)) as questions_attempted
             ,COUNT(CASE WHEN final_grade_scored THEN NULLIF(attempts, 0) END) as scored_questions_attempted
-            ,COUNT(CASE WHEN final_grade_scored AND final_grade_score = 1 THEN 1 END) / NULLIF(COUNT(CASE WHEN final_grade_scored THEN 1 END), 0) as percent_questions_correct
-            ,COUNT(CASE WHEN final_grade_scored AND final_grade_score = 1 AND attempts = 1 THEN 1 END) / NULLIF(COUNT(CASE WHEN final_grade_scored THEN 1 END), 0) as percent_questions_correct_attempt_1
-            ,COUNT(CASE WHEN final_grade_scored AND final_grade_score = 1 AND attempts <= 2 THEN 1 END) / NULLIF(COUNT(CASE WHEN final_grade_scored THEN 1 END), 0) as percent_questions_correct_attempt_2
+            ,COUNT(CASE WHEN final_grade_score = 1 THEN 1 END) / NULLIF(COUNT(CASE WHEN attempts > 0 THEN 1 END), 0) as percent_questions_correct
+            ,COUNT(CASE WHEN final_grade_score = 1 AND attempts = 1 THEN 1 END) / NULLIF(COUNT(CASE WHEN attempts > 0  THEN 1 END), 0) as percent_questions_correct_attempt_1
+            ,COUNT(CASE WHEN final_grade_score = 1 AND attempts <= 2 THEN 1 END) / NULLIF(COUNT(CASE WHEN attempts > 0  THEN 1 END), 0) as percent_questions_correct_attempt_2
         FROM ${curated_takes.SQL_TABLE_NAME}
         WHERE NOT activity
         GROUP BY 1
