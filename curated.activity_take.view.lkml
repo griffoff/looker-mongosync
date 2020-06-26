@@ -200,13 +200,17 @@ view: curated_activity_take {
   dimension: percent_questions_correct_attempt_1 {
     group_label: "Questions"
     label: "% Questions correct (1st attempt)"
-    type: number
+    type: tier
+    style: relational
+    tiers: [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
     value_format_name: percent_0
   }
   dimension: percent_questions_correct_attempt_2 {
     group_label: "Questions"
     label: "% Questions correct (2 attempts or less)"
-    type: number
+    type: tier
+    style: relational
+    tiers: [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
     value_format_name: percent_0
   }
   dimension: take_count {
