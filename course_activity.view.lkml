@@ -9,6 +9,7 @@ view: course_activity {
           ,*
           ,LAG(external_properties) OVER (PARTITION BY business_key ORDER BY last_update_date) AS prev_external_properties
           ,FIRST_VALUE(external_properties) OVER (PARTITION BY business_key ORDER BY last_update_date) AS initial_external_properties
+          ,FIRST_VALUE(label) OVER (PARTITION BY activity_uri order by last_update_date DESC) as best_label
         from realtime.course_activity
       )
       select *
@@ -125,7 +126,7 @@ view: course_activity {
 
   dimension: label {
     type: string
-    sql: ${TABLE}.LABEL ;;
+    sql: ${TABLE}.best_label ;;
   }
 
   dimension_group: last_update {

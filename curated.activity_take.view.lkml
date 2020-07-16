@@ -68,7 +68,7 @@ view: curated_activity_take {
             ,AVG(attempts) as avg_question_attempts
             ,COUNT(NULLIF(attempts, 0)) as questions_attempted
             ,COUNT(CASE WHEN final_grade_scored THEN NULLIF(attempts, 0) END) as scored_questions_attempted
-            ,COUNT(CASE WHEN final_grade_score = 1 THEN 1 END) / NULLIF(COUNT(CASE WHEN attempts > 0 THEN 1 END), 0) as percent_questions_correct
+            ,COUNT(CASE WHEN final_grade_score = 1 AND attempts > 0 THEN 1 END) / NULLIF(COUNT(CASE WHEN attempts > 0 THEN 1 END), 0) as percent_questions_correct
             ,COUNT(CASE WHEN final_grade_score = 1 AND attempts = 1 THEN 1 END) / NULLIF(COUNT(CASE WHEN attempts > 0  THEN 1 END), 0) as percent_questions_correct_attempt_1
             ,COUNT(CASE WHEN final_grade_score = 1 AND attempts <= 2 THEN 1 END) / NULLIF(COUNT(CASE WHEN attempts > 0  THEN 1 END), 0) as percent_questions_correct_attempt_2
         FROM ${curated_takes.SQL_TABLE_NAME}
@@ -118,6 +118,14 @@ view: curated_activity_take {
     label: "Submission"
     type: time
     timeframes: [time, date, day_of_week, month, year]
+  }
+  dimension: activity_source {
+    type: string
+    sql: SPLIT_PART(${activity_uri}, ':', 1) ;;
+  }
+  dimension: activity_take_source {
+    type: string
+    sql: SPLIT_PART(${external_take_uri}, ':', 1) ;;
   }
   dimension: course_uri {}
   dimension: external_take_uri {}
@@ -186,9 +194,11 @@ view: curated_activity_take {
     type: number
   }
   dimension: percent_questions_attempted {
+    type: tier
+    tiers: [0.3, 0.5, 0.7, 0.8, 0.9]
     group_label: "Questions"
     label: "% Questions attempted"
-    type: number
+    style: relational
     sql: ${questions_attempted} / ${total_questions} ;;
     value_format_name: percent_0
   }
@@ -258,6 +268,11 @@ view: curated_activity_take {
     label: "# Takes"
     type: count
   }
+  measure: users {
+    label: "# Users"
+    type: count_distinct
+    sql: ${user_identifier} ;;
+  }
   measure: final_grade_score_average {
     group_label: "Score"
     type: average
@@ -267,6 +282,13 @@ view: curated_activity_take {
   measure: final_grade_score_min {
     group_label: "Score"
     type: min
+    sql: ${final_grade_score} ;;
+    value_format_name: percent_1
+  }
+  measure: final_grade_score_p10 {
+    group_label: "Score"
+    type: percentile
+    percentile: 10
     sql: ${final_grade_score} ;;
     value_format_name: percent_1
   }
@@ -316,6 +338,13 @@ view: curated_activity_take {
     sql: ${final_grade_timespent} ;;
     value_format: "[m]:ss \m\i\n\s"
   }
+  measure: final_grade_timespent_p10 {
+    group_label: "Time spent"
+    type: percentile
+    percentile: 10
+    sql: ${final_grade_timespent} ;;
+    value_format: "[m]:ss \m\i\n\s"
+  }
   measure: final_grade_timespent_q1 {
     group_label: "Time spent"
     type: percentile
@@ -349,5 +378,119 @@ view: curated_activity_take {
     sql: ${final_grade_timespent} ;;
     value_format: "[m]:ss \m\i\n\s"
   }
+
+  parameter: attempts_filter{
+    type: unquoted
+    label: "Correct in how many attempts?"
+    default_value: "percent_questions_correct"
+    allowed_value: {label:"Any number of attempts" value: "percent_questions_correct"}
+    allowed_value: {label:"1st attempt" value: "percent_questions_correct_attempt_1"}
+    allowed_value: {label:"1st or 2nd attempt" value: "percent_questions_correct_attempt_2"}
+  }
+
+  measure: percent_questions_correct_min {
+    group_label: "Questions"
+    type: min
+    sql: ${TABLE}.{% parameter attempts_filter %} ;;
+    value_format_name: percent_1
+  }
+  measure: percent_questions_correct_p10 {
+    group_label: "Questions"
+    type: percentile
+    percentile: 10
+    sql:  ${TABLE}.{% parameter attempts_filter %} ;;
+    value_format_name: percent_1
+  }
+  measure: percent_questions_correct_q1 {
+    group_label: "Questions"
+    type: percentile
+    percentile: 25
+    sql:  ${TABLE}.{% parameter attempts_filter %} ;;
+    value_format_name: percent_1
+  }
+  measure: percent_questions_correct_median {
+    group_label: "Questions"
+    type: median
+    sql:  ${TABLE}.{% parameter attempts_filter %} ;;
+    value_format_name: percent_1
+  }
+  measure: percent_questions_correct_q3 {
+    group_label: "Questions"
+    type: percentile
+    percentile: 75
+    sql:  ${TABLE}.{% parameter attempts_filter %} ;;
+    value_format_name: percent_1
+  }
+  measure: percent_questions_correct_p90 {
+    group_label: "Questions"
+    type: percentile
+    percentile: 90
+    sql:  ${TABLE}.{% parameter attempts_filter %} ;;
+    value_format_name: percent_1
+  }
+  measure: percent_questions_correct_max {
+    group_label: "Questions"
+    type: max
+    sql:  ${TABLE}.{% parameter attempts_filter %} ;;
+    value_format_name: percent_1
+  }
+
+  parameter: stats_metric{
+    type: unquoted
+    label: "Select a metric to use in boxplots"
+    default_value: "Score"
+    allowed_value: {label:"Score" value: "final_grade_score"}
+    allowed_value: {label:"Time Spent (minutes)" value: "final_grade_timespent * 24 * 60"}
+    allowed_value: {label:"% Questions Correct" value: "percent_questions_correct"}
+  }
+
+  measure: stats_min {
+    group_label: "Dynamic measure"
+    type: min
+    sql: ${TABLE}.{% parameter stats_metric %} ;;
+    value_format_name: decimal_1
+  }
+  measure: stats_p10 {
+    group_label: "Dynamic measure"
+    type: percentile
+    percentile: 10
+    sql: ${TABLE}.{% parameter stats_metric %} ;;
+    value_format_name: decimal_1
+  }
+  measure: stats_p25 {
+    group_label: "Dynamic measure"
+    type: percentile
+    percentile: 25
+    sql: ${TABLE}.{% parameter stats_metric %} ;;
+    value_format_name: decimal_1
+  }
+  measure: stats_p50 {
+    group_label: "Dynamic measure"
+    type: percentile
+    percentile: 50
+    sql: ${TABLE}.{% parameter stats_metric %} ;;
+    value_format_name: decimal_1
+  }
+  measure: stats_p75 {
+    group_label: "Dynamic measure"
+    type: percentile
+    percentile: 75
+    sql: ${TABLE}.{% parameter stats_metric %} ;;
+    value_format_name: decimal_1
+  }
+  measure: stats_p90 {
+    group_label: "Dynamic measure"
+    type: percentile
+    percentile: 90
+    sql: ${TABLE}.{% parameter stats_metric %} ;;
+    value_format_name: decimal_1
+  }
+  measure: stats_max {
+    group_label: "Dynamic measure"
+    type: max
+    sql: ${TABLE}.{% parameter stats_metric %} ;;
+    value_format_name: decimal_1
+  }
+
 
 }
