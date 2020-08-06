@@ -12,6 +12,13 @@ explore: activity_take {
     relationship: one_to_many
   }
 
+  join: activity {
+    from: curated_activity
+    sql_on: ${activity_take.activity_uri} = ${activity.activity_uri}
+      and COALESCE(${activity_take.activity_type_uri}, '') = COALESCE(${activity.activity_type_uri}, '');;
+    relationship: many_to_one
+  }
+
 }
 
 explore: course {
@@ -61,29 +68,34 @@ explore: item_take {
 
 }
 
+explore: course_activity {
+  extension: required
+
+  join: course_activity_group {
+    sql: inner join lateral flatten(${course_activity.activity_group_uris}, outer=>True) g on g.value != 'soa:activity-group:default'
+        left join ${course_activity_group.SQL_TABLE_NAME} course_activity_group on ${course_activity.course_uri} = ${course_activity_group.course_uri}
+                                      and g.value = ${course_activity_group.activity_group_uri}
+          ;;
+  }
+
+}
+
 explore: activity_takes {
   label: "Activity Takes"
   from: curated_activity_take
-  view_name: activity_takes
-  extends: [course]
-
-  join: activity {
-    from: curated_activity
-    sql_on: ${activity_takes.activity_uri} = ${activity.activity_uri}
-          and COALESCE(${activity_takes.activity_type_uri}, '') = COALESCE(${activity.activity_type_uri}, '');;
-    relationship: many_to_one
-  }
+  view_name: activity_take
+  extends: [course, course_activity, activity_take]
 
   join: course_activity {
     #fields: []
-    sql_on: ${activity_takes.course_uri} = ${course_activity.course_uri}
-          and ${activity_takes.activity_uri} = ${course_activity.activity_uri};;
+    sql_on: ${activity_take.course_uri} = ${course_activity.course_uri}
+          and ${activity_take.activity_uri} = ${course_activity.activity_uri};;
     relationship: many_to_one
   }
 
   join: course {
     from: realtime_course
-    sql_on: ${activity_takes.course_uri} = ${course.course_uri} ;;
+    sql_on: ${activity_take.course_uri} = ${course.course_uri} ;;
     relationship: many_to_one
   }
 
@@ -93,7 +105,7 @@ explore: courses {
   label: "Everything!"
   from: realtime_course
   view_name: course
-  extends: [activity_take, course]
+  extends: [course, course_activity, activity_take]
 
   join: course_enrollment {
     fields: []
@@ -107,9 +119,9 @@ explore: courses {
     relationship: many_to_one
   }
 
-  join: activity {
-    from: curated_activity
-    sql_on: ${course_activity.activity_uri} = ${activity.activity_uri} ;;
+  join: course_activity {
+    #fields: []
+    sql_on: ${course.course_uri} = ${course_activity.course_uri};;
     relationship: many_to_one
   }
 

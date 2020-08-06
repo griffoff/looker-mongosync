@@ -7,7 +7,7 @@ view: curated_takes {
         take_node.COURSE_URI  AS course_uri,
         take_node.EXTERNAL_TAKE_URI  AS external_take_uri,
         take_node.EXTERNAL_PROPERTIES  AS external_properties_raw,
-        LOWER(take_node.ACTIVITY_URI)  AS activity_uri,
+        take_node.ACTIVITY_URI  AS activity_uri,
         take_node.activity_node_uri as activity_node_uri,
         activity_type_map.activity_type_uri AS activity_type_uri,
         take_node.FINAL_GRADE:scored::boolean  AS final_grade_scored,
@@ -37,24 +37,6 @@ view: curated_takes {
 
 view: curated_activity_take {
   derived_table: {
-#     explore_source: take_node_activity {
-#       column: user_identifier {field:take_node.user_identifier}
-#       column: submission_date {field: take_node.submission_raw}
-#       column: course_uri {field:take_node.course_uri}
-#       column: external_take_uri {field:take_node.external_take_uri}
-#       column: external_properties_raw {field:take_node.external_properties_raw}
-#       column: activity_uri {field:take_node.activity_uri}
-#       column: activity_type_uri {field:activity_type_map.activity_type_uri}
-#       column: final_grade_scored {field: take_node.final_grade_scored}
-#       column: final_grade_taken {field: take_node.final_grade_taken}
-#       column: final_grade_score {field: take_node.final_grade_score}
-#       column: final_grade_timespent {field: take_node.final_grade_timespent}
-#       column: take_count {field:take_node.count}
-#       column: hash {field: take_node.hash}
-#       #sort: {field: take_node.activity_uri}
-#       #sort: {field: take_node.user_identifier}
-#       filters: [take_node.activity: "yes"]
-#     }
     create_process: {
       sql_step:
       CREATE OR REPLACE TABLE LOOKER_SCRATCH.curated_activity_take
@@ -81,8 +63,8 @@ view: curated_activity_take {
         a.course_uri,
         a.external_take_uri,
         a.external_properties_raw,
-        a.activity_uri,
-        a.activity_type_uri,
+        a.activity_uri as activity_uri,
+        a.activity_type_uri as activity_type_uri,
         a.final_grade_scored,
         a.final_grade_taken,
         a.final_grade_score,
@@ -174,7 +156,7 @@ view: curated_activity_take {
   }
   dimension: avg_question_attempts {
     group_label: "Questions"
-    label: "Avgerage attempts per question"
+    label: "Average attempts per question"
     type: number
   }
   measure: avg_attempts_per_question {
@@ -193,16 +175,24 @@ view: curated_activity_take {
     label: "# Scored questions attempted"
     type: number
   }
-  dimension: percent_questions_attempted {
+  dimension: percent_questions_attempted_tier {
     type: tier
     tiers: [0.3, 0.5, 0.7, 0.8, 0.9]
     group_label: "Questions"
-    label: "% Questions attempted"
+    label: "% Questions attempted (buckets)"
     style: relational
+    sql: ${percent_questions_attempted} ;;
+    value_format_name: percent_0
+  }
+  dimension: percent_questions_attempted {
+    type: number
+    tiers: [0.3, 0.5, 0.7, 0.8, 0.9]
+    group_label: "Questions"
+    label: "% Questions attempted"
     sql: ${questions_attempted} / ${total_questions} ;;
     value_format_name: percent_0
   }
-  dimension: pecent_scored_questions_attempted {
+  dimension: percent_scored_questions_attempted {
     group_label: "Questions"
     label: "% Scored questions attempted"
     type: number
@@ -522,6 +512,30 @@ view: curated_activity_take {
     type: max
     sql: ${TABLE}.{% parameter stats_metric %} ;;
     value_format_name: decimal_1
+  }
+
+  measure: activities_launched {
+    group_label: "MTP"
+    label: "# Activities launched"
+    type: number
+    sql: COUNT(DISTINCT CASE WHEN ${percent_questions_attempted} > 0 THEN ${activity_uri} END);;
+    value_format_name: decimal_0
+  }
+
+  measure: activities_completed_partial {
+    group_label: "MTP"
+    label: "# Activities partially complete"
+    type: number
+    sql: COUNT(DISTINCT CASE WHEN ${percent_questions_attempted} < 1 AND ${percent_questions_attempted} > 0 THEN ${activity_uri} END);;
+    value_format_name: decimal_0
+  }
+
+  measure: activities_completed {
+    group_label: "MTP"
+    label: "# Activities complete"
+    type: number
+    sql: COUNT(DISTINCT CASE WHEN ${percent_questions_attempted} = 1THEN ${activity_uri} END);;
+    value_format_name: decimal_0
   }
 
 

@@ -77,6 +77,11 @@ view: realtime_course {
     sql: ${TABLE}.EXTERNAL_PROPERTIES ;;
   }
 
+  dimension: product_platform {
+    type: string
+    sql: COALESCE(${external_properties}:"soa:property:platform":value, SPLIT_PART(${course_uri}, ':', 1))::STRING ;;
+  }
+
   dimension: institution_uri {
     type: string
     sql: ${TABLE}.INSTITUTION_URI ;;
