@@ -145,6 +145,6 @@ view: course_activity {
 
   measure: count {
     type: count
-    drill_fields: []
+    drill_fields: [course_uri, activity_uri, label, activity_group_uris, external_properties]
   }
 }
