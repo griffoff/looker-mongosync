@@ -99,7 +99,7 @@ view: curated_activity_take {
   dimension_group: submission_date {
     label: "Submission"
     type: time
-    timeframes: [time, date, day_of_week, month, year]
+    timeframes: [time, date, day_of_week, week, month, year]
   }
   dimension: activity_source {
     type: string
