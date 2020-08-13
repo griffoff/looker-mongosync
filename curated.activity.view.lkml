@@ -39,7 +39,7 @@ view: curated_activity {
     primary_key: yes
   }
 
-  dimension: activity_uri {}
+  dimension: activity_uri {link: {label: "View in Analytics Diagnostic Tool" url: "https://analytics-tools.cengage.info/diagnostictool/#/activity/view/production/uri/{{ value }}"}}
   dimension: activity_type_uri {}
   dimension: activity_handler {}
   dimension: activity_type {}

@@ -46,6 +46,7 @@ view: realtime_course {
   dimension: course_uri {
     type: string
     sql: ${TABLE}.COURSE_URI ;;
+    link: {label: "View in Analytics Diagnostic Tool" url: "https://analytics-tools.cengage.info/diagnostictool/#/course/view/production/uri/{{ value }}"}
   }
 
 #   dimension: course_key {
