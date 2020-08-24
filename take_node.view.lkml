@@ -100,8 +100,8 @@ view: take_node {
           order by hash
         ;;
     sql_step:
-      merge into take_item t
-      using take_item_incremental i on t.hash = i.hash
+      merge into looker_scratch.take_node t
+      using looker_scratch.take_item_incremental i on t.hash = i.hash
       when matched then update
           set
             t.business_key = i.business_key
