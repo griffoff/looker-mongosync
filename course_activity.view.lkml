@@ -109,20 +109,22 @@ view: course_activity {
         UPDATE course_activity
         SET best_label = l.label
         FROM (
-        SELECT label
-        , activity_uri
-        , count(*) AS popularity
-        , row_number() OVER (PARTITION BY activity_uri ORDER BY popularity DESC) AS pop_rank
-        FROM course_activity
-        WHERE label IS NOT NULL
+          SELECT
+              label
+              , activity_uri
+              , count(*) AS popularity
+              , row_number() OVER (PARTITION BY activity_uri ORDER BY popularity DESC) AS pop_rank
+          FROM course_activity
+          WHERE label IS NOT NULL
+          AND (SELECT COUNT(*) FROM course_activity_incremental) > 0
+          GROUP BY 1, 2
+        ) l
+        WHERE course_activity.activity_uri = l.activity_uri
+        AND l.pop_rank = 1
         AND (
           best_label != label
           OR best_label IS NULL
             )
-        GROUP BY 1, 2
-        ) l
-        WHERE course_activity.activity_uri = l.activity_uri
-        AND l.pop_rank = 1
       ;;
 
       sql_step:
