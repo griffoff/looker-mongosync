@@ -3,109 +3,155 @@ view: take_node {
   derived_table: {
     create_process: {
       sql_step:
-        create or replace table looker_scratch.take_node
+        create or replace temporary table looker_scratch.take_item_incremental
         as
-        with latest as (
-          select hash h, max(last_update_date) d
-          from realtime.take_item
-          where submission_date >= dateadd(year, -3, current_date())
+        with
+          latest as (
+          select hash h, max(_ldts) d
+          from prod.realtime.take_item
+          where _ldts > (select max(_ldts) from looker_scratch.take_node)
+          and submission_date >= dateadd(year, -3, current_date())
           group by 1
-        )
-        ,data as (
-              select
-                hash as business_key
-                ,*
-                ,split_part(COURSE_URI, ':', -1)::string as course_key
-                ,case
-                    when take_node.ACTIVITY
-                      then null
-                    when (take_node.ACTIVITY_NODE_URI) ilike 'cxp:activity:masterygroup:%'
-                      then null
-                    when (take_node.ACTIVITY_NODE_URI) ilike 'cxp:%'
-                      then
-                        case
-                          when (take_node.ACTIVITY_NODE_URI) ilike 'cxp:activity:%'
-                            then
-                              case array_size(split((LOWER(take_node.ACTIVITY_NODE_URI)),':'))
-                                when 3
-                                  then split_part(replace(split_part((LOWER(take_node.ACTIVITY_NODE_URI)), ':', -1), '-', '/'), '/', 1)
-                                when 4
-                                  then array_to_string(array_slice(split((LOWER(take_node.ACTIVITY_NODE_URI)), ':'), 1, 2), ':')
-                                end
-                          else split_part((LOWER(take_node.ACTIVITY_NODE_URI)), ':', 2)
-                          end
-                    when (take_node.ACTIVITY_NODE_URI) ilike 'link:%'
-                      then split_part(split_part((LOWER(take_node.ACTIVITY_NODE_URI)), ':', 2), '-', 1)
-                    -- cnow:item:/book/ell5bms15h/itemid/75003942
-                    -- ils://cnow/books/esmt07t/itemid/752573077
-                    when (take_node.ACTIVITY_NODE_URI) ilike 'cnow:item:/book%'
-                        or (take_node.ACTIVITY_NODE_URI) ilike 'ils://%'
-                      then split_part((LOWER(take_node.ACTIVITY_NODE_URI)), '/', -3)
-                    -- mindtap:item:/book/waac24h/itemid/1481067391/global:1de67454-dc0c-486d-9f49-4be509370846
-                    when (take_node.ACTIVITY_NODE_URI) ilike 'mindtap:item:/book%'
-                        or (take_node.ACTIVITY_NODE_URI) ilike 'cnow:alsnode:/book%'
-                      then split_part((LOWER(take_node.ACTIVITY_NODE_URI)), '/', 3)
-                      --imilac:likert:question:daftsaaum09l/qLeadershipBeliefs_question_7
-                    when (take_node.ACTIVITY_NODE_URI) ilike 'imilac:likert:%'
-                      then split_part(split_part((LOWER(take_node.ACTIVITY_NODE_URI)), ':', 4), '/', 1)
-                    end::string AS activity_node_product_code
-                  ,case
-                    when take_node.ACTIVITY
-                      then null
-                    when (take_node.ACTIVITY_NODE_URI) ilike 'cxp:activity:masterygroup:%'
-                      then null
-                   when (take_node.ACTIVITY_NODE_URI) ilike 'cxp:%'
-                      then
-                        case
-                          when (take_node.ACTIVITY_NODE_URI) ilike 'cxp:activity:%'
-                            then
-                              case array_size(split((LOWER(take_node.ACTIVITY_NODE_URI)),':'))
-                                when 3
-                                  then split_part(replace(split_part((LOWER(take_node.ACTIVITY_NODE_URI)), ':', -1), '-', '/'), '/', -1)
-                                when 4
-                                  then null
+        ),
+        data as (
+            select
+              hash as business_key
+              ,*
+              ,split_part(COURSE_URI, ':', -1)::string as course_key
+              ,case
+                  when take_node.ACTIVITY
+                    then null
+                  when (take_node.ACTIVITY_NODE_URI) ilike 'cxp:activity:masterygroup:%'
+                    then null
+                  when (take_node.ACTIVITY_NODE_URI) ilike 'cxp:%'
+                    then
+                      case
+                        when (take_node.ACTIVITY_NODE_URI) ilike 'cxp:activity:%'
+                          then
+                            case array_size(split((LOWER(take_node.ACTIVITY_NODE_URI)),':'))
+                              when 3
+                                then split_part(replace(split_part((LOWER(take_node.ACTIVITY_NODE_URI)), ':', -1), '-', '/'), '/', 1)
+                              when 4
+                                then array_to_string(array_slice(split((LOWER(take_node.ACTIVITY_NODE_URI)), ':'), 1, 2), ':')
                               end
-                          else split_part((LOWER(take_node.ACTIVITY_NODE_URI)), ':', -1)
+                        else split_part((LOWER(take_node.ACTIVITY_NODE_URI)), ':', 2)
                         end
-                    when (take_node.ACTIVITY_NODE_URI) ilike 'cnow:item:/book%'
-                        or (take_node.ACTIVITY_NODE_URI) ilike 'ils://%'
-                      then split_part((LOWER(take_node.ACTIVITY_NODE_URI)), '/', -1)
-                    when (take_node.ACTIVITY_NODE_URI) ilike 'mindtap:item:/book%'
-                      --or (LOWER(take_node.ACTIVITY_NODE_URI)) like 'cnow:alsnode:/book%' --section id
-                      then split_part((LOWER(take_node.ACTIVITY_NODE_URI)), '/', 5)
-                    --when (LOWER(take_node.ACTIVITY_NODE_URI)) like 'imilac:%'
-                    --  then split_part((LOWER(take_node.ACTIVITY_NODE_URI)), ':', -1)
-                    end::string AS activity_node_item_id
-                  ,split_part(take_node.assignable_content_uri, ':', -1)::string as assignable_content_product_section_imilac
-                  ,case
-                    when take_node.assignable_content_uri ilike 'cnow:activity:als:%'
-                      then split_part(take_node.assignable_content_uri, '/', -3)
-                    when take_node.assignable_content_uri like 'imilac:%'
-                      then split_part(assignable_content_product_section_imilac, '/', 1)
-                    end ::string as assignable_content_product_abbr
-                  ,case
-                    when take_node.assignable_content_uri ilike 'cnow:activity:als:%' or take_node.assignable_content_uri ilike 'imilac:%'
-                      then split_part(take_node.assignable_content_uri, '/', -1)
-                    end ::string as assignable_content_uri_section_id
-                  ,coalesce(activity_node_product_code, assignable_content_product_abbr) as product_code
-                  ,activity_node_item_id as item_id
-                  ,assignable_content_uri_section_id as section_id
-              from realtime.take_item as take_node
-            )
-            select *
-            from latest
-            inner join data on (latest.h, latest.d) = (data.hash, data.last_update_date)
-            order by submission_date
-              --order by course_uri, activity_uri, user_identifier, activity_node_uri
+                  when (take_node.ACTIVITY_NODE_URI) ilike 'link:%'
+                    then split_part(split_part((LOWER(take_node.ACTIVITY_NODE_URI)), ':', 2), '-', 1)
+                  -- cnow:item:/book/ell5bms15h/itemid/75003942
+                  -- ils://cnow/books/esmt07t/itemid/752573077
+                  when (take_node.ACTIVITY_NODE_URI) ilike 'cnow:item:/book%'
+                      or (take_node.ACTIVITY_NODE_URI) ilike 'ils://%'
+                    then split_part((LOWER(take_node.ACTIVITY_NODE_URI)), '/', -3)
+                  -- mindtap:item:/book/waac24h/itemid/1481067391/global:1de67454-dc0c-486d-9f49-4be509370846
+                  when (take_node.ACTIVITY_NODE_URI) ilike 'mindtap:item:/book%'
+                      or (take_node.ACTIVITY_NODE_URI) ilike 'cnow:alsnode:/book%'
+                    then split_part((LOWER(take_node.ACTIVITY_NODE_URI)), '/', 3)
+                    --imilac:likert:question:daftsaaum09l/qLeadershipBeliefs_question_7
+                  when (take_node.ACTIVITY_NODE_URI) ilike 'imilac:likert:%'
+                    then split_part(split_part((LOWER(take_node.ACTIVITY_NODE_URI)), ':', 4), '/', 1)
+                  end::string AS activity_node_product_code
+                ,case
+                  when take_node.ACTIVITY
+                    then null
+                  when (take_node.ACTIVITY_NODE_URI) ilike 'cxp:activity:masterygroup:%'
+                    then null
+                 when (take_node.ACTIVITY_NODE_URI) ilike 'cxp:%'
+                    then
+                      case
+                        when (take_node.ACTIVITY_NODE_URI) ilike 'cxp:activity:%'
+                          then
+                            case array_size(split((LOWER(take_node.ACTIVITY_NODE_URI)),':'))
+                              when 3
+                                then split_part(replace(split_part((LOWER(take_node.ACTIVITY_NODE_URI)), ':', -1), '-', '/'), '/', -1)
+                              when 4
+                                then null
+                            end
+                        else split_part((LOWER(take_node.ACTIVITY_NODE_URI)), ':', -1)
+                      end
+                  when (take_node.ACTIVITY_NODE_URI) ilike 'cnow:item:/book%'
+                      or (take_node.ACTIVITY_NODE_URI) ilike 'ils://%'
+                    then split_part((LOWER(take_node.ACTIVITY_NODE_URI)), '/', -1)
+                  when (take_node.ACTIVITY_NODE_URI) ilike 'mindtap:item:/book%'
+                    --or (LOWER(take_node.ACTIVITY_NODE_URI)) like 'cnow:alsnode:/book%' --section id
+                    then split_part((LOWER(take_node.ACTIVITY_NODE_URI)), '/', 5)
+                  --when (LOWER(take_node.ACTIVITY_NODE_URI)) like 'imilac:%'
+                  --  then split_part((LOWER(take_node.ACTIVITY_NODE_URI)), ':', -1)
+                  end::string AS activity_node_item_id
+                ,split_part(take_node.assignable_content_uri, ':', -1)::string as assignable_content_product_section_imilac
+                ,case
+                  when take_node.assignable_content_uri ilike 'cnow:activity:als:%'
+                    then split_part(take_node.assignable_content_uri, '/', -3)
+                  when take_node.assignable_content_uri like 'imilac:%'
+                    then split_part(assignable_content_product_section_imilac, '/', 1)
+                  end ::string as assignable_content_product_abbr
+                ,case
+                  when take_node.assignable_content_uri ilike 'cnow:activity:als:%' or take_node.assignable_content_uri ilike 'imilac:%'
+                    then split_part(take_node.assignable_content_uri, '/', -1)
+                  end ::string as assignable_content_uri_section_id
+                ,coalesce(activity_node_product_code, assignable_content_product_abbr) as product_code
+                ,activity_node_item_id as item_id
+                ,assignable_content_uri_section_id as section_id
+            from prod.realtime.take_item as take_node
+          )
+          select data.*
+          from latest
+          inner join data on (latest.h, latest.d) = (data.hash, data._ldts)
+          order by hash
+        ;;
+    sql_step:
+      merge into take_item t
+      using take_item_incremental i on t.hash = i.hash
+      when matched then update
+          set
+            t.business_key = i.business_key
+            ,t._ldts = i._ldts,t._rsrc = i._rsrc
+            ,t.activity_uri = i.activity_uri, t.activity_node_uri = i.activity_node_uri, t.external_take_uri = i.external_take_uri, t.course_uri = i.course_uri, t.user_identifier = i.user_identifier, t.submission_date = i.submission_date, t.possible_score = i.possible_score
+            ,t.interaction_grade = i.interaction_grade, t.activity_grade = i.activity_grade, t.final_grade = i.final_grade
+            ,t.activity = i.activity, t.mastery_item = i.mastery_item
+            ,t.activity_type_uri = i.activity_type_uri, t.assignable_content_uri = i.assignable_content_uri
+            ,t.hash = i.hash, t.last_update_date = i.last_update_date
+            ,t.parent_path = i.parent_path, t.position_path = i.position_path
+            ,t.external_properties = i.external_properties
+            ,t.course_key = i.course_key, t.activity_node_product_code = i.activity_node_product_code, t.activity_node_item_id = i.activity_node_item_id
+            ,t.assignable_content_product_section_imilac = i.assignable_content_product_section_imilac, t.assignable_content_product_abbr = i.assignable_content_product_abbr, t.assignable_content_uri_section_id = i.assignable_content_uri_section_id
+            ,t.product_code = i.product_code, t.item_id = i.item_id, t.section_id = i.section_id
+      when not matched then insert (
+          business_key
+          ,_ldts,_rsrc
+          ,activity_uri, activity_node_uri, external_take_uri, course_uri, user_identifier, submission_date, possible_score
+          ,interaction_grade, activity_grade, final_grade
+          ,activity, mastery_item
+          ,activity_type_uri, assignable_content_uri
+          ,hash, last_update_date
+          ,parent_path, position_path
+          ,external_properties
+          ,course_key, activity_node_product_code, activity_node_item_id
+          ,assignable_content_product_section_imilac, assignable_content_product_abbr, assignable_content_uri_section_id
+          ,product_code, item_id, section_id)
+      values (
+          i.business_key
+          ,i._ldts,i._rsrc
+          ,i.activity_uri, i.activity_node_uri, i.external_take_uri, i.course_uri, i.user_identifier, i.submission_date, i.possible_score
+          ,i.interaction_grade, i.activity_grade, i.final_grade
+          ,i.activity, i.mastery_item
+          ,i.activity_type_uri, i.assignable_content_uri
+          ,i.hash, i.last_update_date
+          ,i.parent_path, i.position_path
+          ,i.external_properties
+          ,i.course_key, i.activity_node_product_code, i.activity_node_item_id
+          ,i.assignable_content_product_section_imilac, i.assignable_content_product_abbr, i.assignable_content_uri_section_id
+          ,i.product_code, i.item_id, i.section_id)
       ;;
 
       sql_step:
       alter table looker_scratch.take_node cluster by (submission_date::date);;
 
       sql_step:
-      create or replace table ${SQL_TABLE_NAME} clone looker_scratch.take_node;;
+      alter table looker_scratch.take_node recluster;;
 
-      #sql_step: drop table looker_scratch.take_node ;;
+      sql_step:
+      create or replace table ${SQL_TABLE_NAME} clone looker_scratch.take_node;;
 
     }
 
