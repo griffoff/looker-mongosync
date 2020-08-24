@@ -8,7 +8,7 @@ view: take_node {
 
       sql_step:
         CREATE TRANSIENT TABLE IF NOT EXISTS take_item
-          CLUSTER BY (submission_date::DATE)
+          CLUSTER BY (mastery_item, activity, submission_date::DATE)
         (
           business_key                              STRING,
           _ldts                                     TIMESTAMP_LTZ(9),
