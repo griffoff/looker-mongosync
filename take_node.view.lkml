@@ -238,10 +238,25 @@ view: take_node {
 
       sql_step:
         INSERT INTO item_take_items
-        SELECT *
-        FROM take_item_incremental
-        WHERE NOT activity AND NOT mastery_item
-        ORDER BY submission_date
+        SELECT i.business_key
+                 , i._ldts, i._rsrc
+                 , i.activity_uri, i.activity_node_uri, i.external_take_uri, i.course_uri, i.user_identifier
+                 , i.submission_date, i.possible_score
+                 , i.interaction_grade, i.activity_grade, i.final_grade
+                 , i.activity, i.mastery_item
+                 , COALESCE(i.activity_type_uri_map, i.activity_type_uri), i.assignable_content_uri
+                 , i.hash, i.last_update_date
+                 , i.parent_path, i.position_path
+                 , i.external_properties
+                 , i.course_key, i.activity_node_product_code, i.activity_node_item_id
+                 , i.assignable_content_product_section_imilac, i.assignable_content_product_abbr
+                 , i.assignable_content_uri_section_id
+                 , i.product_code, i.item_id, i.section_id
+                 , i.final_grade_scored, i.final_grade_taken, i.final_grade_score, i.final_grade_possiblescore, i.final_grade_scaledscore
+                 , i.attempts, i.final_grade_timespent
+        FROM take_item_incremental i
+        WHERE NOT i.activity AND NOT i.mastery_item
+        ORDER BY i.submission_date
         ;;
 
       sql_step:
@@ -255,10 +270,25 @@ view: take_node {
 
       sql_step:
         INSERT INTO item_take_activities
-        SELECT *
-        FROM take_item_incremental
-        WHERE activity
-        ORDER BY submission_date
+        SELECT i.business_key
+                 , i._ldts, i._rsrc
+                 , i.activity_uri, i.activity_node_uri, i.external_take_uri, i.course_uri, i.user_identifier
+                 , i.submission_date, i.possible_score
+                 , i.interaction_grade, i.activity_grade, i.final_grade
+                 , i.activity, i.mastery_item
+                 , COALESCE(i.activity_type_uri_map, i.activity_type_uri), i.assignable_content_uri
+                 , i.hash, i.last_update_date
+                 , i.parent_path, i.position_path
+                 , i.external_properties
+                 , i.course_key, i.activity_node_product_code, i.activity_node_item_id
+                 , i.assignable_content_product_section_imilac, i.assignable_content_product_abbr
+                 , i.assignable_content_uri_section_id
+                 , i.product_code, i.item_id, i.section_id
+                 , i.final_grade_scored, i.final_grade_taken, i.final_grade_score, i.final_grade_possiblescore, i.final_grade_scaledscore
+                 , i.attempts, i.final_grade_timespent
+        FROM take_item_incremental i
+        WHERE i.activity
+        ORDER BY i.submission_date
         ;;
 
       sql_step:
