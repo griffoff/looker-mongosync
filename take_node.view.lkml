@@ -237,7 +237,17 @@ view: take_node {
         DELETE FROM item_take_items WHERE hash IN (SELECT hash FROM take_item_incremental WHERE NOT activity AND NOT mastery_item);;
 
       sql_step:
-        INSERT INTO item_take_items
+        INSERT INTO item_take_items (
+                                      business_key, _ldts, _rsrc, activity_uri, activity_node_uri, external_take_uri,
+                                      course_uri, user_identifier, submission_date, possible_score, interaction_grade,
+                                      activity_grade, final_grade, activity, mastery_item, activity_type_uri,
+                                      assignable_content_uri, hash, last_update_date, parent_path, position_path,
+                                      external_properties, course_key, activity_node_product_code, activity_node_item_id,
+                                      assignable_content_product_section_imilac, assignable_content_product_abbr,
+                                      assignable_content_uri_section_id, product_code, item_id, section_id,
+                                      final_grade_scored, final_grade_taken, final_grade_score, final_grade_possiblescore, final_grade_scaledscore,
+                                      attempts, final_grade_timespent
+                                      )
         SELECT i.business_key
                  , i._ldts, i._rsrc
                  , i.activity_uri, i.activity_node_uri, i.external_take_uri, i.course_uri, i.user_identifier
@@ -269,7 +279,17 @@ view: take_node {
         DELETE FROM item_take_activities WHERE hash IN (SELECT hash FROM take_item_incremental WHERE activity);;
 
       sql_step:
-        INSERT INTO item_take_activities
+        INSERT INTO item_take_activities (
+                                      business_key, _ldts, _rsrc, activity_uri, activity_node_uri, external_take_uri,
+                                      course_uri, user_identifier, submission_date, possible_score, interaction_grade,
+                                      activity_grade, final_grade, activity, mastery_item, activity_type_uri,
+                                      assignable_content_uri, hash, last_update_date, parent_path, position_path,
+                                      external_properties, course_key, activity_node_product_code, activity_node_item_id,
+                                      assignable_content_product_section_imilac, assignable_content_product_abbr,
+                                      assignable_content_uri_section_id, product_code, item_id, section_id,
+                                      final_grade_scored, final_grade_taken, final_grade_score, final_grade_possiblescore, final_grade_scaledscore,
+                                      attempts, final_grade_timespent
+                                      )
         SELECT i.business_key
                  , i._ldts, i._rsrc
                  , i.activity_uri, i.activity_node_uri, i.external_take_uri, i.course_uri, i.user_identifier
