@@ -102,24 +102,24 @@ view: course_activity {
         ;;
 
       sql_step:
-        UPDATE course_activity
-        SET best_label = l.label
-        FROM (
-               SELECT label
-                    , activity_uri
-                    , count(*) AS popularity
-                    , row_number() OVER (PARTITION BY activity_uri ORDER BY popularity DESC) AS pop_rank
-               FROM course_activity
-               WHERE label IS NOT NULL
-               GROUP BY 1, 2
-             ) l
-        WHERE course_activity.activity_uri = l.activity_uri
-          AND l.pop_rank = 1
+        ALTER TABLE course_activity RECLUSTER
         ;;
 
       sql_step:
-        ALTER TABLE course_activity RECLUSTER
-        ;;
+        UPDATE course_activity
+        SET best_label = l.label
+        FROM (
+        SELECT label
+        , activity_uri
+        , count(*) AS popularity
+        , row_number() OVER (PARTITION BY activity_uri ORDER BY popularity DESC) AS pop_rank
+        FROM course_activity
+        WHERE label IS NOT NULL
+        GROUP BY 1, 2
+        ) l
+        WHERE course_activity.activity_uri = l.activity_uri
+        AND l.pop_rank = 1
+      ;;
 
       sql_step:
         CREATE OR REPLACE TRANSIENT TABLE ${SQL_TABLE_NAME} CLONE course_activity
