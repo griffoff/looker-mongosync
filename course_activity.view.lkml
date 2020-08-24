@@ -115,6 +115,10 @@ view: course_activity {
         , row_number() OVER (PARTITION BY activity_uri ORDER BY popularity DESC) AS pop_rank
         FROM course_activity
         WHERE label IS NOT NULL
+        AND (
+          best_label != label
+          OR best_label IS NULL
+            )
         GROUP BY 1, 2
         ) l
         WHERE course_activity.activity_uri = l.activity_uri
