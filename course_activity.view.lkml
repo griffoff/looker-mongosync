@@ -122,7 +122,7 @@ view: course_activity {
         WHERE course_activity.activity_uri = l.activity_uri
         AND l.pop_rank = 1
         AND (
-          best_label != label
+          best_label != l.label
           OR best_label IS NULL
             )
       ;;

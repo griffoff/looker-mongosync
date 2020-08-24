@@ -3,155 +3,266 @@ view: take_node {
   derived_table: {
     create_process: {
       sql_step:
-        create or replace temporary table looker_scratch.take_item_incremental
-        as
-        with
-          latest as (
-          select hash h, max(_ldts) d
-          from prod.realtime.take_item
-          where _ldts > (select max(_ldts) from looker_scratch.take_node)
-          and submission_date >= dateadd(year, -3, current_date())
-          group by 1
-        ),
-        data as (
-            select
-              hash as business_key
-              ,*
-              ,split_part(COURSE_URI, ':', -1)::string as course_key
-              ,case
-                  when take_node.ACTIVITY
-                    then null
-                  when (take_node.ACTIVITY_NODE_URI) ilike 'cxp:activity:masterygroup:%'
-                    then null
-                  when (take_node.ACTIVITY_NODE_URI) ilike 'cxp:%'
-                    then
-                      case
-                        when (take_node.ACTIVITY_NODE_URI) ilike 'cxp:activity:%'
-                          then
-                            case array_size(split((LOWER(take_node.ACTIVITY_NODE_URI)),':'))
-                              when 3
-                                then split_part(replace(split_part((LOWER(take_node.ACTIVITY_NODE_URI)), ':', -1), '-', '/'), '/', 1)
-                              when 4
-                                then array_to_string(array_slice(split((LOWER(take_node.ACTIVITY_NODE_URI)), ':'), 1, 2), ':')
-                              end
-                        else split_part((LOWER(take_node.ACTIVITY_NODE_URI)), ':', 2)
-                        end
-                  when (take_node.ACTIVITY_NODE_URI) ilike 'link:%'
-                    then split_part(split_part((LOWER(take_node.ACTIVITY_NODE_URI)), ':', 2), '-', 1)
-                  -- cnow:item:/book/ell5bms15h/itemid/75003942
-                  -- ils://cnow/books/esmt07t/itemid/752573077
-                  when (take_node.ACTIVITY_NODE_URI) ilike 'cnow:item:/book%'
-                      or (take_node.ACTIVITY_NODE_URI) ilike 'ils://%'
-                    then split_part((LOWER(take_node.ACTIVITY_NODE_URI)), '/', -3)
-                  -- mindtap:item:/book/waac24h/itemid/1481067391/global:1de67454-dc0c-486d-9f49-4be509370846
-                  when (take_node.ACTIVITY_NODE_URI) ilike 'mindtap:item:/book%'
-                      or (take_node.ACTIVITY_NODE_URI) ilike 'cnow:alsnode:/book%'
-                    then split_part((LOWER(take_node.ACTIVITY_NODE_URI)), '/', 3)
-                    --imilac:likert:question:daftsaaum09l/qLeadershipBeliefs_question_7
-                  when (take_node.ACTIVITY_NODE_URI) ilike 'imilac:likert:%'
-                    then split_part(split_part((LOWER(take_node.ACTIVITY_NODE_URI)), ':', 4), '/', 1)
-                  end::string AS activity_node_product_code
-                ,case
-                  when take_node.ACTIVITY
-                    then null
-                  when (take_node.ACTIVITY_NODE_URI) ilike 'cxp:activity:masterygroup:%'
-                    then null
-                 when (take_node.ACTIVITY_NODE_URI) ilike 'cxp:%'
-                    then
-                      case
-                        when (take_node.ACTIVITY_NODE_URI) ilike 'cxp:activity:%'
-                          then
-                            case array_size(split((LOWER(take_node.ACTIVITY_NODE_URI)),':'))
-                              when 3
-                                then split_part(replace(split_part((LOWER(take_node.ACTIVITY_NODE_URI)), ':', -1), '-', '/'), '/', -1)
-                              when 4
-                                then null
-                            end
-                        else split_part((LOWER(take_node.ACTIVITY_NODE_URI)), ':', -1)
-                      end
-                  when (take_node.ACTIVITY_NODE_URI) ilike 'cnow:item:/book%'
-                      or (take_node.ACTIVITY_NODE_URI) ilike 'ils://%'
-                    then split_part((LOWER(take_node.ACTIVITY_NODE_URI)), '/', -1)
-                  when (take_node.ACTIVITY_NODE_URI) ilike 'mindtap:item:/book%'
-                    --or (LOWER(take_node.ACTIVITY_NODE_URI)) like 'cnow:alsnode:/book%' --section id
-                    then split_part((LOWER(take_node.ACTIVITY_NODE_URI)), '/', 5)
-                  --when (LOWER(take_node.ACTIVITY_NODE_URI)) like 'imilac:%'
-                  --  then split_part((LOWER(take_node.ACTIVITY_NODE_URI)), ':', -1)
-                  end::string AS activity_node_item_id
-                ,split_part(take_node.assignable_content_uri, ':', -1)::string as assignable_content_product_section_imilac
-                ,case
-                  when take_node.assignable_content_uri ilike 'cnow:activity:als:%'
-                    then split_part(take_node.assignable_content_uri, '/', -3)
-                  when take_node.assignable_content_uri like 'imilac:%'
-                    then split_part(assignable_content_product_section_imilac, '/', 1)
-                  end ::string as assignable_content_product_abbr
-                ,case
-                  when take_node.assignable_content_uri ilike 'cnow:activity:als:%' or take_node.assignable_content_uri ilike 'imilac:%'
-                    then split_part(take_node.assignable_content_uri, '/', -1)
-                  end ::string as assignable_content_uri_section_id
-                ,coalesce(activity_node_product_code, assignable_content_product_abbr) as product_code
-                ,activity_node_item_id as item_id
-                ,assignable_content_uri_section_id as section_id
-            from prod.realtime.take_item as take_node
-          )
-          select data.*
-          from latest
-          inner join data on (latest.h, latest.d) = (data.hash, data._ldts)
-          order by hash
+        USE SCHEMA looker_scratch
         ;;
+
+      sql_step:
+        CREATE TRANSIENT TABLE IF NOT EXISTS take_item
+          CLUSTER BY (submission_date::DATE)
+        (
+          business_key                              STRING,
+          _ldts                                     TIMESTAMP_LTZ(9),
+          _rsrc                                     STRING,
+          activity_uri                              STRING,
+          activity_node_uri                         STRING,
+          external_take_uri                         STRING,
+          course_uri                                STRING,
+          user_identifier                           STRING,
+          submission_date                           TIMESTAMP_LTZ(9),
+          possible_score                            FLOAT,
+          interaction_grade                         VARIANT,
+          activity_grade                            VARIANT,
+          final_grade                               VARIANT,
+          activity                                  BOOLEAN,
+          mastery_item                              BOOLEAN,
+          activity_type_uri                         STRING,
+          assignable_content_uri                    STRING,
+          hash                                      STRING,
+          last_update_date                          TIMESTAMP_LTZ(9),
+          parent_path                               VARIANT,
+          position_path                             VARIANT,
+          external_properties                       VARIANT,
+          course_key                                STRING,
+          activity_node_product_code                STRING,
+          activity_node_item_id                     STRING,
+          assignable_content_product_section_imilac STRING,
+          assignable_content_product_abbr           STRING,
+          assignable_content_uri_section_id         STRING,
+          product_code                              STRING,
+          item_id                                   STRING,
+          section_id                                STRING,
+          final_grade_scored                        BOOLEAN,
+          final_grade_taken                         BOOLEAN,
+          final_grade_score                         FLOAT,
+          final_grade_possiblescore                 FLOAT,
+          final_grade_scaledscore                   FLOAT,
+          attempts                                  INT,
+          final_grade_timespent                     DECIMAL(18, 6)
+        )
+        ;;
+
+      sql_step:
+        CREATE OR REPLACE TEMPORARY TABLE take_item_incremental
+        AS
+        WITH latest AS (
+                         SELECT hash AS h, MAX(_ldts) AS d
+                         FROM prod.realtime.take_item
+                         WHERE _ldts > (
+                                         SELECT COALESCE(max(_ldts), '1970-01-01')
+                                         FROM take_item
+                                       )
+                           AND submission_date >= dateadd(YEAR, -3, current_date())
+                         GROUP BY 1
+                       )
+           , data AS (
+                       SELECT hash AS business_key
+                            , *
+                            , split_part(course_uri, ':', -1)::STRING AS course_key
+                            , CASE
+                                WHEN take_node.activity
+                                  THEN NULL
+                                WHEN (take_node.activity_node_uri) ILIKE 'cxp:activity:masterygroup:%'
+                                  THEN NULL
+                                WHEN (take_node.activity_node_uri) ILIKE 'cxp:%'
+                                  THEN
+                                  CASE
+                                    WHEN (take_node.activity_node_uri) ILIKE 'cxp:activity:%'
+                                      THEN
+                                      CASE array_size(split((LOWER(take_node.activity_node_uri)), ':'))
+                                        WHEN 3
+                                          THEN split_part(
+                                                replace(split_part((LOWER(take_node.activity_node_uri)), ':', -1), '-', '/'),
+                                                '/', 1)
+                                        WHEN 4
+                                          THEN array_to_string(
+                                                array_slice(split((LOWER(take_node.activity_node_uri)), ':'), 1, 2), ':')
+                                      END
+                                    ELSE split_part((LOWER(take_node.activity_node_uri)), ':', 2)
+                                  END
+                                WHEN (take_node.activity_node_uri) ILIKE 'link:%'
+                                  THEN split_part(split_part((LOWER(take_node.activity_node_uri)), ':', 2), '-', 1)
+                         -- cnow:item:/book/ell5bms15h/itemid/75003942
+                         -- ils://cnow/books/esmt07t/itemid/752573077
+                                WHEN (take_node.activity_node_uri) ILIKE 'cnow:item:/book%'
+                                  OR (take_node.activity_node_uri) ILIKE 'ils://%'
+                                  THEN split_part((LOWER(take_node.activity_node_uri)), '/', -3)
+                         -- mindtap:item:/book/waac24h/itemid/1481067391/global:1de67454-dc0c-486d-9f49-4be509370846
+                                WHEN (take_node.activity_node_uri) ILIKE 'mindtap:item:/book%'
+                                  OR (take_node.activity_node_uri) ILIKE 'cnow:alsnode:/book%'
+                                  THEN split_part((LOWER(take_node.activity_node_uri)), '/', 3)
+                         --imilac:likert:question:daftsaaum09l/qLeadershipBeliefs_question_7
+                                WHEN (take_node.activity_node_uri) ILIKE 'imilac:likert:%'
+                                  THEN split_part(split_part((LOWER(take_node.activity_node_uri)), ':', 4), '/', 1)
+                              END::STRING AS activity_node_product_code
+                            , CASE
+                                WHEN take_node.activity
+                                  THEN NULL
+                                WHEN (take_node.activity_node_uri) ILIKE 'cxp:activity:masterygroup:%'
+                                  THEN NULL
+                                WHEN (take_node.activity_node_uri) ILIKE 'cxp:%'
+                                  THEN
+                                  CASE
+                                    WHEN (take_node.activity_node_uri) ILIKE 'cxp:activity:%'
+                                      THEN
+                                      CASE array_size(split((LOWER(take_node.activity_node_uri)), ':'))
+                                        WHEN 3
+                                          THEN split_part(
+                                                replace(split_part((LOWER(take_node.activity_node_uri)), ':', -1), '-', '/'),
+                                                '/', -1)
+                                        WHEN 4
+                                          THEN NULL
+                                      END
+                                    ELSE split_part((LOWER(take_node.activity_node_uri)), ':', -1)
+                                  END
+                                WHEN (take_node.activity_node_uri) ILIKE 'cnow:item:/book%'
+                                  OR (take_node.activity_node_uri) ILIKE 'ils://%'
+                                  THEN split_part((LOWER(take_node.activity_node_uri)), '/', -1)
+                                WHEN (take_node.activity_node_uri) ILIKE 'mindtap:item:/book%'
+                                  --or (LOWER(take_node.ACTIVITY_NODE_URI)) like 'cnow:alsnode:/book%' --section id
+                                  THEN split_part((LOWER(take_node.activity_node_uri)), '/', 5)
+                         --when (LOWER(take_node.ACTIVITY_NODE_URI)) like 'imilac:%'
+                         --  then split_part((LOWER(take_node.ACTIVITY_NODE_URI)), ':', -1)
+                              END::STRING AS activity_node_item_id
+                            , split_part(take_node.assignable_content_uri, ':', -1)::STRING AS assignable_content_product_section_imilac
+                            , CASE
+                                WHEN take_node.assignable_content_uri ILIKE 'cnow:activity:als:%'
+                                  THEN split_part(take_node.assignable_content_uri, '/', -3)
+                                WHEN take_node.assignable_content_uri LIKE 'imilac:%'
+                                  THEN split_part(assignable_content_product_section_imilac, '/', 1)
+                              END ::STRING AS assignable_content_product_abbr
+                            , CASE
+                                WHEN take_node.assignable_content_uri ILIKE 'cnow:activity:als:%' OR
+                                     take_node.assignable_content_uri ILIKE 'imilac:%'
+                                  THEN split_part(take_node.assignable_content_uri, '/', -1)
+                              END ::STRING AS assignable_content_uri_section_id
+                            , coalesce(activity_node_product_code, assignable_content_product_abbr) AS product_code
+                            , activity_node_item_id AS item_id
+                            , assignable_content_uri_section_id AS section_id
+                       FROM prod.realtime.take_item AS take_node
+                     )
+        SELECT
+            data.*
+            ,activity_type_map.activity_type_uri AS activity_type_uri_map
+            ,data.final_grade:scored::BOOLEAN  AS final_grade_scored
+            ,data.final_grade:taken::BOOLEAN  AS final_grade_taken
+            ,data.final_grade:normalScore::FLOAT  AS final_grade_score
+            ,data.final_grade:possibleScore::FLOAT  AS final_grade_possiblescore
+            ,data.final_grade:scaledScore::FLOAT  AS final_grade_scaledscore
+            ,data.interaction_grade:attempts::INT  AS attempts
+            --cap time spent at 2 hrs
+            ,iff(data.final_grade:timeSpent > 7200, NULL, NULLIF(data.final_grade:timeSpent::STRING, ''))::DECIMAL(18, 6) / 60 / 60 / 24 AS final_grade_timespent
+        FROM latest
+             INNER JOIN data ON (latest.h, latest.d) = (data.hash, data._ldts)
+             LEFT JOIN ${activity_type_map.SQL_TABLE_NAME} AS activity_type_map
+                  ON (LOWER(data.ACTIVITY_TYPE_URI)) = activity_type_map.activity_type_uri_source
+        ORDER BY hash
+        ;;
+
     sql_step:
-      merge into looker_scratch.take_node t
-      using looker_scratch.take_item_incremental i on t.hash = i.hash
-      when matched then update
-          set
+      MERGE INTO take_item t
+        USING take_item_incremental i ON t.hash = i.hash
+        WHEN MATCHED THEN UPDATE
+          SET
             t.business_key = i.business_key
             ,t._ldts = i._ldts,t._rsrc = i._rsrc
             ,t.activity_uri = i.activity_uri, t.activity_node_uri = i.activity_node_uri, t.external_take_uri = i.external_take_uri, t.course_uri = i.course_uri, t.user_identifier = i.user_identifier, t.submission_date = i.submission_date, t.possible_score = i.possible_score
             ,t.interaction_grade = i.interaction_grade, t.activity_grade = i.activity_grade, t.final_grade = i.final_grade
             ,t.activity = i.activity, t.mastery_item = i.mastery_item
-            ,t.activity_type_uri = i.activity_type_uri, t.assignable_content_uri = i.assignable_content_uri
+            ,t.activity_type_uri = COALESCE(i.activity_type_uri_map, i.activity_type_uri), t.assignable_content_uri = i.assignable_content_uri
             ,t.hash = i.hash, t.last_update_date = i.last_update_date
             ,t.parent_path = i.parent_path, t.position_path = i.position_path
             ,t.external_properties = i.external_properties
             ,t.course_key = i.course_key, t.activity_node_product_code = i.activity_node_product_code, t.activity_node_item_id = i.activity_node_item_id
-            ,t.assignable_content_product_section_imilac = i.assignable_content_product_section_imilac, t.assignable_content_product_abbr = i.assignable_content_product_abbr, t.assignable_content_uri_section_id = i.assignable_content_uri_section_id
+            ,t.assignable_content_product_section_imilac = i.assignable_content_product_section_imilac, t.assignable_content_product_abbr = i.assignable_content_product_abbr
+            ,t.assignable_content_uri_section_id = i.assignable_content_uri_section_id
             ,t.product_code = i.product_code, t.item_id = i.item_id, t.section_id = i.section_id
-      when not matched then insert (
-          business_key
-          ,_ldts,_rsrc
-          ,activity_uri, activity_node_uri, external_take_uri, course_uri, user_identifier, submission_date, possible_score
-          ,interaction_grade, activity_grade, final_grade
-          ,activity, mastery_item
-          ,activity_type_uri, assignable_content_uri
-          ,hash, last_update_date
-          ,parent_path, position_path
-          ,external_properties
-          ,course_key, activity_node_product_code, activity_node_item_id
-          ,assignable_content_product_section_imilac, assignable_content_product_abbr, assignable_content_uri_section_id
-          ,product_code, item_id, section_id)
-      values (
-          i.business_key
-          ,i._ldts,i._rsrc
-          ,i.activity_uri, i.activity_node_uri, i.external_take_uri, i.course_uri, i.user_identifier, i.submission_date, i.possible_score
-          ,i.interaction_grade, i.activity_grade, i.final_grade
-          ,i.activity, i.mastery_item
-          ,i.activity_type_uri, i.assignable_content_uri
-          ,i.hash, i.last_update_date
-          ,i.parent_path, i.position_path
-          ,i.external_properties
-          ,i.course_key, i.activity_node_product_code, i.activity_node_item_id
-          ,i.assignable_content_product_section_imilac, i.assignable_content_product_abbr, i.assignable_content_uri_section_id
-          ,i.product_code, i.item_id, i.section_id)
+            ,t.final_grade_scored = i.final_grade_scored
+            ,t.final_grade_taken = i.final_grade_taken
+            ,t.final_grade_score = i.final_grade_score
+            ,t.final_grade_possiblescore = i.final_grade_possiblescore
+            ,t.final_grade_scaledscore = i.final_grade_scaledscore
+            ,t.attempts = i.attempts
+            ,t.final_grade_timespent = i.final_grade_timespent
+        WHEN NOT MATCHED THEN INSERT (
+                                      business_key, _ldts, _rsrc, activity_uri, activity_node_uri, external_take_uri,
+                                      course_uri, user_identifier, submission_date, possible_score, interaction_grade,
+                                      activity_grade, final_grade, activity, mastery_item, activity_type_uri,
+                                      assignable_content_uri, hash, last_update_date, parent_path, position_path,
+                                      external_properties, course_key, activity_node_product_code, activity_node_item_id,
+                                      assignable_content_product_section_imilac, assignable_content_product_abbr,
+                                      assignable_content_uri_section_id, product_code, item_id, section_id,
+                                      final_grade_scored, final_grade_taken, final_grade_score, final_grade_possiblescore, final_grade_scaledscore,
+                                      attempts, final_grade_timespent
+                                      )
+          VALUES (
+                   i.business_key
+                 , i._ldts, i._rsrc
+                 , i.activity_uri, i.activity_node_uri, i.external_take_uri, i.course_uri, i.user_identifier
+                 , i.submission_date, i.possible_score
+                 , i.interaction_grade, i.activity_grade, i.final_grade
+                 , i.activity, i.mastery_item
+                 , COALESCE(i.activity_type_uri_map, i.activity_type_uri), i.assignable_content_uri
+                 , i.hash, i.last_update_date
+                 , i.parent_path, i.position_path
+                 , i.external_properties
+                 , i.course_key, i.activity_node_product_code, i.activity_node_item_id
+                 , i.assignable_content_product_section_imilac, i.assignable_content_product_abbr
+                 , i.assignable_content_uri_section_id
+                 , i.product_code, i.item_id, i.section_id
+                 , i.final_grade_scored, i.final_grade_taken, i.final_grade_score, i.final_grade_possiblescore, i.final_grade_scaledscore
+                 , i.attempts, i.final_grade_timespent
+                )
       ;;
 
       sql_step:
-      alter table looker_scratch.take_node cluster by (submission_date::date);;
+        ALTER TABLE take_item RECLUSTER;;
 
       sql_step:
-      alter table looker_scratch.take_node recluster;;
+        CREATE OR REPLACE TRANSIENT TABLE ${SQL_TABLE_NAME} CLONE take_item;;
 
       sql_step:
-      create or replace table ${SQL_TABLE_NAME} clone looker_scratch.take_node;;
+        CREATE TRANSIENT TABLE IF NOT EXISTS item_take_items LIKE take_item;;
+
+      sql_step:
+        DELETE FROM item_take_items WHERE hash IN (SELECT hash FROM take_item_incremental WHERE NOT activity AND NOT mastery_item);;
+
+      sql_step:
+        INSERT INTO item_take_items
+        SELECT *
+        FROM take_item_incremental
+        WHERE NOT activity AND NOT mastery_item
+        ORDER BY submission_date
+        ;;
+
+      sql_step:
+        ALTER TABLE item_take_items RECLUSTER;;
+
+      sql_step:
+        CREATE TRANSIENT TABLE IF NOT EXISTS item_take_activities LIKE take_item;;
+
+      sql_step:
+        DELETE FROM item_take_activities WHERE hash IN (SELECT hash FROM take_item_incremental WHERE activity);;
+
+      sql_step:
+        INSERT INTO item_take_activities
+        SELECT *
+        FROM take_item_incremental
+        WHERE activity
+        ORDER BY submission_date
+        ;;
+
+      sql_step:
+        ALTER TABLE item_take_activities RECLUSTER;;
 
     }
 

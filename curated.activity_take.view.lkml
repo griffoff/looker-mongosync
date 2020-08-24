@@ -1,39 +1,19 @@
-view: curated_takes {
-  derived_table: {
-    sql:
-    SELECT
-        take_node.USER_IDENTIFIER  AS user_identifier,
-        take_node.SUBMISSION_DATE  AS submission_date,
-        take_node.COURSE_URI  AS course_uri,
-        take_node.EXTERNAL_TAKE_URI  AS external_take_uri,
-        take_node.EXTERNAL_PROPERTIES  AS external_properties_raw,
-        take_node.ACTIVITY_URI  AS activity_uri,
-        take_node.activity_node_uri as activity_node_uri,
-        activity_type_map.activity_type_uri AS activity_type_uri,
-        take_node.FINAL_GRADE:scored::boolean  AS final_grade_scored,
-        take_node.FINAL_GRADE:taken::boolean  AS final_grade_taken,
-        take_node.FINAL_GRADE:normalScore::float  AS final_grade_score,
-        take_node.FINAL_GRADE:possibleScore::float  AS final_grade_possiblescore,
-        take_node.FINAL_GRADE:scaledScore::float  AS final_grade_scaledscore,
-        take_node.INTERACTION_GRADE:attempts::int  AS attempts,
-        --cap time spent at 2 hrs
-        --least(7200, try_cast(nullif(take_node.FINAL_GRADE:timeSpent::string, '') AS decimal(18, 6))) / 60 / 60 / 24 AS final_grade_timespent,
-        iff(take_node.FINAL_GRADE:timeSpent > 7200, NULL, NULLIF(take_node.FINAL_GRADE:timeSpent::string, ''))::decimal(18, 6) / 60 / 60 / 24 AS final_grade_timespent,
-        take_node.HASH  AS hash,
-        take_node.ACTIVITY
-      FROM ${take_node.SQL_TABLE_NAME} AS take_node
-      LEFT JOIN ${activity_type_map.SQL_TABLE_NAME} AS activity_type_map ON (LOWER(take_node.ACTIVITY_TYPE_URI)) = activity_type_map.activity_type_uri_source
-
-      WHERE
-        (
-        UPPER(activity_type_map.activity_type_uri) <> UPPER('als-pete')
-        OR activity_type_map.activity_type_uri IS NULL
-        )
-      AND NOT mastery_item
-      --GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
-      ;;
-  }
-}
+# view: curated_takes {
+#   derived_table: {
+#     sql:
+#       SELECT
+#         *
+#         ,external_properties  AS external_properties_raw
+#       FROM ${take_node.SQL_TABLE_NAME} AS take_node
+#       WHERE NOT mastery_item
+#       AND (
+#         UPPER(activity_type_uri) <> UPPER('imilac:als-pete')
+#         OR activity_type_uri IS NULL
+#         )
+#
+#       ;;
+#   }
+# }
 
 view: curated_activity_take {
   derived_table: {
@@ -53,8 +33,7 @@ view: curated_activity_take {
             ,COUNT(CASE WHEN final_grade_score = 1 AND attempts > 0 THEN 1 END) / NULLIF(COUNT(CASE WHEN attempts > 0 THEN 1 END), 0) as percent_questions_correct
             ,COUNT(CASE WHEN final_grade_score = 1 AND attempts = 1 THEN 1 END) / NULLIF(COUNT(CASE WHEN attempts > 0  THEN 1 END), 0) as percent_questions_correct_attempt_1
             ,COUNT(CASE WHEN final_grade_score = 1 AND attempts <= 2 THEN 1 END) / NULLIF(COUNT(CASE WHEN attempts > 0  THEN 1 END), 0) as percent_questions_correct_attempt_2
-        FROM ${curated_takes.SQL_TABLE_NAME}
-        WHERE NOT activity
+        FROM looker_scratch.take_item_items
         GROUP BY 1
       )
       SELECT
@@ -62,7 +41,7 @@ view: curated_activity_take {
         a.submission_date,
         a.course_uri,
         a.external_take_uri,
-        a.external_properties_raw,
+        a.external_properties,
         a.activity_uri as activity_uri,
         a.activity_type_uri as activity_type_uri,
         a.final_grade_scored,
@@ -79,11 +58,9 @@ view: curated_activity_take {
         q.percent_questions_correct,
         q.percent_questions_correct_attempt_1,
         q.percent_questions_correct_attempt_2,
-        COUNT(*) as take_count
-      FROM ${curated_takes.SQL_TABLE_NAME} a
+        1 as take_count
+      FROM looker_scratch.take_item_activities a
       LEFT JOIN q ON a.external_take_uri = q.external_take_uri
-      WHERE activity
-      GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21
       ORDER BY submission_date
       ;;
 
@@ -234,6 +211,7 @@ view: curated_activity_take {
   dimension: external_properties_raw {
     group_label: "External Properties"
     type: string
+    sql: ${TABLE}.external_properties ;;
   }
   dimension: difficulty {
     hidden: yes
