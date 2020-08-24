@@ -33,7 +33,7 @@ view: curated_activity_take {
             ,COUNT(CASE WHEN final_grade_score = 1 AND attempts > 0 THEN 1 END) / NULLIF(COUNT(CASE WHEN attempts > 0 THEN 1 END), 0) as percent_questions_correct
             ,COUNT(CASE WHEN final_grade_score = 1 AND attempts = 1 THEN 1 END) / NULLIF(COUNT(CASE WHEN attempts > 0  THEN 1 END), 0) as percent_questions_correct_attempt_1
             ,COUNT(CASE WHEN final_grade_score = 1 AND attempts <= 2 THEN 1 END) / NULLIF(COUNT(CASE WHEN attempts > 0  THEN 1 END), 0) as percent_questions_correct_attempt_2
-        FROM looker_scratch.take_item_items
+        FROM looker_scratch.item_take_items
         GROUP BY 1
       )
       SELECT
@@ -59,7 +59,7 @@ view: curated_activity_take {
         q.percent_questions_correct_attempt_1,
         q.percent_questions_correct_attempt_2,
         1 as take_count
-      FROM looker_scratch.take_item_activities a
+      FROM looker_scratch.item_take_activities a
       LEFT JOIN q ON a.external_take_uri = q.external_take_uri
       ORDER BY submission_date
       ;;
