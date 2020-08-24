@@ -3,6 +3,11 @@ view: course_activity {
   derived_table: {
 
     create_process: {
+
+      sql_step:
+        USE SCHEMA looker_scratch
+      ;;
+
       sql_step:
         CREATE TRANSIENT TABLE IF NOT EXISTS course_activity
         (
@@ -109,11 +114,16 @@ view: course_activity {
                GROUP BY 1, 2
              ) l
         WHERE course_activity.activity_uri = l.activity_uri
-          AND l.pop_rank = 1;;
+          AND l.pop_rank = 1
+        ;;
 
-      sql_step: ALTER TABLE course_activity RECLUSTER;;
+      sql_step:
+        ALTER TABLE course_activity RECLUSTER
+        ;;
 
-      sql_step: CREATE OR REPLACE TRANSIENT TABLE ${SQL_TABLE_NAME} CLONE course_activity ;;
+      sql_step:
+        CREATE OR REPLACE TRANSIENT TABLE ${SQL_TABLE_NAME} CLONE course_activity
+        ;;
 
     }
 
