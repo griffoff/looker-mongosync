@@ -56,7 +56,9 @@ view: realtime_course {
 # transformation to CONCAT 'E-' coursekeys for cnow courses
   dimension: course_key {
     type: string
-    sql: CASE WHEN split_part(${course_uri}, ':', 1) like 'cnow' THEN CONCAT ('E-',split_part(${course_uri}, ':', -1)) ELSE split_part(${course_uri}, ':', -1) END ;;
+    sql: COALESCE(${external_properties}:"soa:property:courseKey":value
+          ,CASE WHEN split_part(${course_uri}, ':', 1) like 'cnow' THEN CONCAT ('E-',split_part(${course_uri}, ':', -1)) ELSE split_part(${course_uri}, ':', -1) END
+          );;
   }
 
   dimension_group: end {
