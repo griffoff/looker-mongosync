@@ -73,7 +73,7 @@ explore: course_activity {
   extension: required
 
   join: course_activity_group {
-    sql: inner join lateral flatten(${course_activity.activity_group_uris}, outer=>True) g on g.value != 'soa:activity-group:default'
+    sql: left join lateral flatten(${course_activity.activity_group_uris}, outer=>True) g on g.value != 'soa:activity-group:default'
         left join ${course_activity_group.SQL_TABLE_NAME} course_activity_group on ${course_activity.course_uri} = ${course_activity_group.course_uri}
                                       and g.value = ${course_activity_group.activity_group_uri}
           ;;
