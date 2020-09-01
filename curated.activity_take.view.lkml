@@ -518,7 +518,7 @@ view: curated_activity_take {
   dimension: activity_counter {
     hidden: yes
     sql:
-      {% if course_activity.activity_uri._in_query %}
+      {% if course_activity._in_query %}
         HASH(${activity_uri}, ${user_identifier})
       {% else %}
         ${activity_uri}
