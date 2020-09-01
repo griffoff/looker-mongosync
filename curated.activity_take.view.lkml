@@ -72,49 +72,72 @@ view: curated_activity_take {
     }
     datagroup_trigger: realtime_default_datagroup
   }
-  dimension: user_identifier {}
+  dimension: user_identifier {hidden: yes}
   dimension_group: submission_date {
     label: "Submission"
     type: time
     timeframes: [time, date, day_of_week, week, month, year]
   }
   dimension: activity_source {
+    group_label: "Source"
     type: string
     sql: SPLIT_PART(${activity_uri}, ':', 1) ;;
   }
   dimension: activity_take_source {
+    group_label: "Source"
     type: string
     sql: SPLIT_PART(${external_take_uri}, ':', 1) ;;
   }
-  dimension: course_uri {}
+  dimension: course_uri {hidden:yes}
   dimension: external_take_uri {}
-  dimension: activity_uri {}
-  dimension: activity_type_uri {}
+  dimension: activity_uri {hidden: yes}
+  dimension: activity_type_uri {hidden: yes}
+  dimension: final_grade_scored {
+    group_label: "Score"
+    label: "Scored?"
+    type: yesno
+  }
+  dimension: final_grade_scored_value {
+    group_label: "Score"
+    label: "Scored/Not Scored"
+    type: string
+    case: {when: {sql: ${final_grade_scored};; label: "Scored"}
+      else:"Not Scored"
+      }
+  }
+  dimension: final_grade_score {
+    group_label: "Score"
+    label: "Final Score"
+    value_format_name: percent_1
+    type: number
+  }
   dimension: final_grade_score_tiers {
-    label: "Score Bucket"
+    group_label: "Score"
+    label: "Final Score Bucket"
     value_format_name: percent_1
     type: tier
     tiers: [0.4, 0.6, 0.7, 0.8, 0.9]
     style: relational
     sql: ${final_grade_score} ;;
   }
-  dimension: final_grade_scored {
-    label: "Scored?"
-    type: yesno
-  }
   dimension: final_grade_taken {
+    group_label: "Taken"
     label: "Taken?"
     type: yesno
   }
-  dimension: final_grade_score {
-    label: "Score"
-    value_format_name: percent_1
-    type: number
+  dimension: final_grade_taken_value {
+    group_label: "Taken"
+    label: "Taken/Not Taken"
+    type: string
+    case: {when: {sql: ${final_grade_taken};; label: "Taken"}
+      else:"Not Taken"
+    }
   }
   dimension: final_grade_timespent {
     label: "Time spent"
     value_format: "[m]:ss \m\i\n\s"
     type: number
+    hidden: yes
   }
   dimension: total_questions {
     group_label: "Questions"
@@ -492,11 +515,22 @@ view: curated_activity_take {
     value_format_name: decimal_1
   }
 
+  dimension: activity_counter {
+    hidden: yes
+    sql:
+      {% if course_activity.activity_uri._in_query %}
+        HASH(${activity_uri}, ${user_identifier})
+      {% else %}
+        ${activity_uri}
+      {% endif %}
+      ;;
+  }
+
   measure: activities_launched {
     group_label: "MTP"
     label: "# Activities launched"
     type: number
-    sql: COUNT(DISTINCT CASE WHEN ${percent_questions_attempted} > 0 THEN ${activity_uri} END);;
+    sql: COUNT(DISTINCT CASE WHEN ${percent_questions_attempted} > 0 THEN ${activity_counter} END);;
     value_format_name: decimal_0
   }
 
@@ -504,7 +538,7 @@ view: curated_activity_take {
     group_label: "MTP"
     label: "# Activities partially complete"
     type: number
-    sql: COUNT(DISTINCT CASE WHEN ${percent_questions_attempted} < 1 AND ${percent_questions_attempted} > 0 THEN ${activity_uri} END);;
+    sql: COUNT(DISTINCT CASE WHEN ${percent_questions_attempted} < 1 AND ${percent_questions_attempted} > 0 THEN ${activity_counter} END);;
     value_format_name: decimal_0
   }
 
@@ -512,7 +546,7 @@ view: curated_activity_take {
     group_label: "MTP"
     label: "# Activities complete"
     type: number
-    sql: COUNT(DISTINCT CASE WHEN ${percent_questions_attempted} = 1THEN ${activity_uri} END);;
+    sql: COUNT(DISTINCT CASE WHEN ${percent_questions_attempted} = 1THEN ${activity_counter} END);;
     value_format_name: decimal_0
   }
 
