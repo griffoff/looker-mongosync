@@ -161,6 +161,7 @@ view: curated_activity_take {
   }
   measure: avg_attempts_per_question {
     group_label: "Questions"
+    label: "Attempts per Question (Avg)"
     type: number
     sql: SUM(${total_question_attempts}) / SUM(${questions_attempted}) ;;
     value_format_name: decimal_1
