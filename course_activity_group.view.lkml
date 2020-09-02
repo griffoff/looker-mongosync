@@ -1,19 +1,25 @@
 view: course_activity_group {
   #sql_table_name: REALTIME.COURSE_ACTIVITY_GROUP ;;
   derived_table: {
-    sql:
-      with data as (
-        select
-          _hash as business_key
-          ,case when lead(last_update_date) over(partition by business_key order by last_update_date) is null then 1 end as latest
-          ,*
-        from realtime.course_activity_group
-      )
-      select *
-      from data
-      where latest = 1
-      order by course_uri, activity_group_uri
-      ;;
+    create_process: {
+      sql_step:
+      CREATE OR REPLACE TRANSIENT TABLE ${SQL_TABLE_NAME}
+      As
+        with data as (
+          select
+            _hash as business_key
+            ,case when lead(last_update_date) over(partition by business_key order by last_update_date) is null then 1 end as latest
+            ,*
+          from realtime.course_activity_group
+        )
+        select *
+        from data
+        where latest = 1
+        order by course_uri, activity_group_uri
+        ;;
+      sql_step:
+        ALTER TABLE ${SQL_TABLE_NAME} CLUSTER BY (course_uri, activity_group_uri);;
+    }
 
       datagroup_trigger: realtime_default_datagroup
   }

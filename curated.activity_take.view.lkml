@@ -1,21 +1,123 @@
-# view: curated_takes {
-#   derived_table: {
-#     sql:
-#       SELECT
-#         *
-#         ,external_properties  AS external_properties_raw
-#       FROM ${take_node.SQL_TABLE_NAME} AS take_node
-#       WHERE NOT mastery_item
-#       AND (
-#         UPPER(activity_type_uri) <> UPPER('imilac:als-pete')
-#         OR activity_type_uri IS NULL
-#         )
-#
-#       ;;
-#   }
-# }
+view: final_grade {
+  extension: required
 
+  dimension: final_grade_scored {
+    group_label: "Score"
+    label: "Scored?"
+    type: yesno
+  }
+  dimension: final_grade_scored_value {
+    group_label: "Score"
+    label: "Scored/Not Scored"
+    type: string
+    case: {when: {sql: ${final_grade_scored};; label: "Scored"}
+      else:"Not Scored"
+    }
+  }
+  dimension: final_grade_score {
+    group_label: "Score"
+    label: "Final Score"
+    value_format_name: percent_1
+    type: number
+  }
+  dimension: final_grade_score_tiers {
+    group_label: "Score"
+    label: "Final Score Bucket"
+    value_format_name: percent_1
+    type: tier
+    tiers: [0.4, 0.6, 0.7, 0.8, 0.9]
+    style: relational
+    sql: ${final_grade_score} ;;
+  }
+  dimension: final_grade_taken {
+    group_label: "Taken"
+    label: "Taken?"
+    type: yesno
+  }
+  dimension: final_grade_taken_value {
+    group_label: "Taken"
+    label: "Taken/Not Taken"
+    type: string
+    case: {when: {sql: ${final_grade_taken};; label: "Taken"}
+      else:"Not Taken"
+    }
+  }
+  dimension: final_grade_timespent {
+    label: "Time spent"
+    value_format: "[m]:ss \m\i\n\s"
+    type: number
+  }
+
+  measure: final_grade_timespent_average {
+    group_label: "Time spent"
+    label: "Time spent (Avg)"
+    type: average
+    sql: ${final_grade_timespent} ;;
+    value_format: "[m]:ss \m\i\n\s"
+  }
+  measure: final_grade_timespent_sum {
+    group_label: "Time spent"
+    label: "Time spent (Sum)"
+    type: average
+    sql: ${final_grade_timespent} ;;
+    value_format: "[m]:ss \m\i\n\s"
+  }
+  measure: final_grade_timespent_min {
+    group_label: "Time spent"
+    label: "Time spent (Min)"
+    type: min
+    sql: ${final_grade_timespent} ;;
+    value_format: "[m]:ss \m\i\n\s"
+  }
+  measure: final_grade_timespent_p10 {
+    group_label: "Time spent"
+    label: "Time spent (10th Percentile)"
+    type: percentile
+    percentile: 10
+    sql: ${final_grade_timespent} ;;
+    value_format: "[m]:ss \m\i\n\s"
+  }
+  measure: final_grade_timespent_q1 {
+    group_label: "Time spent"
+    label: "Time spent (25th Percentile)"
+    type: percentile
+    percentile: 25
+    sql: ${final_grade_timespent} ;;
+    value_format: "[m]:ss \m\i\n\s"
+  }
+  measure: final_grade_timespent_median {
+    group_label: "Time spent"
+    label: "Time spent (Median)"
+    type: median
+    sql: ${final_grade_timespent} ;;
+    value_format: "[m]:ss \m\i\n\s"
+  }
+  measure: final_grade_timespent_q3 {
+    group_label: "Time spent"
+    label: "Time spent (75th Percentile)"
+    type: percentile
+    percentile: 75
+    sql: ${final_grade_timespent} ;;
+    value_format: "[m]:ss \m\i\n\s"
+  }
+  measure: final_grade_timespent_p90 {
+    group_label: "Time spent"
+    label: "Time spent (90th Percentile)"
+    type: percentile
+    percentile: 90
+    sql: ${final_grade_timespent} ;;
+    value_format: "[m]:ss \m\i\n\s"
+  }
+  measure: final_grade_timespent_max {
+    group_label: "Time spent"
+    label: "Time spent (Max)"
+    type: max
+    sql: ${final_grade_timespent} ;;
+    value_format: "[m]:ss \m\i\n\s"
+  }
+}
 view: curated_activity_take {
+  extends: [final_grade]
   derived_table: {
     create_process: {
       sql_step:
@@ -61,10 +163,10 @@ view: curated_activity_take {
         1 as take_count
       FROM looker_scratch.item_take_activities a
       LEFT JOIN q ON a.external_take_uri = q.external_take_uri
-      ORDER BY submission_date
+      ORDER BY course_uri, activity_uri, user_identifier
       ;;
 
-      sql_step: ALTER TABLE looker_scratch.curated_activity_take cluster by (submission_date::date)
+      sql_step: ALTER TABLE looker_scratch.curated_activity_take cluster by (course_uri, activity_uri, user_identifier)
       ;;
 
       sql_step: create or replace table ${SQL_TABLE_NAME} CLONE looker_scratch.curated_activity_take
@@ -72,11 +174,11 @@ view: curated_activity_take {
     }
     datagroup_trigger: realtime_default_datagroup
   }
-  dimension: user_identifier {hidden: yes}
+  dimension: user_identifier {label: "user guid" hidden: yes}
   dimension_group: submission_date {
     label: "Submission"
     type: time
-    timeframes: [time, date, day_of_week, week, month, year]
+    timeframes: [raw, time, date, day_of_week, week, month, year]
   }
   dimension: activity_source {
     group_label: "Source"
@@ -89,56 +191,16 @@ view: curated_activity_take {
     sql: SPLIT_PART(${external_take_uri}, ':', 1) ;;
   }
   dimension: course_uri {hidden:yes}
-  dimension: external_take_uri {}
-  dimension: activity_uri {hidden: yes}
-  dimension: activity_type_uri {hidden: yes}
-  dimension: final_grade_scored {
-    group_label: "Score"
-    label: "Scored?"
-    type: yesno
-  }
-  dimension: final_grade_scored_value {
-    group_label: "Score"
-    label: "Scored/Not Scored"
+  dimension: external_take_uri{
     type: string
-    case: {when: {sql: ${final_grade_scored};; label: "Scored"}
-      else:"Not Scored"
-      }
-  }
-  dimension: final_grade_score {
-    group_label: "Score"
-    label: "Final Score"
-    value_format_name: percent_1
-    type: number
-  }
-  dimension: final_grade_score_tiers {
-    group_label: "Score"
-    label: "Final Score Bucket"
-    value_format_name: percent_1
-    type: tier
-    tiers: [0.4, 0.6, 0.7, 0.8, 0.9]
-    style: relational
-    sql: ${final_grade_score} ;;
-  }
-  dimension: final_grade_taken {
-    group_label: "Taken"
-    label: "Taken?"
-    type: yesno
-  }
-  dimension: final_grade_taken_value {
-    group_label: "Taken"
-    label: "Taken/Not Taken"
-    type: string
-    case: {when: {sql: ${final_grade_taken};; label: "Taken"}
-      else:"Not Taken"
+    link: {
+      url: "cengage.looker.com/explore/take_node?_f['external_take_uri']={{value | url_encode }}"
+      label: "View all take nodes"
     }
   }
-  dimension: final_grade_timespent {
-    label: "Time spent"
-    value_format: "[m]:ss \m\i\n\s"
-    type: number
-    hidden: yes
-  }
+  dimension: activity_uri {hidden: yes}
+  dimension: activity_type_uri {hidden: yes}
+
   dimension: total_questions {
     group_label: "Questions"
     label: "# Questions"
@@ -158,6 +220,11 @@ view: curated_activity_take {
     group_label: "Questions"
     label: "Average attempts per question"
     type: number
+  }
+  measure: latest_submission_date {
+    label: "Latest submission date"
+    type: max
+    sql: ${submission_date_raw} ;;
   }
   measure: avg_attempts_per_question {
     group_label: "Questions"
@@ -237,24 +304,6 @@ view: curated_activity_take {
     type: string
     sql: ${TABLE}.external_properties ;;
   }
-  dimension: difficulty {
-    hidden: yes
-    group_label: "External Properties"
-    type: number
-    sql:  ${external_properties_raw}:"cengage:book:item:difficulty"::FLOAT;;
-  }
-  dimension: problem_type {
-    group_label: "External Properties"
-    hidden: yes
-    type: string
-    sql:  ${external_properties_raw}:"cengage:book:item:problem-type"::STRING;;
-  }
-  dimension: item_name {
-    group_label: "External Properties"
-    hidden: yes
-    type: string
-    sql:  ${external_properties_raw}:"cengage:book:item:name"::STRING;;
-  }
 
   measure: count {
     label: "# Takes"
@@ -278,6 +327,13 @@ view: curated_activity_take {
     type: min
     sql: ${final_grade_score} ;;
     value_format_name: percent_1
+  }
+  measure: final_grade_score_sd {
+    group_label: "Score"
+    label: "Final Score (Std. Dev.)"
+    value_format_name: percent_1
+    sql: STDDEV(${final_grade_score}) ;;
+    type: number
   }
   measure: final_grade_score_p10 {
     group_label: "Score"
@@ -326,66 +382,7 @@ view: curated_activity_take {
     value_format_name: percent_1
   }
 
-  measure: final_grade_timespent_average {
-    group_label: "Time spent"
-    label: "Time spent (Avg)"
-    type: average
-    sql: ${final_grade_timespent} ;;
-    value_format: "[m]:ss \m\i\n\s"
-  }
-  measure: final_grade_timespent_min {
-    group_label: "Time spent"
-    label: "Time spent (Min)"
-    type: min
-    sql: ${final_grade_timespent} ;;
-    value_format: "[m]:ss \m\i\n\s"
-  }
-  measure: final_grade_timespent_p10 {
-    group_label: "Time spent"
-    label: "Time spent (10th Percentile)"
-    type: percentile
-    percentile: 10
-    sql: ${final_grade_timespent} ;;
-    value_format: "[m]:ss \m\i\n\s"
-  }
-  measure: final_grade_timespent_q1 {
-    group_label: "Time spent"
-    label: "Time spent (25th Percentile)"
-    type: percentile
-    percentile: 25
-    sql: ${final_grade_timespent} ;;
-    value_format: "[m]:ss \m\i\n\s"
-  }
-  measure: final_grade_timespent_median {
-    group_label: "Time spent"
-    label: "Time spent (Median)"
-    type: median
-    sql: ${final_grade_timespent} ;;
-    value_format: "[m]:ss \m\i\n\s"
-  }
-  measure: final_grade_timespent_q3 {
-    group_label: "Time spent"
-    label: "Time spent (75th Percentile)"
-    type: percentile
-    percentile: 75
-    sql: ${final_grade_timespent} ;;
-    value_format: "[m]:ss \m\i\n\s"
-  }
-  measure: final_grade_timespent_p90 {
-    group_label: "Time spent"
-    label: "Time spent (90th Percentile)"
-    type: percentile
-    percentile: 90
-    sql: ${final_grade_timespent} ;;
-    value_format: "[m]:ss \m\i\n\s"
-  }
-  measure: final_grade_timespent_max {
-    group_label: "Time spent"
-    label: "Time spent (Max)"
-    type: max
-    sql: ${final_grade_timespent} ;;
-    value_format: "[m]:ss \m\i\n\s"
-  }
+
 
   parameter: attempts_filter{
     type: unquoted

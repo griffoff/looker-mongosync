@@ -52,7 +52,7 @@ explore: item_take {
 
   join: item {
     from: curated_item
-    sql_on: ${item_take.activity_item_uri} = ${item.activity_item_uri} ;;
+    sql_on: ${item_take.activity_node_uri} = ${item.activity_node_uri} ;;
     relationship: many_to_one
   }
 

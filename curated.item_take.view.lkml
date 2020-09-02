@@ -1,19 +1,83 @@
 include:"curated.activity_take.view"
 view: curated_item_take {
-  extends: [curated_activity_take]
+  extends: [final_grade]
 
   sql_table_name: looker_scratch.item_take_items ;;
 
-  dimension: activity_item_uri {}
+  dimension: hash {
+    primary_key:yes
+    hidden:yes
+  }
+  dimension: activity_uri{type: string hidden:yes}
+  dimension: activity_node_uri{type: string}
+  dimension: external_take_uri{
+    type: string
+    link: {
+      url: "cengage.looker.com/explore/take_node?_f['external_take_uri']={{value | url_encode }}"
+      label: "View all take nodes"
+      }
+  }
+  dimension: course_uri{type: string hidden:yes}
+  dimension: user_identifier{type: string hidden:yes}
+  dimension: possible_score{type: number}
+  dimension: interaction_grade{type: number}
+  dimension: activity_grade{type: number}
+  dimension: last_update_date{type: date_raw hidden:yes}
+  dimension: parent_path{type: string}
+  dimension: position_path{type: string}
+  dimension: course_key{type: string hidden:yes}
+  dimension: activity_node_product_code{type: string}
+  dimension: activity_node_item_id{type: string}
+  dimension: assignable_content_product_section_imilac{type: string hidden: yes}
+  dimension: assignable_content_product_abbr{type: string hidden: yes}
+  dimension: assignable_content_uri_section_id{type: string hidden: yes}
+  dimension: product_code{type: string}
+  dimension: item_id{type: string}
+  dimension: section_id{type: string hidden:yes}
+  dimension: attempts{type: number}
 
-  dimension: attempts {
+  dimension_group: submission_date{
+    type: time
+    timeframes: [time, date, time_of_day, hour_of_day, day_of_week]
+  }
+  dimension: external_properties_raw {
+    group_label: "External Properties"
+    type: string
+    sql: ${TABLE}.external_properties ;;
+  }
+  dimension: difficulty {
+    group_label: "External Properties"
     type: number
+    sql:  ${external_properties_raw}:"cengage:book:item:difficulty"::FLOAT;;
+  }
+  dimension: question_type {
+    group_label: "External Properties"
+    type: string
+    sql:  COALESCE(
+            ${external_properties_raw}:"cengage:book:item:problem-type"
+            , ${external_properties_raw}:"cas:property:question:type"
+            )::STRING;;
+  }
+  dimension: container_type {
+    group_label: "External Properties"
+    type: string
+    sql: ${external_properties_raw}:"analytics:container-type";;
+    }
+  dimension: node_type {
+    group_label: "External Properties"
+    type: string
+    sql: ${external_properties_raw}:"analytics:node-type";;
   }
 
   measure: sum_questions_attempted {
     type: number
     hidden: yes
     sql: NULLIF(COUNT(CASE WHEN ${attempts} > 0 THEN 1 END), 0) ;;
+  }
+
+  measure: avg_question_attempts {
+    type: average
+    sql: NULLIF(${attempts}, 0) ;;
   }
 
   measure: final_grade_percent_correct {
@@ -37,68 +101,6 @@ view: curated_item_take {
     value_format_name: percent_1
   }
 
-  dimension: difficulty {
-    hidden: no
-  }
-  dimension: problem_type {
-    hidden: no
-  }
-  dimension: item_name {
-    hidden: no
-  }
-  measure: final_grade_score_average {
-    hidden: yes
-  }
-  measure: final_grade_score_min {
-    hidden: yes
-  }
-  measure: final_grade_score_q1 {
-    hidden: yes
-  }
-  measure: final_grade_score_median {
-    hidden: yes
-  }
-  measure: final_grade_score_q3 {
-    hidden: yes
-  }
-  measure: final_grade_score_p90 {
-    hidden: yes
-  }
-  measure: final_grade_score_max {
-    hidden: yes
-  }
-  dimension: total_questions {
-    hidden: yes
-  }
-  dimension: total_scored_questions {
-    hidden: yes
-  }
-  dimension: total_question_attempts {
-    hidden: yes
-  }
-  dimension: avg_question_attempts {
-    hidden: yes
-  }
-  dimension: questions_attempted {
-    hidden: yes
-  }
-  dimension: scored_questions_attempted {
-    hidden: yes
-  }
-  dimension: pecent_questions_attempted {
-    hidden: yes
-  }
-  dimension: pecent_scored_questions_attempted {
-    hidden: yes
-  }
-  dimension: percent_questions_correct {
-    hidden: yes
-  }
-  dimension: percent_questions_correct_attempt_1 {
-    hidden: yes
-  }
-  dimension: percent_questions_correct_attempt_2 {
-    hidden: yes
-  }
+
 
 }

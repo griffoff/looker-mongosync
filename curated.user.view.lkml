@@ -1,18 +1,37 @@
 view: curated_user {
   derived_table: {
-    explore_source: take_node_filtered {
-      column: activity_final_grade_score_avg { field: take_node.activity_final_grade_score_avg }
-      column: activity_final_grade_score_max { field: take_node.activity_final_grade_score_max }
-      column: activity_final_grade_score_min { field: take_node.activity_final_grade_score_min }
-      column: activity_final_grade_score_sd { field: take_node.activity_final_grade_score_sd }
-      column: activity_final_grade_timespent_avg { field: take_node.activity_final_grade_timespent_avg }
-      column: activity_final_grade_timespent_sum { field: take_node.activity_final_grade_timespent_sum }
-      column: item_final_score_correct_percent { field: take_node.item_final_score_correct_percent }
-      column: item_final_score_timespent_avg { field: take_node.item_final_score_timespent_avg }
-      column: latest_submission_date { field: take_node.latest_submission_date }
-      column: user_identifier { field: take_node.user_identifier }
-      column: course_count { field: take_node.course_count }
-      column: take_count { field: take_node.take_count }
+    create_process: {
+      sql_step:
+        CREATE OR REPLACE TRANSIENT TABLE ${SQL_TABLE_NAME}
+        AS
+        SELECT
+          activity_take.user_identifier AS user_identifier,
+          AVG(activity_take.final_grade_score) AS activity_final_grade_score_avg,
+          MAX(activity_take.final_grade_score ) AS activity_final_grade_score_max,
+          MIN(activity_take.final_grade_score ) AS activity_final_grade_score_min,
+          STDDEV(activity_take.final_grade_score)  AS activity_final_grade_score_sd,
+          AVG(activity_take.final_grade_timespent) AS activity_final_grade_timespent_avg,
+          SUM(activity_take.final_grade_timespent) AS activity_final_grade_timespent_sum,
+          COUNT(CASE WHEN item_take.final_grade_score = 1 THEN 1 END) / (NULLIF(COUNT(CASE WHEN item_take.attempts > 0 THEN 1 END), 0)) AS item_final_score_correct_percent,
+          AVG(item_take.final_grade_timespent ) AS item_final_score_timespent_avg,
+          MAX(activity_take.submission_date ) AS latest_submission_date,
+          COUNT(DISTINCT course.primary_key) AS course_count,
+          COUNT(DISTINCT activity_take.hash) AS take_count
+        FROM LOOKER_SCRATCH.LR$JJM721599041600589_realtime_course AS course
+        LEFT JOIN LOOKER_SCRATCH.LR$JJ4GW1599043047265_course_activity AS course_activity ON course.COURSE_URI = course_activity.COURSE_URI
+        LEFT JOIN LOOKER_SCRATCH.LR$JJS951599042011659_course_enrollment AS course_enrollment ON course.COURSE_URI = course_enrollment.COURSE_URI
+        LEFT JOIN LOOKER_SCRATCH.LR$JJJ5S1599083900374_curated_activity_take AS activity_take ON course_activity.COURSE_URI = activity_take.course_uri
+                  and course_activity.ACTIVITY_URI = activity_take.activity_uri
+                  and course_enrollment.user_identifier = activity_take.user_identifier
+        LEFT JOIN looker_scratch.item_take_items  AS item_take ON (activity_take.external_take_uri) = (item_take.external_take_uri)
+
+        GROUP BY 1
+        ORDER BY user_identifier
+        ;;
+
+      sql_step:
+        ALTER TABLE ${SQL_TABLE_NAME} CLUSTER BY (user_identifier);;
+
     }
     datagroup_trigger: realtime_default_datagroup
   }

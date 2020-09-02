@@ -2,7 +2,7 @@ view: curated_item {
   derived_table: {
     explore_source: take_node_item {
       column: item_final_score_correct_percent { field: take_node.item_final_score_correct_percent }
-      column: item_final_score_timespent_avg { field: take_node.item_final_score_timespent_avg }
+      column: item_final_score_timespent_avg { field: take_node.item_final_score_timespent_average }
       column: activity_item_uri { field: take_node.activity_node_uri }
       column: activity_type_uri { field: take_node.activity_type_uri}
       column: product_code { field: take_node.activity_node_product_code }
@@ -55,7 +55,7 @@ view: curated_item {
     type: date_time
   }
 
-  dimension: activity_item_uri {primary_key: yes}
+  dimension: activity_node_uri {primary_key: yes alias: [activity_item_uri]}
   dimension: activity_type_uri {}
   dimension: product_code {}
   dimension: item_id {}

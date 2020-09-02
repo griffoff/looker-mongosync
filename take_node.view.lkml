@@ -1,3 +1,6 @@
+explore: take_node {
+  hidden: yes
+}
 view: take_node {
   #sql_table_name: REALTIME.TAKE_ITEM ;;
   derived_table: {
@@ -234,6 +237,9 @@ view: take_node {
         CREATE TRANSIENT TABLE IF NOT EXISTS item_take_items LIKE take_item;;
 
       sql_step:
+        ALTER TABLE item_take_items CLUSTER BY (external_take_uri) ;;
+
+      sql_step:
         DELETE FROM item_take_items WHERE hash IN (SELECT hash FROM take_item_incremental WHERE NOT activity AND NOT mastery_item);;
 
       sql_step:
@@ -266,7 +272,7 @@ view: take_node {
                  , i.attempts, i.final_grade_timespent
         FROM take_item_incremental i
         WHERE NOT i.activity AND NOT i.mastery_item
-        ORDER BY i.submission_date
+        ORDER BY i.external_take_uri
         ;;
 
       sql_step:
@@ -274,6 +280,9 @@ view: take_node {
 
       sql_step:
         CREATE TRANSIENT TABLE IF NOT EXISTS item_take_activities LIKE take_item;;
+
+      sql_step:
+        ALTER TABLE item_take_activities CLUSTER BY (course_uri, activity_uri) ;;
 
       sql_step:
         DELETE FROM item_take_activities WHERE hash IN (SELECT hash FROM take_item_incremental WHERE activity);;
@@ -308,7 +317,7 @@ view: take_node {
                  , i.attempts, i.final_grade_timespent
         FROM take_item_incremental i
         WHERE i.activity
-        ORDER BY i.submission_date
+        ORDER BY i.course_uri, i.activity_uri
         ;;
 
       sql_step:

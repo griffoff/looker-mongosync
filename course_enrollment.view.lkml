@@ -74,6 +74,7 @@ view: course_enrollment {
   }
 
   dimension: user_identifier {
+    label: "User GUID"
     type: string
     sql: ${TABLE}.user_identifier ;;
   }
