@@ -1,6 +1,3 @@
-explore: take_node {
-  hidden: yes
-}
 view: take_node {
   #sql_table_name: REALTIME.TAKE_ITEM ;;
   derived_table: {
