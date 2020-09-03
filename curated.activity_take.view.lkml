@@ -116,6 +116,7 @@ view: final_grade {
     value_format: "[m]:ss \m\i\n\s"
   }
 }
+
 view: curated_activity_take {
   extends: [final_grade]
   derived_table: {
@@ -163,10 +164,11 @@ view: curated_activity_take {
         1 as take_count
       FROM looker_scratch.item_take_activities a
       LEFT JOIN q ON a.external_take_uri = q.external_take_uri
-      ORDER BY course_uri, activity_uri, user_identifier
+      ORDER BY user_identifier
+      --course_uri, activity_uri, user_identifier
       ;;
 
-      sql_step: ALTER TABLE looker_scratch.curated_activity_take cluster by (course_uri, activity_uri, user_identifier)
+      sql_step: ALTER TABLE looker_scratch.curated_activity_take cluster by (user_identifier)
       ;;
 
       sql_step: create or replace table ${SQL_TABLE_NAME} CLONE looker_scratch.curated_activity_take
@@ -194,7 +196,7 @@ view: curated_activity_take {
   dimension: external_take_uri{
     type: string
     link: {
-      url: "cengage.looker.com/explore/take_node?_f['external_take_uri']={{value | url_encode }}"
+      url: "https://cengage.looker.com/explore/take_node?_f['external_take_uri']={{value | url_encode }}"
       label: "View all take nodes"
     }
   }

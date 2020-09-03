@@ -5,7 +5,7 @@ view: curated_user {
         CREATE OR REPLACE TRANSIENT TABLE ${SQL_TABLE_NAME}
         AS
         SELECT
-          activity_take.user_identifier AS user_identifier,
+          course_enrollment.user_identifier AS user_identifier,
           AVG(activity_take.final_grade_score) AS activity_final_grade_score_avg,
           MAX(activity_take.final_grade_score ) AS activity_final_grade_score_max,
           MIN(activity_take.final_grade_score ) AS activity_final_grade_score_min,
@@ -18,10 +18,8 @@ view: curated_user {
           COUNT(DISTINCT course.primary_key) AS course_count,
           COUNT(DISTINCT activity_take.hash) AS take_count
         FROM LOOKER_SCRATCH.LR$JJM721599041600589_realtime_course AS course
-        LEFT JOIN LOOKER_SCRATCH.LR$JJ4GW1599043047265_course_activity AS course_activity ON course.COURSE_URI = course_activity.COURSE_URI
-        LEFT JOIN LOOKER_SCRATCH.LR$JJS951599042011659_course_enrollment AS course_enrollment ON course.COURSE_URI = course_enrollment.COURSE_URI
-        LEFT JOIN LOOKER_SCRATCH.LR$JJJ5S1599083900374_curated_activity_take AS activity_take ON course_activity.COURSE_URI = activity_take.course_uri
-                  and course_activity.ACTIVITY_URI = activity_take.activity_uri
+        INNER JOIN LOOKER_SCRATCH.LR$JJS951599042011659_course_enrollment AS course_enrollment ON course.COURSE_URI = course_enrollment.COURSE_URI
+        LEFT JOIN LOOKER_SCRATCH.item_take_activities AS activity_take ON course.COURSE_URI = activity_take.course_uri
                   and course_enrollment.user_identifier = activity_take.user_identifier
         LEFT JOIN looker_scratch.item_take_items  AS item_take ON (activity_take.external_take_uri) = (item_take.external_take_uri)
 

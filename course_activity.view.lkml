@@ -26,7 +26,7 @@ view: course_activity {
           best_label                  STRING,
           initial_external_properties VARIANT,
           prev_external_properties    VARIANT
-        ) CLUSTER BY (course_uri, activity_uri)
+        ) CLUSTER BY (course_uri)
       ;;
 
       sql_step:
