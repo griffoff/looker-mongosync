@@ -375,7 +375,7 @@ view: curated_activity_take {
   }
   measure: final_grade_score_median {
     group_label: "Score"
-    label: "Final Score (25th Percentile/Median)"
+    label: "Final Score (50th Percentile/Median)"
     type:number
     sql: PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY ${final_grade_score} )  ;;
     value_format_name: percent_1
