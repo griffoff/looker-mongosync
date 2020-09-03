@@ -526,6 +526,16 @@ view: curated_activity_take {
       ;;
   }
 
+  dimension: activity_completion_status {
+    type: string
+    case: {
+      when: {sql:${percent_questions_attempted} = 0;; label:"Not Started"}
+      when: {sql:${percent_questions_attempted} < 1;; label:"Partially Complete"}
+      else: "Complete"
+    }
+
+  }
+
   measure: activities_launched {
     group_label: "MTP"
     label: "# Activities launched"
