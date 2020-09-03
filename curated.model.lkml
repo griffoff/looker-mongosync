@@ -125,7 +125,7 @@ explore: courses {
 
   join: course_activity {
     #fields: []
-    sql_on: ${course.course_uri} = ${course_activity.course_uri};;
+    sql_on: ${course_enrollment.course_uri} = ${course_activity.course_uri};;
     relationship: one_to_many
   }
 

@@ -136,6 +136,8 @@ view: course_activity {
     datagroup_trigger: realtime_default_datagroup
   }
 
+  drill_fields: [course_uri, activity_uri, label, activity_group_uris, external_properties]
+
   dimension: business_key {
     type: string
     hidden: yes
@@ -261,6 +263,11 @@ view: course_activity {
 
   measure: count {
     type: count
-    drill_fields: [course_uri, activity_uri, label, activity_group_uris, external_properties]
+  }
+
+  measure: activity_count {
+    label: "# Activities"
+    type: count_distinct
+    sql: ${activity_uri} ;;
   }
 }

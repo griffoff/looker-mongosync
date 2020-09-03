@@ -543,15 +543,21 @@ view: curated_activity_take {
     value_format_name: decimal_1
   }
 
+  dimension: student_activity_counter {
+    hidden: yes
+    sql:  HASH(${activity_uri}, ${user_identifier}) ;;
+  }
+
   dimension: activity_counter {
     hidden: yes
-    sql:
-      {% if course_activity._in_query %}
-        HASH(${activity_uri}, ${user_identifier})
-      {% else %}
-        ${activity_uri}
-      {% endif %}
-      ;;
+    sql:  ${activity_uri} ;;
+#     sql:
+#       {% if course_activity._in_query %}
+#         HASH(${activity_uri}, ${user_identifier})
+#       {% else %}
+#         ${activity_uri}
+#       {% endif %}
+#       ;;
   }
 
   dimension: activity_completion_status {
@@ -566,25 +572,33 @@ view: curated_activity_take {
 
   measure: activities_launched {
     group_label: "MTP"
-    label: "# Activities launched"
+    label: "# Course activities used"
     type: number
     sql: COUNT(DISTINCT CASE WHEN ${percent_questions_attempted} > 0 THEN ${activity_counter} END);;
     value_format_name: decimal_0
   }
 
+  measure: activities_started {
+    group_label: "MTP"
+    label: "# Activity takes started"
+    type: number
+    sql: COUNT(DISTINCT CASE WHEN ${percent_questions_attempted} > 0 THEN ${student_activity_counter} END);;
+    value_format_name: decimal_0
+  }
+
   measure: activities_completed_partial {
     group_label: "MTP"
-    label: "# Activities partially complete"
+    label: "# Activitiy takes partially complete"
     type: number
-    sql: COUNT(DISTINCT CASE WHEN ${percent_questions_attempted} < 1 AND ${percent_questions_attempted} > 0 THEN ${activity_counter} END);;
+    sql: COUNT(DISTINCT CASE WHEN ${percent_questions_attempted} < 1 AND ${percent_questions_attempted} > 0 THEN ${student_activity_counter} END);;
     value_format_name: decimal_0
   }
 
   measure: activities_completed {
     group_label: "MTP"
-    label: "# Activities complete"
+    label: "# Activity takes complete"
     type: number
-    sql: COUNT(DISTINCT CASE WHEN ${percent_questions_attempted} = 1THEN ${activity_counter} END);;
+    sql: COUNT(DISTINCT CASE WHEN ${percent_questions_attempted} = 1THEN ${student_activity_counter} END);;
     value_format_name: decimal_0
   }
 
