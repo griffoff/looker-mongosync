@@ -41,6 +41,10 @@ view: curated_item_take {
     type: time
     timeframes: [time, date, time_of_day, hour_of_day, day_of_week]
   }
+  dimension: final_grade {
+    type: string
+    hidden: yes
+  }
   dimension: external_properties_raw {
     group_label: "External Properties"
     type: string

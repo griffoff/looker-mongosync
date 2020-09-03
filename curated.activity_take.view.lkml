@@ -29,19 +29,6 @@ view: final_grade {
     style: relational
     sql: ${final_grade_score} ;;
   }
-  dimension: final_grade_taken {
-    group_label: "Taken"
-    label: "Taken?"
-    type: yesno
-  }
-  dimension: final_grade_taken_value {
-    group_label: "Taken"
-    label: "Taken/Not Taken"
-    type: string
-    case: {when: {sql: ${final_grade_taken};; label: "Taken"}
-      else:"Not Taken"
-    }
-  }
   dimension: final_grade_timespent {
     label: "Time spent"
     value_format: "[m]:ss \m\i\n\s"
@@ -202,7 +189,19 @@ view: curated_activity_take {
   }
   dimension: activity_uri {hidden: yes}
   dimension: activity_type_uri {hidden: yes}
-
+  dimension: final_grade_taken {
+    group_label: "Taken"
+    label: "Taken?"
+    type: yesno
+  }
+  dimension: final_grade_taken_value {
+    group_label: "Taken"
+    label: "Taken/Not Taken"
+    type: string
+    case: {when: {sql: ${final_grade_taken};; label: "Taken"}
+      else:"Not Taken"
+    }
+  }
   dimension: total_questions {
     group_label: "Questions"
     label: "# Questions"
@@ -275,17 +274,40 @@ view: curated_activity_take {
     type: number
     value_format_name: percent_0
   }
-  dimension: percent_questions_correct_attempt_1 {
+  dimension: percent_questions_correct_tier {
     group_label: "Questions"
-    label: "% Questions correct (1st attempt)"
+    label: "% Questions correct (buckets)"
+    sql: ${percent_questions_correct} ;;
+    type: tier
+    style: relational
+    tiers: [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+    value_format_name: percent_0
+  }
+  dimension: percent_questions_correct_attempt_1 {
+    type: number
+    group_label: "Questions"
+    label: "% Questions correct 1st attempt"
+    value_format_name: percent_0
+  }
+  dimension: percent_questions_correct_attempt_1_tier {
+    group_label: "Questions"
+    label: "% Questions correct 1st attempt (buckets)"
+    sql: ${percent_questions_correct_attempt_1} ;;
     type: tier
     style: relational
     tiers: [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
     value_format_name: percent_0
   }
   dimension: percent_questions_correct_attempt_2 {
+    type: number
     group_label: "Questions"
-    label: "% Questions correct (2 attempts or less)"
+    label: "% Questions correct in 2 attempts or less"
+    value_format_name: percent_0
+  }
+  dimension: percent_questions_correct_attempt_2_tier {
+    group_label: "Questions"
+    label: "% Questions correct in 2 attempts or less (buckets)"
+    sql: ${percent_questions_correct_attempt_2} ;;
     type: tier
     style: relational
     tiers: [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
