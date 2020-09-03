@@ -362,40 +362,36 @@ view: curated_activity_take {
   measure: final_grade_score_p10 {
     group_label: "Score"
     label: "Final Score (10th Percentile)"
-    type: percentile
-    percentile: 10
-    sql: ${final_grade_score} ;;
+    type:number
+    sql: PERCENTILE_CONT(0.1) WITHIN GROUP (ORDER BY ${final_grade_score} )  ;;
     value_format_name: percent_1
   }
   measure: final_grade_score_q1 {
     group_label: "Score"
     label: "Final Score (25th Percentile)"
-    type: percentile
-    percentile: 25
-    sql: ${final_grade_score} ;;
+     type:number
+    sql: PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY ${final_grade_score} )  ;;
     value_format_name: percent_1
   }
   measure: final_grade_score_median {
     group_label: "Score"
-    label: "Final Score (Median)"
-    type: median
-    sql: ${final_grade_score} ;;
+    label: "Final Score (25th Percentile/Median)"
+    type:number
+    sql: PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY ${final_grade_score} )  ;;
     value_format_name: percent_1
   }
   measure: final_grade_score_q3 {
     group_label: "Score"
     label: "Final Score (75th Percentile)"
-    type: percentile
-    percentile: 75
-    sql: ${final_grade_score} ;;
+     type:number
+    sql: PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY ${final_grade_score} )  ;;
     value_format_name: percent_1
   }
   measure: final_grade_score_p90 {
     group_label: "Score"
     label: "Final Score (90th Percentile)"
-    type: percentile
-    percentile: 90
-    sql: ${final_grade_score} ;;
+    type:number
+    sql: PERCENTILE_CONT(0.9) WITHIN GROUP (ORDER BY ${final_grade_score} )  ;;
     value_format_name: percent_1
   }
   measure: final_grade_score_max {
@@ -428,40 +424,50 @@ view: curated_activity_take {
   measure: percent_questions_correct_p10 {
     group_label: "Questions"
     label: "% Questions Correct (10th Percentile)"
-    type: percentile
-    percentile: 10
-    sql:  ${TABLE}.{% parameter attempts_filter %} ;;
+    type: number
+    sql:    PERCENTILE_CONT(0.1) WITHIN GROUP (ORDER BY ${TABLE}.{% parameter attempts_filter %} )  ;;
+#     type: percentile
+#     percentile: 10
+#     sql:  ${TABLE}.{% parameter attempts_filter %} ;;
     value_format_name: percent_1
   }
   measure: percent_questions_correct_q1 {
     group_label: "Questions"
     label: "% Questions Correct (25th Percentile)"
-    type: percentile
-    percentile: 25
-    sql:  ${TABLE}.{% parameter attempts_filter %} ;;
+    type: number
+    sql:    PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY ${TABLE}.{% parameter attempts_filter %} )  ;;
+#     type: percentile
+#     percentile: 25
+#     sql:  ${TABLE}.{% parameter attempts_filter %} ;;
     value_format_name: percent_1
   }
   measure: percent_questions_correct_median {
-    label: "% Questions Correct (Median)"
+    label: "% Questions Correct (50th Percentile/Median)"
     group_label: "Questions"
-    type: median
-    sql:  ${TABLE}.{% parameter attempts_filter %} ;;
+    type: number
+    sql:    PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY ${TABLE}.{% parameter attempts_filter %} )  ;;
+#     type: median
+#     sql:  ${TABLE}.{% parameter attempts_filter %} ;;
     value_format_name: percent_1
   }
   measure: percent_questions_correct_q3 {
     group_label: "Questions"
     label: "% Questions Correct (75th Percentile)"
-    type: percentile
-    percentile: 75
-    sql:  ${TABLE}.{% parameter attempts_filter %} ;;
+    type: number
+    sql:    PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY ${TABLE}.{% parameter attempts_filter %} )  ;;
+#     type: percentile
+#     percentile: 75
+#     sql:  ${TABLE}.{% parameter attempts_filter %} ;;
     value_format_name: percent_1
   }
   measure: percent_questions_correct_p90 {
     group_label: "Questions"
     label: "% Questions Correct (90th Percentile)"
-    type: percentile
-    percentile: 90
-    sql:  ${TABLE}.{% parameter attempts_filter %} ;;
+    type: number
+    sql:    PERCENTILE_CONT(0.9) WITHIN GROUP (ORDER BY ${TABLE}.{% parameter attempts_filter %} )  ;;
+#     type: percentile
+#     percentile: 90
+#     sql:  ${TABLE}.{% parameter attempts_filter %} ;;
     value_format_name: percent_1
   }
   measure: percent_questions_correct_max {

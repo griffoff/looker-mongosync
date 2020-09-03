@@ -98,7 +98,7 @@ explore: activity_takes {
   join: course {
     from: realtime_course
     sql_on: ${activity_take.course_uri} = ${course.course_uri} ;;
-    relationship: many_to_one
+    relationship: one_to_one
   }
 
 }
@@ -126,12 +126,12 @@ explore: courses {
   join: course_activity {
     #fields: []
     sql_on: ${course.course_uri} = ${course_activity.course_uri};;
-    relationship: many_to_one
+    relationship: one_to_many
   }
 
   join: activity_take {
     from: curated_activity_take
-    sql_on: ${course.course_uri} = ${activity_take.course_uri}
+    sql_on: ${course_enrollment.course_uri} = ${activity_take.course_uri}
           and ${course_activity.activity_uri} = ${activity_take.activity_uri}
           and ${course_enrollment.user_identifier} = ${activity_take.user_identifier};;
     relationship: one_to_many
