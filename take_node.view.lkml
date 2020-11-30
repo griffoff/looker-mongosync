@@ -1014,9 +1014,17 @@ view: take_node {
     drill_fields: [details*]
   }
 
-  measure: count_uri {
+  measure: count_item_id {
     label: "# Unique Items"
-    description: "Unique count of Activity URI"
+    description: "Unique count of Activity Node Item Id"
+    type: count_distinct
+    sql: ${activity_node_item_id} ;;
+    drill_fields: [details*]
+  }
+
+  measure: count_activity_uri {
+    label: "# Unique Activities"
+    description: "Unique count of Activity Node Item Id"
     type: count_distinct
     sql: ${activity_uri} ;;
     drill_fields: [details*]
