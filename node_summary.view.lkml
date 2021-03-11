@@ -1,3 +1,5 @@
+include: "//core/named_formats.lkml"
+
 view: node_summary {
 #   sql_table_name: REALTIME.NODE_SUMMARY ;;
   derived_table: {

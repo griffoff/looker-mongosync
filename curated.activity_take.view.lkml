@@ -163,7 +163,7 @@ view: curated_activity_take {
     }
     datagroup_trigger: realtime_default_datagroup
   }
-  dimension: user_identifier {label: "user guid" hidden: yes}
+  dimension: user_identifier {label: "user guid" hidden: no}
   dimension_group: submission_date {
     label: "Submission"
     type: time
@@ -254,7 +254,7 @@ view: curated_activity_take {
     value_format_name: percent_0
   }
   dimension: percent_questions_attempted {
-    type: number
+    type: tier
     tiers: [0.3, 0.5, 0.7, 0.8, 0.9]
     group_label: "Questions"
     label: "% Questions attempted"
@@ -545,12 +545,17 @@ view: curated_activity_take {
 
   dimension: student_activity_counter {
     hidden: yes
-    sql:  HASH(${activity_uri}, ${user_identifier}) ;;
+    sql:  HASH(${activity_counter}, ${user_identifier}) ;;
+  }
+
+  dimension: course_activity_counter {
+    hidden: yes
+    sql:  HASH(${activity_counter}, ${course_uri}) ;;
   }
 
   dimension: activity_counter {
     hidden: yes
-    sql:  ${activity_uri} ;;
+    sql:  SPLIT_PART(${activity_uri}, ':', -1) ;;
 #     sql:
 #       {% if course_activity._in_query %}
 #         HASH(${activity_uri}, ${user_identifier})
@@ -570,11 +575,25 @@ view: curated_activity_take {
 
   }
 
+  measure: content_activity_count {
+    label: "# Content activities"
+    description: "The number of activities counts unique activities even when they are used in multiple course sections or products"
+    type: count_distinct
+    sql: ${activity_counter} ;;
+  }
+
+  measure: activity_count {
+    label: "# Course section activities"
+    description: "The number of activities counts unique activities even when they are used in multiple course sections or products"
+    type: count_distinct
+    sql: ${course_activity_counter} ;;
+  }
+
   measure: activities_launched {
     group_label: "MTP"
     label: "# Course activities used"
     type: number
-    sql: COUNT(DISTINCT CASE WHEN ${percent_questions_attempted} > 0 THEN ${activity_counter} END);;
+    sql: COUNT(DISTINCT CASE WHEN ${percent_questions_attempted} > 0 THEN ${course_activity_counter} END);;
     value_format_name: decimal_0
   }
 

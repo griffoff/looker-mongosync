@@ -137,8 +137,10 @@ view: curated_activity {
     type: average
     sql: ${take_count} ;;
   }
-  measure: count {
+  measure: activity_count {
+    hidden: yes
     label: "# Activities"
-    type: count
+    type: count_distinct
+    sql: SPLIT_PART(${activity_uri}, ':', -1) ;;
   }
 }

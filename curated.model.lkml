@@ -1,6 +1,6 @@
 include: "curated_base.model"
 label: "RealTime Data - Curated"
-include: "//cube/dims.lkml"
+include: "//cengage_unlimited/views/cu_user_analysis/course_info.view"
 
 # Models for extension
 explore: activity_take {
@@ -22,7 +22,7 @@ explore: activity_take {
 }
 
 explore: course {
-  extends: [dim_course]
+  extends: [course_info]
   extension: required
   from: realtime_course
   view_name: course
@@ -32,8 +32,8 @@ explore: course {
 #     sql_on: ${course.snapshot_label} = ${mindtap_snapshot.snapshotid};;
 #   }
 
-  join: dim_course {
-    sql_on: ${course.course_key} = ${dim_course.coursekey} ;;
+  join: course_info {
+    sql_on: ${course.course_key} = ${course_info.course_key} ;;
     relationship: one_to_one
   }
 
@@ -48,7 +48,8 @@ explore: course {
 explore: item_take {
   label: "Item Takes"
   from: curated_item_take
-  extends: [dim_course]
+  view_name: item_take
+  extends: [course_info]
 
   join: item {
     from: curated_item
@@ -62,8 +63,8 @@ explore: item_take {
     relationship: many_to_one
   }
 
-  join: dim_course {
-    sql_on: ${course.course_key} = ${dim_course.coursekey} ;;
+  join: course_info {
+    sql_on: ${course.course_key} = ${course_info.course_key} ;;
     relationship: one_to_one
   }
 
@@ -78,6 +79,7 @@ explore: course_activity {
         left join ${course_activity_group.SQL_TABLE_NAME} course_activity_group on ${course_activity.course_uri} = ${course_activity_group.course_uri}
                                       and g.value = ${course_activity_group.activity_group_uri}
           ;;
+    relationship: many_to_many
   }
 
 }

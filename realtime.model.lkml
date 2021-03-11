@@ -3,16 +3,12 @@ connection: "snowflake_prod"
 label: "Realtime - Source"
 
 include: "//core/common.lkml"
-include: "//cube/dims.lkml"
+include: "//cengage_unlimited/views/cu_user_analysis/course_info.view"
+include: "//cengage_unlimited/views/cu_user_analysis/product_info.view"
+include: "realtime_course.view"
 include: "datagroups.lkml"
 
 include: "//project_source/*.view.lkml"
-
-# include all the views
-include: "/mongo_sync/*.view"
-
-# include all the dashboards
-# include: "*.dashboard"
 
 # persist_with: realtime_default_datagroup
 
@@ -77,11 +73,13 @@ explore: course_activity {
 }
 
 explore: realtime_course {
+  from: realtime_course
+  view_name: realtime_course
   view_label: "Course"
-  extends: [dim_course, product_item_metadata, course_activity, take_node]
+  extends: [course_info, product_item_metadata, course_activity, take_node]
 
-  join: dim_course {
-    sql_on: ${realtime_course.course_key} = ${dim_course.coursekey} ;;
+  join: course_info {
+    sql_on: ${realtime_course.course_key} = ${course_info.course_key} ;;
     relationship: one_to_one
   }
 
@@ -104,7 +102,7 @@ explore: realtime_course {
 }
 
 explore: product_toc_metadata {
-  extends: [product_item_metadata, dim_product]
+  extends: [product_item_metadata, product_info]
   label: "CXP Content Service"
   join: product_item_metadata {
     sql_on: (${product_toc_metadata.source_system}, ${product_toc_metadata.product_code})
@@ -112,8 +110,8 @@ explore: product_toc_metadata {
           ;;
     relationship: one_to_many
   }
-  join: dim_product {
-    sql_on: ${product_toc_metadata.isbn} = ${dim_product.isbn13} ;;
+  join: product_info {
+    sql_on: ${product_toc_metadata.isbn} = ${product_info.isbn13} ;;
     relationship: many_to_one
   }
   join: product_activity_metadata {
@@ -142,15 +140,15 @@ explore: all_take_nodes {
   view_name: take_node
   label: "All Take Nodes"
   description: "All taken 'nodes' linked back to course information and to content books."
-  extends: [dim_course, take_node]
+  extends: [course_info, take_node]
 
   join: realtime_course {
     relationship: many_to_one
     sql_on: ${take_node.course_uri} = ${realtime_course.course_uri} ;;
   }
 
-  join: dim_course {
-    sql_on: ${realtime_course.course_key} = ${dim_course.coursekey} ;;
+  join: course_info {
+    sql_on: ${realtime_course.course_key} = ${course_info.course_key} ;;
     type: left_outer
     relationship: many_to_one
   }
@@ -277,7 +275,7 @@ explore: item_take {
 
   join: item {
     from: curated_item
-    sql_on: ${item_take.activity_item_uri} = ${item.activity_item_uri} ;;
+    sql_on: ${item_take.activity_node_uri} = ${item.activity_node_uri} ;;
     relationship: many_to_one
   }
 

@@ -1,3 +1,5 @@
+include: "//core/named_formats.lkml"
+
 view: take_node {
   #sql_table_name: REALTIME.TAKE_ITEM ;;
   derived_table: {
@@ -784,13 +786,14 @@ view: take_node {
     drill_fields: [details*]
   }
 
-  measure: item_final_score_timespent_avg {
+  measure: item_final_score_timespent_average {
     group_label: "Final Grade - Item Score"
     label: "Time spent (avg)"
     type: average
     sql: ${item_final_score_timespent};;
     value_format_name: duration_hms
     drill_fields: [details*]
+    alias: [item_final_score_timespent_avg]
   }
 
   dimension: final_grade_taken {

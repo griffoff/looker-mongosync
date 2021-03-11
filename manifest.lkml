@@ -7,7 +7,7 @@ local_dependency: {
    project: "core"
  }
 local_dependency: {
-  project: "cube"
+  project: "cengage_unlimited"
 }
 local_dependency: {
   project: "project_source"

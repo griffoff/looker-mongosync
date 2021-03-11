@@ -1,3 +1,5 @@
+include: "//core/named_formats.lkml"
+
 view: curated_user {
   derived_table: {
     create_process: {
