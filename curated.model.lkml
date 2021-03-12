@@ -85,10 +85,11 @@ explore: course_activity {
 }
 
 explore: activity_takes {
+  extends: [course, course_activity, activity_take]
   label: "Activity Takes"
+  view_label: "Activity Takes"
   from: curated_activity_take
   view_name: activity_take
-  extends: [course, course_activity, activity_take]
 
   join: course_activity {
     fields: []

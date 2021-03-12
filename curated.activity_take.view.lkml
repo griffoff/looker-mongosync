@@ -179,7 +179,7 @@ view: curated_activity_take {
     type: string
     sql: SPLIT_PART(${external_take_uri}, ':', 1) ;;
   }
-  dimension: course_uri {hidden:yes}
+  dimension: course_uri {hidden:no}
   dimension: external_take_uri{
     type: string
     link: {
@@ -187,7 +187,7 @@ view: curated_activity_take {
       label: "View all take nodes"
     }
   }
-  dimension: activity_uri {hidden: yes}
+  dimension: activity_uri {hidden: no}
   dimension: activity_type_uri {hidden: yes}
   dimension: final_grade_taken {
     group_label: "Taken"
@@ -573,6 +573,26 @@ view: curated_activity_take {
       else: "Complete"
     }
 
+  }
+
+  measure: example_activity_uri {
+    type: string
+    sql: ANY_VALUE(${activity_uri});;
+  }
+
+  measure: example_course_uri {
+    type: string
+    sql: ANY_VALUE(${course_uri});;
+  }
+
+  measure: example_external_properties {
+    type: string
+    sql: ANY_VALUE(${external_properties_raw});;
+  }
+
+  measure: example_external_take_uri {
+    type: string
+    sql: ANY_VALUE(${external_take_uri});;
   }
 
   measure: content_activity_count {
