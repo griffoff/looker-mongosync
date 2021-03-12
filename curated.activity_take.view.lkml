@@ -595,12 +595,12 @@ view: curated_activity_take {
     sql: ANY_VALUE(${external_take_uri});;
   }
 
-  measure: content_activity_count {
-    label: "# Content activities"
-    description: "The number of activities counts unique activities even when they are used in multiple course sections or products"
-    type: count_distinct
-    sql: ${activity_counter} ;;
-  }
+  # measure: content_activity_count {
+  #   label: "# Content activities"
+  #   description: "The number of activities counts unique activities even when they are used in multiple course sections or products"
+  #   type: count_distinct
+  #   sql: ${activity_counter} ;;
+  # }
 
   measure: activity_count {
     label: "# Course section activities"
