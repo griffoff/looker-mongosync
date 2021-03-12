@@ -109,7 +109,8 @@ view: curated_activity_take {
   derived_table: {
     create_process: {
       sql_step:
-      CREATE OR REPLACE TABLE LOOKER_SCRATCH.curated_activity_take
+      CREATE OR REPLACE TRANSIENT TABLE LOOKER_SCRATCH.curated_activity_take
+      CLUSTER BY (submission_date::DATE)
       AS
       WITH q AS (
         SELECT
@@ -129,7 +130,8 @@ view: curated_activity_take {
       SELECT
         a.user_identifier,
         a.submission_date,
-        a.course_uri,
+        COALESCE(shadow.parent_course_uri, a.course_uri) as course_uri,
+        shadow.shadow_course_uri,
         a.external_take_uri,
         a.external_properties,
         a.activity_uri as activity_uri,
@@ -150,15 +152,13 @@ view: curated_activity_take {
         q.percent_questions_correct_attempt_2,
         1 as take_count
       FROM looker_scratch.item_take_activities a
+      LEFT JOIN ${course_shadow_map.SQL_TABLE_NAME} shadow ON a.course_uri = shadow.shadow_course_uri
       LEFT JOIN q ON a.external_take_uri = q.external_take_uri
-      ORDER BY user_identifier
+      ORDER BY submission_date
       --course_uri, activity_uri, user_identifier
       ;;
 
-      sql_step: ALTER TABLE looker_scratch.curated_activity_take cluster by (user_identifier)
-      ;;
-
-      sql_step: create or replace table ${SQL_TABLE_NAME} CLONE looker_scratch.curated_activity_take
+      sql_step: create or replace transient table ${SQL_TABLE_NAME} CLONE looker_scratch.curated_activity_take
       ;;
     }
     datagroup_trigger: realtime_default_datagroup
