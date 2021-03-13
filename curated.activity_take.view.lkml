@@ -34,6 +34,12 @@ view: final_grade {
     value_format: "[m]:ss \m\i\n\s"
     type: number
   }
+  dimension: final_grade_timespent_mins {
+    label: "Time spent (minutes)"
+    value_format_name: decimal_1
+    type: number
+    sql: ${final_grade_timespent} * 24 * 60 ;;
+  }
 
   measure: final_grade_timespent_average {
     group_label: "Time spent"
@@ -484,7 +490,7 @@ view: curated_activity_take {
     description: "Use with the Dynamic Measure measures"
     default_value: "Score"
     allowed_value: {label:"Score" value: "final_grade_score"}
-    allowed_value: {label:"Time Spent (minutes)" value: "final_grade_timespent * 24 * 60"}
+    allowed_value: {label:"Time Spent" value: "final_grade_timespent"}
     allowed_value: {label:"% Questions Correct" value: "percent_questions_correct"}
   }
 
