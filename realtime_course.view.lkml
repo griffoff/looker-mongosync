@@ -52,15 +52,36 @@ view: realtime_course {
     ;;
 
   # map soa CGIs
+  # soa:prod:CGI or just CGI in some takes
     sql_step:
     merge into looker_scratch.realtime_course rc
-    using prod.datavault.sat_coursesection scs on rc.course_uri like 'soa:prod:%'
-                                              and split_part(course_uri, ':', -1) = scs.course_cgi
+    using prod.datavault.sat_coursesection scs on split_part(course_uri, ':', -1) = scs.course_cgi
                                               and rc.course_key is null
                                               and scs._latest
     when matched then update
       set rc.course_key = UPPER(scs.course_key)
     ;;
+
+  # map cnow shadow courses
+  sql_step:
+    merge into looker_scratch.realtime_course rc
+    using (
+    with shadow as (
+        select split_part(short_label, '.', -1) as id, course_uri
+        from looker_scratch.realtime_course
+        where course_uri like 'cnow:course:%'
+          and id != ''
+          and course_key is null
+       )
+    select coalesce(c.course_key, o.external_id) as parent_course_key, shadow.course_uri as shadow_course_uri, ROW_NUMBER() OVER (PARTITION BY shadow_course_uri order by parent_course_key) as r
+    from looker_scratch.realtime_course c
+    left join shadow on c.external_properties:"mindtap:property:snapshot-id":value = shadow.id
+    left join mindtap.prod_nb.snapshot s on shadow.id = s.id
+    left join mindtap.prod_nb.org o on s.org_id = o.id
+    ) map on rc.course_uri = map.shadow_course_uri and r = 1
+    when matched then update
+      set rc.course_key = UPPER(map.parent_course_key)
+  ;;
 
   # map cnow
     sql_step:
