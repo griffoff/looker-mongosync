@@ -6,7 +6,7 @@ include: "//core/common.lkml"
 include: "//cengage_unlimited/views/cu_user_analysis/course_info.view"
 include: "//cengage_unlimited/views/cu_user_analysis/product_info.view"
 include: "//cengage_unlimited/views/cu_user_analysis/user_profile.view"
-include: "//fivetran_mindtap/nb.snapshot.view"
+#include: "//fivetran_mindtap/nb.snapshot.view"
 
 include: "realtime_course.view"
 include: "datagroups.lkml"
@@ -158,10 +158,11 @@ explore: all_take_nodes {
     relationship: many_to_one
   }
 
-  join: snapshot {
-    relationship: many_to_one
-    sql_on: ${snapshot.id} = ${realtime_course.snapshot_label};;
-  }
+  # join: mindtap_snapshot {
+  #   from: snapshot
+  #   relationship: many_to_one
+  #   sql_on: ${mindtap_snapshot.id} = ${realtime_course.snapshot_label};;
+  # }
 
   join: lo_items {
     sql_on: ${take_node.activity_node_item_id} = ${lo_items.item_identifier} ;;

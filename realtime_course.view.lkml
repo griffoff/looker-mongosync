@@ -1,5 +1,5 @@
 include: "./datagroups.lkml"
-named_value_format: x {value_format:"0"}
+
 explore: realtime_course {hidden: yes}
 view: realtime_course {
 
