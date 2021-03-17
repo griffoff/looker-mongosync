@@ -1,3 +1,6 @@
+include: "curated_base.model"
+include: "//core/named_formats.lkml"
+
 view: curated_activity {
   derived_table: {
     explore_source: take_node_activity {

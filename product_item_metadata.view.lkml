@@ -1,3 +1,20 @@
+include: "./datagroups.lkml"
+include: "./node_summary.view"
+#include: "./product_toc_metadata.view"
+
+explore: product_item_metadata {
+  hidden: yes
+  join: node_summary {
+    sql_on: (${product_item_metadata.item_uri}) = (${node_summary.activity_node_uri}) ;;
+    relationship: one_to_one
+  }
+
+  # join: product_toc_metadata {
+  #   sql_on: (${product_item_metadata.product_code}, ${product_item_metadata.item_id}) = (${product_toc_metadata.product_code}, ${product_toc_metadata.node_id}) ;;
+  #   relationship: many_to_one
+  # }
+}
+
 view: product_item_metadata {
 #   sql_table_name: REALTIME.PRODUCT_ITEM_METADATA ;;
   derived_table: {
@@ -58,10 +75,10 @@ view: product_item_metadata {
     sql: Upper(${TABLE}.HANDLER) ;;
   }
 
-  dimension: discipline {
-    hidden: no
-    sql: ${product_toc_metadata.discipline} ;;
-  }
+  # dimension: discipline {
+  #   hidden: no
+  #   sql: ${product_toc_metadata.discipline} ;;
+  # }
 
   dimension: item_id {
     type: string

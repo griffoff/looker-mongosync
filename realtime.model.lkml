@@ -5,24 +5,29 @@ label: "Realtime - Source"
 include: "//core/common.lkml"
 include: "//cengage_unlimited/views/cu_user_analysis/course_info.view"
 include: "//cengage_unlimited/views/cu_user_analysis/product_info.view"
+include: "//cengage_unlimited/views/cu_user_analysis/user_profile.view"
+include: "//fivetran_mindtap/nb.snapshot.view"
+
 include: "realtime_course.view"
 include: "datagroups.lkml"
+include: "./product_activity_metadata.view"
+include: "./product_item_metadata.view"
+include: "./node_summary.view"
+include: "./TAGS.*"
+include: "./take_node.view"
+include: "./realtime_course.view"
+include: "./course_activity_group.view"
+include: "./course_activity_groups.view"
+include: "./course_activity.view"
+include: "./course_enrollment.view"
+include: "./product_mastery_group.view"
+include: "./lo_items.view"
 
-include: "//project_source/*.view.lkml"
+
+
+# include: "//project_source/*.view.lkml"
 
 # persist_with: realtime_default_datagroup
-
-
-explore: product_activity_metadata {}
-
-explore: product_item_metadata {
-  fields: [ALL_FIELDS*, -product_item_metadata.discipline]
-  #extension: required
-  join: node_summary {
-    sql_on: (${product_item_metadata.item_uri}) = (${node_summary.activity_node_uri}) ;;
-    relationship: one_to_one
-  }
-}
 
 explore: take_node {
   extension: required
@@ -72,7 +77,7 @@ explore: course_activity {
   }
 }
 
-explore: realtime_course {
+explore: course {
   from: realtime_course
   view_name: realtime_course
   view_label: "Course"
@@ -140,7 +145,7 @@ explore: all_take_nodes {
   view_name: take_node
   label: "All Take Nodes"
   description: "All taken 'nodes' linked back to course information and to content books."
-  extends: [course_info, take_node]
+  extends: [course_info, user_profile, take_node]
 
   join: realtime_course {
     relationship: many_to_one
@@ -153,9 +158,9 @@ explore: all_take_nodes {
     relationship: many_to_one
   }
 
-  join: mindtap_snapshot {
+  join: snapshot {
     relationship: many_to_one
-    sql_on: ${mindtap_snapshot.snapshotid} = ${realtime_course.snapshot_label};;
+    sql_on: ${snapshot.id} = ${realtime_course.snapshot_label};;
   }
 
   join: lo_items {
@@ -223,9 +228,9 @@ explore: all_take_nodes {
     relationship: many_to_one
   }
 
-  join: all_users {
+  join: user_profile {
     view_label: "LMS User Info"
-    sql_on: ${take_node.user_identifier} = ${all_users.user_sso_guid} ;;
+    sql_on: ${take_node.user_identifier} = ${user_profile.user_sso_guid} ;;
     relationship: many_to_one
   }
 
@@ -269,19 +274,19 @@ explore: all_take_nodes {
 
 }
 
-explore: item_take {
-  label: "Item Takes"
-  from: curated_item_take
+# explore: item_take {
+#   label: "Item Takes"
+#   from: curated_item_take
 
-  join: item {
-    from: curated_item
-    sql_on: ${item_take.activity_node_uri} = ${item.activity_node_uri} ;;
-    relationship: many_to_one
-  }
+#   join: item {
+#     from: curated_item
+#     sql_on: ${item_take.activity_node_uri} = ${item.activity_node_uri} ;;
+#     relationship: many_to_one
+#   }
 
-  join: course {
-    from: realtime_course
-    sql_on: ${item_take.course_uri} = ${course.course_uri} ;;
-    relationship: many_to_one
-  }
-}
+#   join: course {
+#     from: realtime_course
+#     sql_on: ${item_take.course_uri} = ${course.course_uri} ;;
+#     relationship: many_to_one
+#   }
+# }

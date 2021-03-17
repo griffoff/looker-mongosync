@@ -1,4 +1,4 @@
-include: "//core/named_formats.lkml"
+#include: "//core/named_formats.lkml"
 
 view: take_node {
   #sql_table_name: REALTIME.TAKE_ITEM ;;

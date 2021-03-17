@@ -1,3 +1,5 @@
+include: "./course_shadow_map.view"
+
 view: final_grade {
   extension: required
 
@@ -185,15 +187,27 @@ view: curated_activity_take {
     type: string
     sql: SPLIT_PART(${external_take_uri}, ':', 1) ;;
   }
-  dimension: course_uri {hidden:no}
+  dimension: course_uri {
+    hidden:no
+    link: {
+      label: "View Course in Analytics Diagnostic Tool"
+      url: "https://analytics-tools.cengage.info/diagnostictool/#/course/view/production/uri/{{ value }}"
+    }
+  }
   dimension: external_take_uri{
     type: string
     link: {
-      url: "https://cengage.looker.com/explore/realtime/all_take_nodes?f[take_node.external_take_uri]={{value | url_encode }}"
-      label: "View all take nodes"
+      label: "View Take in Analytics Diagnostic Tool"
+      url: "https://analytics-tools.cengage.info/diagnostictool/#/activity-take/view/production/uri/{{ value }}"
     }
   }
-  dimension: activity_uri {hidden: no}
+  dimension: activity_uri {
+    hidden: no
+    link: {
+      label: "View Activity in Analytics Diagnostic Tool"
+      url: "https://analytics-tools.cengage.info/diagnostictool/#/activity/view/production/uri/{{ value }}"
+    }
+    }
   dimension: activity_type_uri {hidden: yes}
   dimension: final_grade_taken {
     group_label: "Taken"
@@ -584,11 +598,19 @@ view: curated_activity_take {
   measure: example_activity_uri {
     type: string
     sql: ANY_VALUE(${activity_uri});;
+    link: {
+      label: "View Activity in Analytics Diagnostic Tool"
+      url: "https://analytics-tools.cengage.info/diagnostictool/#/activity/view/production/uri/{{ value }}"
+    }
   }
 
   measure: example_course_uri {
     type: string
     sql: ANY_VALUE(${course_uri});;
+    link: {
+      label: "View Course in Analytics Diagnostic Tool"
+      url: "https://analytics-tools.cengage.info/diagnostictool/#/course/view/production/uri/{{ value }}"
+    }
   }
 
   measure: example_external_properties {
@@ -599,6 +621,10 @@ view: curated_activity_take {
   measure: example_external_take_uri {
     type: string
     sql: ANY_VALUE(${external_take_uri});;
+    link: {
+      label: "View Take in Analytics Diagnostic Tool"
+      url: "https://analytics-tools.cengage.info/diagnostictool/#/activity-take/view/production/uri/{{ value }}"
+    }
   }
 
   # measure: content_activity_count {

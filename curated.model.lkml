@@ -1,6 +1,18 @@
-include: "curated_base.model"
-label: "RealTime Data - Curated"
+#include: "curated_base.model"
 include: "//cengage_unlimited/views/cu_user_analysis/course_info.view"
+include: "//cengage_unlimited/views/cu_user_analysis/user_profile.view"
+include: "./curated.activity_take.view"
+include: "./curated.item_take.view"
+include: "./curated.item.view"
+include: "./curated.user.view"
+include: "./curated.activity.view"
+include: "./realtime_course.view"
+include: "./course_activity.view"
+include: "./course_enrollment.view"
+include: "./course_activity_group.view"
+
+label: "RealTime Data - Curated"
+connection: "snowflake_prod"
 
 # Models for extension
 explore: activity_take {
@@ -23,7 +35,7 @@ explore: activity_take {
 
 explore: course {
   extends: [course_info]
-  extension: required
+  #extension: required
   from: realtime_course
   view_name: course
 
@@ -37,10 +49,6 @@ explore: course {
     relationship: one_to_one
   }
 
-#   join: dim_course {
-#     sql_on: (${course.course_key}) = (${dim_course.coursekey}) ;;
-#     relationship: one_to_one
-#   }
 }
 
 
@@ -49,7 +57,7 @@ explore: item_take {
   label: "Item Takes"
   from: curated_item_take
   view_name: item_take
-  extends: [course_info]
+  extends: [course]
 
   join: item {
     from: curated_item
@@ -61,11 +69,6 @@ explore: item_take {
     from: realtime_course
     sql_on: ${item_take.course_uri} = ${course.course_uri} ;;
     relationship: many_to_one
-  }
-
-  join: course_info {
-    sql_on: ${course.course_key} = ${course_info.course_key} ;;
-    relationship: one_to_one
   }
 
 }
@@ -85,7 +88,7 @@ explore: course_activity {
 }
 
 explore: activity_takes {
-  extends: [course, course_activity, activity_take]
+  extends: [course, course_activity, activity_take, user_profile]
   label: "Activity Takes"
   view_label: "Activity Takes"
   from: curated_activity_take
@@ -102,6 +105,11 @@ explore: activity_takes {
     from: realtime_course
     sql_on: ${activity_take.course_uri} = ${course.course_uri} ;;
     relationship: one_to_one
+  }
+
+  join: user_profile {
+    sql_on: ${activity_take.user_identifier}  = ${user_profile.user_sso_guid};;
+    relationship: many_to_one
   }
 
 }

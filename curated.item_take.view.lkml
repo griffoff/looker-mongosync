@@ -13,7 +13,7 @@ view: curated_item_take {
   dimension: external_take_uri{
     type: string
     link: {
-      url: "cengage.looker.com/explore/take_node?_f['external_take_uri']={{value | url_encode }}"
+      url: "cengage.looker.com/explore/activity_takes?_f['activity_take.external_take_uri']={{value | url_encode }}"
       label: "View all take nodes"
       }
     hidden: yes

@@ -1,3 +1,6 @@
+include: "./datagroups.lkml"
+
+explore: product_activity_metadata {hidden:yes}
 view: product_activity_metadata {
   #sql_table_name: REALTIME.PRODUCT_ACTIVITY_METADATA ;;
   derived_table: {

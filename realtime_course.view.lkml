@@ -1,5 +1,8 @@
+include: "./datagroups.lkml"
+named_value_format: x {value_format:"0"}
+explore: realtime_course {hidden: yes}
 view: realtime_course {
-  #sql_table_name: REALTIME.COURSE ;;
+
   derived_table: {
     create_process: {
       sql_step:
@@ -13,49 +16,57 @@ view: realtime_course {
           ,*
           ,UPPER(CASE
             WHEN external_properties:"soa:property:courseKey":value IS NOT NULL THEN external_properties:"soa:property:courseKey":value
-            WHEN split_part(course_uri, ':', 1) like 'cnow' THEN CONCAT ('E-',split_part(course_uri, ':', -1))
             WHEN course_uri like 'soa:%' THEN NULL
             ELSE split_part(course_uri, ':', -1) END) as course_key
         from realtime.course
       )
       select *
-      from data
+      from data d
       where latest = 1
       order by course_uri
     ;;
 
+ # insert missing course_uris
     sql_step:
     insert into looker_scratch.realtime_course (course_uri, course_key)
-    with missing as (
-      select distinct course_uri
-      from looker_scratch.item_take_activities
-      where course_uri not in (select course_uri from realtime.course)
-        and course_uri like 'soa:prod%'
-     )
-    select course_uri, UPPER(scs.course_key) as course_key
-    from missing
-    left join prod.datavault.sat_coursesection scs on split_part(course_uri, ':', -1) = scs.course_cgi
-                                                  and scs._latest
-    ;;
-
-    sql_step:
-    insert into looker_scratch.realtime_course (course_uri, course_key)
-    with missing as (
-    select distinct course_uri
+    select distinct
+      course_uri
+      ,UPPER(CASE
+            WHEN course_uri like 'soa:%' THEN NULL
+            ELSE split_part(course_uri, ':', -1) END
+            ) as course_key
     from looker_scratch.item_take_activities
-    where course_uri not in (select course_uri from realtime.course)
-    and course_uri not like 'soa:prod%'
-    )
-    select course_uri, UPPER(scs.course_key) as course_key
-    from missing
-    left join prod.datavault.sat_coursesection scs on split_part(course_uri, ':', -1) = scs.course_key
-                                                  and scs._latest
+    where course_uri not in (select course_uri from realtime.course where course_uri is not null)
     ;;
 
+  # validate course_keys
+    sql_step:
+    update looker_scratch.realtime_course
+      set course_key = NULL
+    where course_key not in (
+          select course_key
+          from prod.datavault.sat_coursesection
+          where course_key is not null
+          and _latest
+      )
+    ;;
+
+  # map soa CGIs
     sql_step:
     merge into looker_scratch.realtime_course rc
     using prod.datavault.sat_coursesection scs on rc.course_uri like 'soa:prod:%'
                                               and split_part(course_uri, ':', -1) = scs.course_cgi
+                                              and rc.course_key is null
+                                              and scs._latest
+    when matched then update
+      set rc.course_key = UPPER(scs.course_key)
+    ;;
+
+  # map cnow
+    sql_step:
+    merge into looker_scratch.realtime_course rc
+    using prod.datavault.sat_coursesection scs on rc.course_uri like 'cnow:course:%'
+                                              and 'E' || split_part(course_uri, ':', -1) = REPLACE(scs.course_key, '-', '')
                                               and rc.course_key is null
                                               and scs._latest
     when matched then update
@@ -100,11 +111,11 @@ view: realtime_course {
     link: {label: "View in Analytics Diagnostic Tool" url: "https://analytics-tools.cengage.info/diagnostictool/#/course/view/production/uri/{{ value }}"}
   }
 
-#   dimension: course_key {
-#     type: string
-#     sql: split_part(${course_uri}, ':', -1) ;;
-#   }
-# transformation to CONCAT 'E-' coursekeys for cnow courses
+  dimension: source {
+    type: string
+    sql: split_part(${course_uri}, ':', 1) ;;
+  }
+
   dimension: course_key {
     type: string
   }

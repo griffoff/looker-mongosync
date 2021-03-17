@@ -1,10 +1,15 @@
 connection: "snowflake_prod"
 label: "RealTime Data - Curated (Simple Raw Views)"
 
-include: "datagroups.lkml"
-include: "//core/common.lkml"
-include: "*.view.lkml"
-#include: "*.dashboard.lookml"  # include all dashboards in this project
+# # # include: "datagroups.lkml"
+# # # include: "//core/common.lkml"
+# # # include: "*.view.lkml"
+# # # #include: "*.dashboard.lookml"  # include all dashboards in this project
+include: "./take_node.view"
+include: "./product_activity_metadata.view"
+include: "./activity_type_map.view"
+include: "./product_item_metadata.view"
+include: "./product_toc_metadata.view"
 
 # These explores are used as the base for NDTs (Native derived tables)
 # there is in inheritance chain
@@ -83,16 +88,3 @@ explore: take_node_item {
     }
   }
 }
-
-
-# Hide these when real models are created
-# they are just used for exploring the individual tables
-explore: curated_activity_take {}
-
-explore: curated_item_take {}
-
-explore: curated_user {}
-
-explore: curated_item {}
-
-explore: curated_activity {}

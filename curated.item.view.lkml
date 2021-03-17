@@ -1,3 +1,5 @@
+include: "curated_base.model"
+
 view: curated_item {
   derived_table: {
     explore_source: take_node_item {

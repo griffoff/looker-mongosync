@@ -10,5 +10,5 @@ local_dependency: {
   project: "cengage_unlimited"
 }
 local_dependency: {
-  project: "project_source"
+  project: "fivetran_mindtap"
 }
