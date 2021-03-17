@@ -82,6 +82,7 @@ explore: course {
   view_name: realtime_course
   view_label: "Course"
   extends: [course_info, product_item_metadata, course_activity, take_node]
+  hidden: yes
 
   join: course_info {
     sql_on: ${realtime_course.course_key} = ${course_info.course_key} ;;
@@ -109,6 +110,8 @@ explore: course {
 explore: product_toc_metadata {
   extends: [product_item_metadata, product_info]
   label: "CXP Content Service"
+  hidden: yes
+
   join: product_item_metadata {
     sql_on: (${product_toc_metadata.source_system}, ${product_toc_metadata.product_code})
         = (${product_item_metadata.source_system}, ${product_item_metadata.product_code})
@@ -133,7 +136,7 @@ explore: product_toc_metadata {
   }
 }
 
-explore: lo_items {}
+#explore: lo_items {}
 
 explore: node_summary {
   label: "Weekly Summary of Items"
@@ -146,6 +149,7 @@ explore: all_take_nodes {
   label: "All Take Nodes"
   description: "All taken 'nodes' linked back to course information and to content books."
   extends: [course_info, user_profile, take_node]
+  hidden: no
 
   join: realtime_course {
     relationship: many_to_one

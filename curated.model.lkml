@@ -35,7 +35,7 @@ explore: activity_take {
 
 explore: course {
   extends: [course_info]
-  #extension: required
+  extension: required
   from: realtime_course
   view_name: course
 
@@ -58,6 +58,7 @@ explore: item_take {
   from: curated_item_take
   view_name: item_take
   extends: [course]
+  hidden: yes
 
   join: item {
     from: curated_item
@@ -93,6 +94,7 @@ explore: activity_takes {
   view_label: "Activity Takes"
   from: curated_activity_take
   view_name: activity_take
+  hidden: no
 
   join: course_activity {
     #fields: [activity_uri]
@@ -121,6 +123,7 @@ explore: courses {
   from: realtime_course
   view_name: course
   extends: [course, course_activity, activity_take]
+  hidden: yes
 
   join: course_enrollment {
     fields: [course_enrollment.course_uri, course_enrollment.user_identifier]
