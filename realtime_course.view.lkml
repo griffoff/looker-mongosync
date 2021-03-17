@@ -134,7 +134,7 @@ view: realtime_course {
 
   dimension: source {
     type: string
-    sql: split_part(${course_uri}, ':', 1) ;;
+    sql: IFF(ARRAY_SIZE(SPLIT(${course_uri}, ':')) = 1, 'Malformed-URI', SPLIT_PART(${course_uri}, ':', 1)) ;;
   }
 
   dimension: course_key {
