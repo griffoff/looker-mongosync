@@ -107,18 +107,18 @@ view: curated_activity {
     dimension: total_takes_last_30_days {
       type: tier
       style: integer
-      tiers: [1, 100, 1000, 10000, 100000]
+      tiers: [1, 10, 100, 500, 1000, 10000]
     }
     dimension: total_takes {
       type: tier
       style: integer
-      tiers: [1, 10000, 100000, 1000000, 10000000]
+      tiers: [1, 10, 100, 500, 1000, 10000]
     }
-    dimension: courses_with_activity {
-      type: tier
-      style: integer
-      tiers: [1, 10, 100, 1000, 10000]
-    }
+    # dimension: courses_with_activity {
+    #   type: tier
+    #   style: integer
+    #   tiers: [1, 10, 100, 500, 1000, 10000]
+    # }
 }
 
 # view: curated_activity {
