@@ -100,24 +100,24 @@ view: curated_activity {
     dimension: min_final_score {group_label:"Score" value_format_name: percent_1}
     dimension: avg_final_score {group_label:"Score" value_format_name: percent_1}
     dimension: max_final_score {group_label:"Score" value_format_name: percent_1}
-    dimension: min_time_spent {group_label:"Time Spent" value_format_name: duration_minutes sql: ${TABLE}.min_time_spent / (3600 * 24);;}
-    dimension: avg_time_spent {group_label:"Time Spent" value_format_name: duration_minutes sql: ${TABLE}.avg_time_spent / (3600 * 24);;}
-    dimension: max_time_spent {group_label:"Time Spent" value_format_name: duration_minutes sql: ${TABLE}.max_time_spent / (3600 * 24);;}
+    dimension: min_time_spent {group_label:"Time Spent" type: number value_format_name: duration_minutes sql: ${TABLE}.min_time_spent / (3600 * 24);;}
+    dimension: avg_time_spent {group_label:"Time Spent" type: number value_format_name: duration_minutes sql: ${TABLE}.avg_time_spent / (3600 * 24);;}
+    dimension: max_time_spent {group_label:"Time Spent" type: number value_format_name: duration_minutes sql: ${TABLE}.max_time_spent / (3600 * 24);;}
 
     dimension: total_takes_last_30_days {
       type: tier
       style: integer
-      tiers: [100, 1000, 10000, 100000]
+      tiers: [1, 100, 1000, 10000, 100000]
     }
     dimension: total_takes {
       type: tier
       style: integer
-      tiers: [10000, 100000, 1000000, 10000000]
+      tiers: [1, 10000, 100000, 1000000, 10000000]
     }
     dimension: courses_with_activity {
       type: tier
       style: integer
-      tiers: [10, 100, 1000, 10000]
+      tiers: [1, 10, 100, 1000, 10000]
     }
 }
 
