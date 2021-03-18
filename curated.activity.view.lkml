@@ -97,12 +97,13 @@ view: curated_activity {
       alias:[activity_name]
       }
     dimension: label_source {}
-    dimension: min_final_score {group_label:"Score"}
-    dimension: avg_final_score {group_label:"Score"}
-    dimension: max_final_score {group_label:"Score"}
-    dimension: min_time_spent {group_label:"Time Spent"}
-    dimension: avg_time_spent {group_label:"Time Spent"}
-    dimension: max_time_spent {group_label:"Time Spent"}
+    dimension: min_final_score {group_label:"Score" value_format_name: percent_1}
+    dimension: avg_final_score {group_label:"Score" value_format_name: percent_1}
+    dimension: max_final_score {group_label:"Score" value_format_name: percent_1}
+    dimension: min_time_spent {group_label:"Time Spent" value_format_name: duration_minutes sql: ${TABLE}.min_time_spent / (3600 * 24);;}
+    dimension: avg_time_spent {group_label:"Time Spent" value_format_name: duration_minutes sql: ${TABLE}.avg_time_spent / (3600 * 24);;}
+    dimension: max_time_spent {group_label:"Time Spent" value_format_name: duration_minutes sql: ${TABLE}.max_time_spent / (3600 * 24);;}
+
     dimension: total_takes_last_30_days {
       type: tier
       style: integer
