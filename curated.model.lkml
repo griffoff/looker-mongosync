@@ -27,7 +27,7 @@ explore: activity_take {
   join: activity {
     from: curated_activity
     sql_on: ${activity_take.activity_uri} = ${activity.activity_uri}
-      and COALESCE(${activity_take.activity_type_uri}, '') = COALESCE(${activity.activity_type_uri}, '');;
+      and ${activity_take.course_uri} = ${activity.course_uri};;
     relationship: many_to_one
   }
 

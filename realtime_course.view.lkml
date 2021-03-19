@@ -3,6 +3,8 @@ include: "./datagroups.lkml"
 explore: realtime_course {hidden: yes}
 view: realtime_course {
 
+  view_label: "Course Details (from Real-time)"
+
   derived_table: {
     create_process: {
       sql_step:

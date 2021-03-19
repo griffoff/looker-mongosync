@@ -9,32 +9,14 @@ view: curated_activity {
         ;;
 
         sql_step:
-          create or replace temporary table activities
+          create or replace temporary table course_activities
           as
-          with content as (
-            select
-              assignable_content_uri
-              , count(*) as total_takes
-              , count(case when submission_date >= current_date - 30 then 1 end) as total_takes_last_30_days
-              , count(distinct course_uri) as courses_with_activity
-              , min(final_grade:normalScore::float) as final_score_min
-              , avg(final_grade:normalScore::float) as final_score_avg
-              , max(final_grade:normalScore::float) as final_score_max
-              , median(final_grade:normalScore::float) as final_score_med
-              , min(final_grade:timeSpent::float) as time_spent_min
-              , avg(final_grade:timeSpent::float) as time_spent_avg
-              , max(final_grade:timeSpent::float) as time_spent_max
-              , median(final_grade:timeSpent::float) as time_spent_med
-            from looker_scratch.item_take_activities
-            where assignable_content_uri is not null
-            group by 1
-          )
-          ,course_activities as (
           select
-            activity_uri
+            course_uri
+            , activity_uri
             , any_value(activity_type_uri) as activity_type_uri
             , any_value(external_properties:"analytics:activity-type") as activity_type
-            , any_value(a.assignable_content_uri) as assignable_content_uri
+            , any_value(assignable_content_uri) as assignable_content_uri
             , count(*) as course_activity_total_takes
             , count(case when submission_date >= current_date - 30 then 1 end) as course_activity_total_takes_last_30_days
             , min(final_grade:normalScore::float) as course_activity_final_score_min
@@ -47,10 +29,49 @@ view: curated_activity {
             , median(final_grade:timeSpent::float) as course_activity_time_spent_med
           from looker_scratch.item_take_activities a
           where a.activity_uri is not null
+          group by 1, 2
+        ;;
+
+        # for activities that are used in more than 5 courses that don't have an assignable content uri
+        # use the activity_uri instead
+        sql_step:
+        update course_activities
+        set assignable_content_uri = activity_uri
+        where activity_uri in (
+          select activity_uri
+          from course_activities
+          where assignable_content_uri is null
           group by 1
+          having count(*) >= 5
+        )
+        and assignable_content_uri is null
+        ;;
+
+        sql_step:
+          create or replace temporary table activities
+          as
+          with content as (
+            select
+              course_activities.assignable_content_uri
+              , count(*) as total_takes
+              , count(case when submission_date >= current_date - 30 then 1 end) as total_takes_last_30_days
+              , count(distinct course_uri) as courses_with_activity
+              , min(final_grade:normalScore::float) as final_score_min
+              , avg(final_grade:normalScore::float) as final_score_avg
+              , max(final_grade:normalScore::float) as final_score_max
+              , median(final_grade:normalScore::float) as final_score_med
+              , min(final_grade:timeSpent::float) as time_spent_min
+              , avg(final_grade:timeSpent::float) as time_spent_avg
+              , max(final_grade:timeSpent::float) as time_spent_max
+              , median(final_grade:timeSpent::float) as time_spent_med
+            from looker_scratch.item_take_activities
+            inner join course_activities using(course_uri, activity_uri)
+            where course_activities.assignable_content_uri is not null
+            group by 1
           )
           select
-              a.*
+              hash(a.course_uri, a.activity_uri) as pk
+              , a.*
               , c.total_takes
               , c.total_takes_last_30_days
               , c.courses_with_activity
@@ -147,7 +168,9 @@ view: curated_activity {
     }
 
     dimension: source_system {}
-    dimension: activity_uri {primary_key:yes}
+    dimension: pk {hidden:yes primary_key:yes}
+    dimension: course_uri {hidden:yes}
+    dimension: activity_uri {}
     dimension: assignable_content_uri {}
     dimension: activity_type_uri {}
     dimension: activity_type {}
@@ -199,7 +222,17 @@ view: curated_activity {
   dimension: course_activity_time_spent_max {hidden: yes group_label:"Course Section Activity Metrics" type: number value_format_name: duration_minutes sql: ${TABLE}.course_activity_time_spent_max / (3600 * 24);;}
   dimension: course_activity_time_spent_med {hidden: no label: "Course Section Median Time Spent" group_label:"Course Section Activity Metrics" type: number value_format_name: duration_minutes sql: ${TABLE}.course_activity_time_spent_med / (3600 * 24);;}
 
+  measure: course_section_activity_count {
+    type: count
+    label: "# Course Section Activities"
+  }
 
+  measure: content_activity_count {
+    label: "# Master Activities"
+    type: count_distinct
+    sql: ${assignable_content_uri} ;;
+    hidden: yes
+  }
 }
 
 # view: curated_activity {
