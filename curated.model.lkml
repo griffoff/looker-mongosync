@@ -78,7 +78,7 @@ explore: course_activity {
   extension: required
 
   join: course_activity_group {
-    #fields: [course_activity_group.activity_group_type_uri]
+    fields: [course_activity_group.activity_group_type_uri]
     sql: left join lateral flatten(${course_activity.activity_group_uris}, outer=>True) g on g.value != 'soa:activity-group:default'
         left join ${course_activity_group.SQL_TABLE_NAME} course_activity_group on ${course_activity.course_uri} = ${course_activity_group.course_uri}
                                       and g.value = ${course_activity_group.activity_group_uri}
@@ -97,7 +97,7 @@ explore: activity_takes {
   hidden: no
 
   join: course_activity {
-    #fields: [activity_uri]
+    fields: []
     sql_on: ${course.course_uri} = ${course_activity.course_uri}
           and ${activity_take.activity_uri} = ${course_activity.activity_uri};;
     relationship: many_to_one

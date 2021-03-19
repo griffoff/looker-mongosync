@@ -11,22 +11,59 @@ view: curated_activity {
         sql_step:
           create or replace temporary table activities
           as
+          with content as (
+            select
+              assignable_content_uri
+              , count(*) as total_takes
+              , count(case when submission_date >= current_date - 30 then 1 end) as total_takes_last_30_days
+              , count(distinct course_uri) as courses_with_activity
+              , min(final_grade:normalScore::float) as final_score_min
+              , avg(final_grade:normalScore::float) as final_score_avg
+              , max(final_grade:normalScore::float) as final_score_max
+              , median(final_grade:normalScore::float) as final_score_med
+              , min(final_grade:timeSpent::float) as time_spent_min
+              , avg(final_grade:timeSpent::float) as time_spent_avg
+              , max(final_grade:timeSpent::float) as time_spent_max
+              , median(final_grade:timeSpent::float) as time_spent_med
+            from looker_scratch.item_take_activities
+            where assignable_content_uri is not null
+            group by 1
+          )
+          ,course_activities as (
           select
             activity_uri
             , any_value(activity_type_uri) as activity_type_uri
             , any_value(external_properties:"analytics:activity-type") as activity_type
-            , count(*) as total_takes
-            , count(case when submission_date >= current_date - 30 then 1 end) as total_takes_last_30_days
-            , count(distinct course_uri) as courses_with_activity
-            , min(final_grade:normalScore::float) as min_final_score
-            , avg(final_grade:normalScore::float) as avg_final_score
-            , max(final_grade:normalScore::float) as max_final_score
-            , min(final_grade:timeSpent::float) as min_time_spent
-            , avg(final_grade:timeSpent::float) as avg_time_spent
-            , max(final_grade:timeSpent::float) as max_time_spent
-          from item_take_activities
-          where activity_uri is not null
+            , any_value(a.assignable_content_uri) as assignable_content_uri
+            , count(*) as course_activity_total_takes
+            , count(case when submission_date >= current_date - 30 then 1 end) as course_activity_total_takes_last_30_days
+            , min(final_grade:normalScore::float) as course_activity_final_score_min
+            , avg(final_grade:normalScore::float) as course_activity_final_score_avg
+            , max(final_grade:normalScore::float) as course_activity_final_score_max
+            , median(final_grade:normalScore::float) as course_activity_final_score_med
+            , min(final_grade:timeSpent::float) as course_activity_time_spent_min
+            , avg(final_grade:timeSpent::float) as course_activity_time_spent_avg
+            , max(final_grade:timeSpent::float) as course_activity_time_spent_max
+            , median(final_grade:timeSpent::float) as course_activity_time_spent_med
+          from looker_scratch.item_take_activities a
+          where a.activity_uri is not null
           group by 1
+          )
+          select
+              a.*
+              , c.total_takes
+              , c.total_takes_last_30_days
+              , c.courses_with_activity
+              , c.final_score_min
+              , c.final_score_avg
+              , c.final_score_max
+              , c.final_score_med
+              , c.time_spent_min
+              , c.time_spent_avg
+              , c.time_spent_max
+              , c.time_spent_med
+          from course_activities a
+          left join content c on a.assignable_content_uri = c.assignable_content_uri
         ;;
 
         sql_step:
@@ -80,9 +117,30 @@ view: curated_activity {
               ,a.*
               ,l.source as label_source
               ,l.label
+              ,NULL::STRING as content_label
           from activities a
           left join all_labels l on a.activity_uri = l.activity_uri
         ;;
+
+        sql_step:
+          merge into ${SQL_TABLE_NAME} a
+          using (
+            with content_name as (
+              select
+                assignable_content_uri
+                , label
+                , row_number() over (partition by assignable_content_uri order by label is null, course_activity_total_takes desc) = 1 as preferred
+              from ${SQL_TABLE_NAME}
+            )
+            select
+              assignable_content_uri
+              , label
+            from content_name
+            where preferred
+            ) c on a.assignable_content_uri = c.assignable_content_uri
+          when matched then update
+            set content_label = c.label
+          ;;
       }
 
       persist_for: "24 hours"
@@ -90,35 +148,58 @@ view: curated_activity {
 
     dimension: source_system {}
     dimension: activity_uri {primary_key:yes}
+    dimension: assignable_content_uri {}
     dimension: activity_type_uri {}
     dimension: activity_type {}
     dimension: label {
       label: "Activity Name"
       alias:[activity_name]
+      sql: coalesce(${TABLE}.label, ${TABLE}.content_label, ${assignable_content_uri}, ${activity_uri}) ;;
+      description: "Activity Name from the course section, falls back to conformed name, assignable_content_uri and activity_uri when activity names are not available"
       }
+    dimension: content_label {
+      label: "Conformed Activity Name"
+      sql: coalesce(${TABLE}.content_label, ${label}) ;;
+      description: "Name from activity in all courses with the most takes"
+    }
     dimension: label_source {}
-    dimension: min_final_score {group_label:"Score" value_format_name: percent_1}
-    dimension: avg_final_score {group_label:"Score" value_format_name: percent_1}
-    dimension: max_final_score {group_label:"Score" value_format_name: percent_1}
-    dimension: min_time_spent {group_label:"Time Spent" type: number value_format_name: duration_minutes sql: ${TABLE}.min_time_spent / (3600 * 24);;}
-    dimension: avg_time_spent {group_label:"Time Spent" type: number value_format_name: duration_minutes sql: ${TABLE}.avg_time_spent / (3600 * 24);;}
-    dimension: max_time_spent {group_label:"Time Spent" type: number value_format_name: duration_minutes sql: ${TABLE}.max_time_spent / (3600 * 24);;}
-
+    dimension: final_score_min {hidden: yes group_label:"Overall Activity Metrics" value_format_name: percent_1}
+    dimension: final_score_avg {hidden: no label: "Avg. Final Score" group_label:"Overall Activity Metrics" value_format_name: percent_1}
+    dimension: final_score_max {hidden: yes group_label:"Overall Activity Metrics" value_format_name: percent_1}
+    dimension: final_score_med {hidden: no label: "Median Final Score" group_label:"Overall Activity Metrics" value_format_name: percent_1}
+    dimension: time_spent_min {hidden: yes group_label:"Overall Activity Metrics" type: number value_format_name: duration_minutes sql: ${TABLE}.time_spent_min / (3600 * 24);;}
+    dimension: time_spent_avg {hidden: yes group_label:"Overall Activity Metrics" type: number value_format_name: duration_minutes sql: ${TABLE}.time_spent_avg / (3600 * 24);;}
+    dimension: time_spent_max {hidden: yes group_label:"Overall Activity Metrics" type: number value_format_name: duration_minutes sql: ${TABLE}.time_spent_max / (3600 * 24);;}
+    dimension: time_spent_med {hidden: no label: "Median Time Spent" group_label:"Overall Activity Metrics" type: number value_format_name: duration_minutes sql: ${TABLE}.time_spent_med / (3600 * 24);;}
     dimension: total_takes_last_30_days {
+      group_label:"Overall Activity Metrics"
       type: tier
       style: integer
       tiers: [1, 10, 100, 500, 1000, 10000]
     }
     dimension: total_takes {
+      group_label:"Overall Activity Metrics"
       type: tier
       style: integer
       tiers: [1, 10, 100, 500, 1000, 10000]
     }
-    # dimension: courses_with_activity {
-    #   type: tier
-    #   style: integer
-    #   tiers: [1, 10, 100, 500, 1000, 10000]
-    # }
+    dimension: courses_with_activity {
+      group_label:"Overall Activity Metrics"
+      type: tier
+      style: integer
+      tiers: [1, 10, 100, 500, 1000, 10000]
+    }
+
+  dimension: course_activity_final_score_min {hidden: yes group_label:"Course Section Activity Metrics" value_format_name: percent_1}
+  dimension: course_activity_final_score_avg {hidden: no label: "Course Section Avg. Final Score" group_label:"Course Section Activity Metrics" value_format_name: percent_1}
+  dimension: course_activity_final_score_max {hidden: yes group_label:"Course Section Activity Metrics" value_format_name: percent_1}
+  dimension: course_activity_final_score_med {hidden: no label: "Course Section Avg. Final Score" group_label:"Course Section Activity Metrics" value_format_name: percent_1}
+  dimension: course_activity_time_spent_min {hidden: yes group_label:"Course Section Activity Metrics" type: number value_format_name: duration_minutes sql: ${TABLE}.course_activity_time_spent_min / (3600 * 24);;}
+  dimension: course_activity_time_spent_avg {hidden: yes group_label:"Course Section Activity Metrics" type: number value_format_name: duration_minutes sql: ${TABLE}.course_activity_time_spent_avg / (3600 * 24);;}
+  dimension: course_activity_time_spent_max {hidden: yes group_label:"Course Section Activity Metrics" type: number value_format_name: duration_minutes sql: ${TABLE}.course_activity_time_spent_max / (3600 * 24);;}
+  dimension: course_activity_time_spent_med {hidden: no label: "Course Section Median Time Spent" group_label:"Course Section Activity Metrics" type: number value_format_name: duration_minutes sql: ${TABLE}.course_activity_time_spent_med / (3600 * 24);;}
+
+
 }
 
 # view: curated_activity {
