@@ -274,8 +274,6 @@ view: curated_activity_take {
     value_format_name: percent_0
   }
   dimension: percent_questions_attempted {
-    type: tier
-    tiers: [0.3, 0.5, 0.7, 0.8, 0.9]
     group_label: "Questions"
     label: "% Questions attempted"
     sql: ${questions_attempted} / ${total_questions} ;;
@@ -669,7 +667,7 @@ view: curated_activity_take {
     group_label: "MTP"
     label: "# Activity takes complete"
     type: number
-    sql: COUNT(DISTINCT CASE WHEN ${percent_questions_attempted} = 1THEN ${student_activity_counter} END);;
+    sql: COUNT(DISTINCT CASE WHEN ${percent_questions_attempted} = 1 THEN ${student_activity_counter} END);;
     value_format_name: decimal_0
   }
 
