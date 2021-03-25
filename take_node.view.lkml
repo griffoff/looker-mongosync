@@ -1,4 +1,36 @@
 #include: "//core/named_formats.lkml"
+include: "./product_activity_metadata.view"
+include: "./activity_type_map.view"
+include: "./product_toc_metadata.view"
+include: "./product_item_metadata.view"
+include: "./product_mastery_group.view"
+
+explore: take_node {
+  from: take_node
+  view_name: take_node
+  hidden: yes
+  extension: required
+
+  join: product_activity_metadata {
+    sql_on: (${take_node.product_code}, ${take_node.section_id}) = (${product_activity_metadata.product_code}, ${product_activity_metadata.item_id}) ;;
+    relationship: many_to_one
+  }
+
+  join: product_item_metadata {
+    sql_on: ${take_node.activity_node_uri} = ${product_item_metadata.item_uri} ;;
+    relationship: many_to_one
+  }
+
+  join: product_toc_metadata {
+    sql_on: (${product_item_metadata.product_code}, ${product_item_metadata.item_id}) = (${product_toc_metadata.product_code}, ${product_toc_metadata.node_id}) ;;
+    relationship: many_to_one
+  }
+
+  join: product_mastery_group {
+    sql_on: ${take_node.activity_node_uri_masterygroup_cgid} = ${product_mastery_group.computed_hash} ;;
+    relationship: many_to_one
+  }
+}
 
 view: take_node {
   #sql_table_name: REALTIME.TAKE_ITEM ;;

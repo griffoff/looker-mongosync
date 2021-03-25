@@ -1,6 +1,5 @@
 include: "./datagroups.lkml"
 include: "./node_summary.view"
-#include: "./product_toc_metadata.view"
 
 explore: product_item_metadata {
   hidden: yes

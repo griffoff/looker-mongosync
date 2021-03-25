@@ -1,3 +1,31 @@
+include: "./course_activity_groups.view"
+include: "./course_activity_group.view"
+
+explore: course_activity {
+  hidden: yes
+# this is the way to do it without persisting course_activity_groups, there is a bug in snowflake that makes this fail currently
+# https://support.snowflake.net/s/case/5000Z00000tEe65QAC/bug-with-lateral-flatten-alias
+#   join: course_activity_groups {
+#     required_joins: [course_activity]
+#     sql_table_name:  lateral flatten(course_activity.activity_group_uris, outer=>True);;
+#     type: cross
+#     relationship: one_to_many
+#   }
+
+  join: course_activity_groups {
+    sql_on: (${course_activity.course_uri}, ${course_activity.activity_uri}) = (${course_activity_groups.course_uri}, ${course_activity_groups.activity_uri})  ;;
+    relationship: one_to_many
+  }
+
+  join: course_activity_group {
+    required_joins: [course_activity_groups]
+    #sql_on: (${course_activity.course_uri}, course_activity_groups.value::string = (${course_activity_group.course_uri}, ${course_activity_group.activity_group_uri});;
+    sql_on: (${course_activity_groups.course_uri}, ${course_activity_groups.activity_group_uri}) = (${course_activity_group.course_uri}, ${course_activity_group.activity_group_uri});;
+    relationship: many_to_one
+  }
+}
+
+
 view: course_activity {
   #sql_table_name: realtime.course_activity ;;
   derived_table: {

@@ -1,15 +1,11 @@
-connection: "snowflake_prod"
-label: "RealTime Data - Curated (Simple Raw Views)"
-
-# # # include: "datagroups.lkml"
-# # # include: "//core/common.lkml"
-# # # include: "*.view.lkml"
-# # # #include: "*.dashboard.lookml"  # include all dashboards in this project
 include: "./take_node.view"
 include: "./product_activity_metadata.view"
 include: "./activity_type_map.view"
 include: "./product_item_metadata.view"
 include: "./product_toc_metadata.view"
+
+connection: "snowflake_prod"
+label: "RealTime Data - Curated (Simple Raw Views)"
 
 # These explores are used as the base for NDTs (Native derived tables)
 # there is in inheritance chain

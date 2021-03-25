@@ -1,3 +1,39 @@
+include: "//cengage_unlimited/views/cu_user_analysis/product_info.view"
+include: "/product_item_metadata.view"
+include: "/product_activity_metadata.view"
+include: "/product_mastery_group.view"
+
+explore: product_toc_metadata {
+  view_name: product_toc_metadata
+  from: product_toc_metadata
+  label: "CXP Content Service"
+  hidden: yes
+  extends: [product_item_metadata, product_info]
+
+  join: product_item_metadata {
+    sql_on: (${product_toc_metadata.source_system}, ${product_toc_metadata.product_code})
+        = (${product_item_metadata.source_system}, ${product_item_metadata.product_code})
+          ;;
+    relationship: one_to_many
+  }
+  join: product_info {
+    sql_on: ${product_toc_metadata.isbn} = ${product_info.isbn13} ;;
+    relationship: many_to_one
+  }
+  join: product_activity_metadata {
+    sql_on: (${product_toc_metadata.source_system}, ${product_toc_metadata.product_code})
+        = (${product_activity_metadata.source_system}, ${product_activity_metadata.product_code})
+          ;;
+    relationship: one_to_many
+  }
+  join: product_mastery_group {
+    sql_on: (${product_toc_metadata.source_system}, ${product_toc_metadata.product_code})
+        = (${product_mastery_group.source_system}, ${product_mastery_group.product_code})
+          ;;
+    relationship: one_to_many
+  }
+}
+
 view: product_toc_metadata {
 #   sql_table_name: REALTIME.PRODUCT_TOC_METADATA ;;
     derived_table: {

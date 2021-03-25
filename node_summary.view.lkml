@@ -1,5 +1,11 @@
 include: "//core/named_formats.lkml"
 
+explore: node_summary {
+  label: "Weekly Summary of Items"
+  description: "This contains all 'nodes' from realtime, including, items, mastery groups and activities, summarized into per week usage. Use of metrics measures will likely result in NOT the data you want."
+}
+
+
 view: node_summary {
 #   sql_table_name: REALTIME.NODE_SUMMARY ;;
   derived_table: {

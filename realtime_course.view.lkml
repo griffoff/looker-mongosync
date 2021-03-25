@@ -1,6 +1,39 @@
 include: "./datagroups.lkml"
+include: "//cengage_unlimited/views/cu_user_analysis/product_info.view"
+include: "./product_item_metadata.view"
+include: "./course_activity.view"
+include: "./course_enrollment.view"
+include: "./take_node.view"
 
-explore: realtime_course {hidden: yes}
+explore: realtime_course {
+  view_name: realtime_course
+  from: realtime_course
+  hidden: yes
+  view_label: "Course (Realtime)"
+  extends: [course_info, product_item_metadata, course_activity, take_node]
+
+  join: course_info {
+    sql_on: ${realtime_course.course_key} = ${course_info.course_key} ;;
+    relationship: one_to_one
+  }
+
+  join: course_activity {
+    sql_on: ${realtime_course.course_uri} = ${course_activity.course_uri} ;;
+    relationship: one_to_many
+  }
+
+  join: course_enrollment{
+    sql_on: ${realtime_course.course_uri} = ${course_enrollment.course_uri} ;;
+    relationship: one_to_many
+  }
+
+  join: take_node {
+    sql_on: (${course_activity.course_uri}, ${course_activity.activity_uri}, ${course_enrollment.user_identifier})
+      = (${take_node.course_uri}, ${take_node.activity_uri}, ${take_node.user_identifier});;
+    relationship: one_to_many
+  }
+
+}
 view: realtime_course {
 
   view_label: "Course Details (from Real-time)"
