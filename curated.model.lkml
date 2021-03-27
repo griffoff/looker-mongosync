@@ -1,5 +1,6 @@
-include: "//cengage_unlimited/views/cu_user_analysis/course_info.view"
+include: "//cengage_unlimited/views/cu_user_analysis/course_info.explore"
 include: "//cengage_unlimited/views/cu_user_analysis/user_profile.view"
+include: "./TAGS.*.view"
 include: "./curated.activity_take.view"
 include: "./curated.item_take.view"
 include: "./curated.item.view"
@@ -15,7 +16,7 @@ connection: "snowflake_prod"
 
 # Models for extension
 explore: activity_take {
-  extension: required
+  hidden: yes
   from: curated_activity_take
   join: item_take {
     from: curated_item_take
@@ -51,10 +52,70 @@ explore: item_take {
     relationship: many_to_one
   }
 
+  join: tx_state_items {
+    view_label: "LOTS"
+    sql_on: ${item_take.activity_node_item_id} = ${tx_state_items.item_identifier} ;;
+    relationship: many_to_one
+  }
+
+  join: snhu_items {
+    view_label: "LOTS"
+    sql_on: ${item_take.activity_node_item_id} = ${snhu_items.cnow_item_id} ;;
+    relationship: many_to_one
+  }
+
+  join: csu_items {
+    view_label: "LOTS"
+    sql_on: ${item_take.activity_node_item_id} = ${csu_items.item_identifier} ;;
+    relationship: many_to_one
+  }
+
+  join: nwtc_items {
+    view_label: "LOTS"
+    sql_on: ${item_take.activity_node_item_id} = ${nwtc_items.item_identifier} ;;
+    relationship: many_to_one
+  }
+
+  join: nwtc_payroll_items {
+    view_label: "LOTS"
+    sql_on: ${item_take.activity_node_item_id} = ${nwtc_payroll_items.item_identifier};;
+    relationship: many_to_one
+  }
+
+  join: concorde_items {
+    view_label: "LOTS"
+    sql_on: ${item_take.activity_node_item_id} = ${concorde_items.item_identifier} ;;
+    relationship: many_to_one
+  }
+
+  join: rcc_bus_10_items {
+    view_label: "LOTS"
+    sql_on: ${item_take.activity_node_item_id} = ${rcc_bus_10_items.item_identifier} ;;
+    relationship: many_to_one
+  }
+
+  join: rcc_mag_51_items {
+    view_label: "LOTS"
+    sql_on: ${item_take.activity_node_item_id} = ${rcc_mag_51_items.item_identifier} ;;
+    relationship: many_to_one
+  }
+
+  join: hbu_items {
+    view_label: "LOTS"
+    sql_on: ${item_take.activity_node_item_id} = ${hbu_items.item_identifier} ;;
+    relationship: many_to_one
+  }
+
+  join: snu_items {
+    view_label: "LOTS"
+    sql_on: ${item_take.activity_node_item_id} = ${snu_items.item_identifier} ;;
+    relationship: many_to_one
+  }
+
 }
 
 explore: activity_takes {
-  extends: [realtime_course, course_activity, activity_take, user_profile]
+  extends: [realtime_course, course_activity, activity_take, item_take, user_profile]
   label: "Activity Takes"
   view_label: "Activity Takes"
   from: curated_activity_take

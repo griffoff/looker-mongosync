@@ -131,7 +131,7 @@ view: curated_activity {
         ;;
 
         sql_step:
-          create or replace transient table ${SQL_TABLE_NAME}
+          create or replace transient table curated_activity
           as
           select
               split_part(a.activity_uri, ':', 1) as source_system
@@ -144,14 +144,14 @@ view: curated_activity {
         ;;
 
         sql_step:
-          merge into ${SQL_TABLE_NAME} a
+          merge into curated_activity a
           using (
             with content_name as (
               select
                 assignable_content_uri
                 , label
                 , row_number() over (partition by assignable_content_uri order by label is null, course_activity_total_takes desc) = 1 as preferred
-              from ${SQL_TABLE_NAME}
+              from curated_activity
             )
             select
               assignable_content_uri
@@ -162,6 +162,8 @@ view: curated_activity {
           when matched then update
             set content_label = c.label
           ;;
+
+        sql_step: create or replace transient table ${SQL_TABLE_NAME} clone curated_activity ;;
       }
 
       persist_for: "24 hours"

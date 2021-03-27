@@ -2,7 +2,7 @@
 
 include: "//core/common.lkml"
 include: "//cengage_unlimited/views/cu_user_analysis/user_profile.view"
-include: "//cengage_unlimited/views/cu_user_analysis/course_info.view"
+include: "//cengage_unlimited/views/cu_user_analysis/course_info.explore"
 #include: "//fivetran_mindtap/nb.snapshot.view"
 
 include: "take_node.view"

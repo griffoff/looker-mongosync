@@ -1,5 +1,11 @@
 include: "./course_shadow_map.view"
 
+explore: curated_activity_take {
+  hidden: yes
+  from: curated_activity_take
+  view_name: curated_activity_take
+}
+
 view: final_grade {
   extension: required
 

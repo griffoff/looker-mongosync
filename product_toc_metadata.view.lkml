@@ -2,6 +2,7 @@ include: "//cengage_unlimited/views/cu_user_analysis/product_info.view"
 include: "/product_item_metadata.view"
 include: "/product_activity_metadata.view"
 include: "/product_mastery_group.view"
+include: "//cengage_unlimited/views/cu_user_analysis/product_info.explore"
 
 explore: product_toc_metadata {
   view_name: product_toc_metadata

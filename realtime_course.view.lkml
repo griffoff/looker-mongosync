@@ -4,6 +4,7 @@ include: "./product_item_metadata.view"
 include: "./course_activity.view"
 include: "./course_enrollment.view"
 include: "./take_node.view"
+include: "//cengage_unlimited/views/cu_user_analysis/course_info.explore"
 
 explore: realtime_course {
   view_name: realtime_course
