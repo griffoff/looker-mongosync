@@ -11,6 +11,7 @@ include: "datagroups.lkml"
 include: "./node_summary.view"
 include: "./TAGS.*"
 include: "./realtime_course.view"
+include: "/csfi_view.view"
 # include: "./lo_items.view"
 
 connection: "snowflake_prod"
