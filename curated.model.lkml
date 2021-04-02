@@ -118,6 +118,7 @@ explore: activity_takes {
   extends: [realtime_course, course_activity, activity_take, item_take, user_profile]
   label: "Activity Takes"
   view_label: "Activity Takes"
+  description: "This is a view of all activity and item takes including related information such as activity, product, user, institution metadata"
   from: curated_activity_take
   view_name: activity_take
   hidden: no
