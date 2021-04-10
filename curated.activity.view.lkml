@@ -1,5 +1,6 @@
 include: "curated_base.model"
 include: "//core/named_formats.lkml"
+include: "course_activity_group*.view"
 
 view: curated_activity {
     derived_table: {
@@ -15,7 +16,7 @@ view: curated_activity {
             course_uri
             , activity_uri
             , any_value(activity_type_uri) as activity_type_uri
-            , any_value(external_properties:"analytics:activity-type") as activity_type
+            , any_value(external_properties:"analytics:activity-type")::STRING as activity_type
             , any_value(assignable_content_uri) as assignable_content_uri
             , count(*) as course_activity_total_takes
             , count(case when submission_date >= current_date - 30 then 1 end) as course_activity_total_takes_last_30_days
@@ -161,6 +162,24 @@ view: curated_activity {
             ) c on a.assignable_content_uri = c.assignable_content_uri
           when matched then update
             set content_label = c.label
+          ;;
+
+        sql_step:
+          merge into curated_activity a
+          using (
+            select activity_uri, course_activity_group.LABEL as activity_type, row_number() over (partition by activity_uri order by count(*) desc) = 1 as keep
+            from ${course_activity_groups.SQL_TABLE_NAME} course_activity_groups
+            left join ${course_activity_group.SQL_TABLE_NAME} AS course_activity_group ON (course_activity_groups.course_uri, course_activity_groups.activity_group_uri) = (course_activity_group.COURSE_URI, course_activity_group.ACTIVITY_GROUP_URI)
+            WHERE course_activity_group.ACTIVITY_GROUP_TYPE_URI IN (
+                'mindtap:activity-group-type:activity-type'
+                ,'cnow:group-type:assignment-category'
+                ,'coursemate-reporting:asset-group-type:category'
+                ,'soa:group-type:assignment-category'
+              )
+            GROUP BY 1, 2
+            ) g on a.activity_uri = g.activity_uri and g.keep
+          when matched then update
+            set activity_type = g.activity_type
           ;;
 
         sql_step: create or replace transient table ${SQL_TABLE_NAME} clone curated_activity ;;

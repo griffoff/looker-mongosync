@@ -3,7 +3,8 @@ view: course_activity_group {
   derived_table: {
     create_process: {
       sql_step:
-      CREATE OR REPLACE TRANSIENT TABLE ${SQL_TABLE_NAME}
+      CREATE OR REPLACE TRANSIENT TABLE looker_scratch.course_activity_group
+      CLUSTER BY (course_uri, activity_group_uri)
       As
         with data as (
           select
@@ -17,8 +18,9 @@ view: course_activity_group {
         where latest = 1
         order by course_uri, activity_group_uri
         ;;
-      sql_step:
-        ALTER TABLE ${SQL_TABLE_NAME} CLUSTER BY (course_uri, activity_group_uri);;
+
+        sql_step:
+        create or replace transient table ${SQL_TABLE_NAME} clone looker_scratch.course_activity_group;;
     }
 
       datagroup_trigger: realtime_default_datagroup
