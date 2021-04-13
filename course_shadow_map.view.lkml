@@ -13,7 +13,7 @@ view: course_shadow_map {
     inner join shadow on c.external_properties:"mindtap:property:snapshot-id":value = shadow.id
     ;;
 
-    persist_for: "24 hours"
+    datagroup_trigger: daily_refresh
   }
 
   dimension: parent_course_uri {}

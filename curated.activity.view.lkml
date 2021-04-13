@@ -185,7 +185,7 @@ view: curated_activity {
         sql_step: create or replace transient table ${SQL_TABLE_NAME} clone curated_activity ;;
       }
 
-      persist_for: "24 hours"
+      datagroup_trigger: daily_refresh
     }
 
     dimension: source_system {}
