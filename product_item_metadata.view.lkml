@@ -25,9 +25,28 @@ view: product_item_metadata {
           ,*
         from REALTIME.PRODUCT_ITEM_METADATA
       )
-      select *
+      select
+        business_key
+        ,_rsrc, source_system, product_code::STRING as product_code
+        , item_id, item_uri, cgid, name, handler, parent_id, ancestor_ids
+        ,null::VARIANT as question_text
       from data
       where latest = 1
+      union all
+      select
+          id::STRING as business_key
+          ,'webassign.wa_app_v4net.questions' as _rsrc
+          ,'WA' as source_system
+          ,split_part(code, ' ', 1)::STRING as product_code
+          ,id::STRING as item_id
+          ,'wa:prod:question' || id as item_uri
+          ,lcs_cgi as cgid
+          ,split_part(code, ' ', -1) as name
+          ,'WA' as handler
+          ,null as parent_id
+          ,null as ancestor_ids
+          ,question::VARIANT as question_text
+      from webassign.wa_app_v4net.questions
       order by item_id, item_uri
       ;;
 

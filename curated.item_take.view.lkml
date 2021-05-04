@@ -9,7 +9,12 @@ view: curated_item_take {
     hidden:yes
   }
   dimension: activity_uri{type: string hidden:yes}
-  dimension: activity_node_uri{type: string}
+  dimension: activity_node_uri{type: string
+    sql:CASE
+        WHEN ${TABLE}.ACTIVITY_NODE_URI LIKE 'wa:%'
+        THEN regexp_replace(${TABLE}.activity_node_uri, '(:box:\\d+)$', '')
+        ELSE ${TABLE}.ACTIVITY_NODE_URI
+        END ;;}
   dimension: external_take_uri{
     type: string
     link: {

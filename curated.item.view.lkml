@@ -57,7 +57,11 @@ view: curated_item {
     type: date_time
   }
 
-  dimension: activity_node_uri {primary_key: yes alias: [activity_item_uri]}
+  dimension: activity_node_uri {
+    primary_key: yes
+    sql: ${TABLE}.activity_item_uri;;
+    alias: [activity_item_uri]
+  }
   dimension: activity_type_uri {}
   dimension: product_code {}
   dimension: item_id {}

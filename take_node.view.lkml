@@ -409,7 +409,11 @@ view: take_node {
   dimension: activity_node_uri {
     group_label: "Activity Node Uri"
     type: string
-    sql: LOWER(${TABLE}.ACTIVITY_NODE_URI) ;;
+    sql: CASE WHEN ${TABLE}.ACTIVITY_NODE_URI LIKE 'wa:%'
+      THEN regexp_replace(${TABLE}.activity_node_uri, '(:box:\\d+)$', '')
+      ELSE LOWER(${TABLE}.ACTIVITY_NODE_URI)
+      END
+        ;;
     link: {
       label: "Scores Across Discipline"
 #       url: "/explore/realtime/take_node?fields=take_node.count,take_node.final_grade_score_avg, dim_product,discipline&f[take_node.activity_node_uri]={{ value }}"#

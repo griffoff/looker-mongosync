@@ -250,6 +250,11 @@ view: curated_activity_take {
     type: max
     sql: ${submission_date_raw} ;;
   }
+  measure: earliest_submission_date {
+    label: "Earliest submission date"
+    type: min
+    sql: ${submission_date_raw} ;;
+  }
   measure: avg_attempts_per_question {
     group_label: "Questions"
     label: "Attempts per Question (Avg)"

@@ -248,11 +248,16 @@ view: curated_activity {
     label: "# Course Section Activities"
   }
 
+  measure: example_assignable_content_uri {
+    type: string
+    sql: ANY_VALUE(${assignable_content_uri}) ;;
+  }
+
   measure: content_activity_count {
     label: "# Master Activities"
     type: count_distinct
     sql: ${assignable_content_uri} ;;
-    hidden: yes
+    hidden: no
   }
 }
 
