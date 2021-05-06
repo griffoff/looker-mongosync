@@ -14,25 +14,6 @@ include: "./course_activity_group.view"
 label: "RealTime Data - Curated"
 connection: "snowflake_prod"
 
-# Models for extension
-explore: activity_take {
-  hidden: yes
-  from: curated_activity_take
-  join: item_take {
-    from: curated_item_take
-    sql_on: (${activity_take.external_take_uri}) = (${item_take.external_take_uri}) ;;
-    relationship: one_to_many
-  }
-
-  join: activity {
-    from: curated_activity
-    sql_on: ${activity_take.activity_uri} = ${activity.activity_uri}
-      and ${activity_take.course_uri} = ${activity.course_uri};;
-    relationship: many_to_one
-  }
-
-}
-
 # Models for exploration
 explore: item_take {
   label: "Item Takes"
@@ -109,6 +90,27 @@ explore: item_take {
   join: snu_items {
     view_label: "LOTS"
     sql_on: ${item_take.activity_node_item_id} = ${snu_items.item_identifier} ;;
+    relationship: many_to_one
+  }
+
+}
+
+# Models for extension
+explore: activity_take {
+  extends: [item_take]
+  hidden: yes
+  from: curated_activity_take
+  view_name: activity_take
+  join: item_take {
+    from: curated_item_take
+    sql_on: (${activity_take.external_take_uri}) = (${item_take.external_take_uri}) ;;
+    relationship: one_to_many
+  }
+
+  join: activity {
+    from: curated_activity
+    sql_on: ${activity_take.activity_uri} = ${activity.activity_uri}
+      and ${activity_take.course_uri} = ${activity.course_uri};;
     relationship: many_to_one
   }
 

@@ -1,4 +1,18 @@
 include:"curated.activity_take.view"
+include:"curated.item.view"
+explore: curated_item_take {
+  hidden: yes
+  join: item {
+    sql_on: ${curated_item_take.activity_node_uri} = ${item.activity_node_uri} ;;
+    relationship: many_to_one
+
+  }
+}
+
+view: item {
+  extends: [curated_item]
+}
+
 view: curated_item_take {
   extends: [final_grade]
 
@@ -62,11 +76,16 @@ view: curated_item_take {
   }
   dimension: question_type {
     group_label: "External Properties"
+    label: "Item Type"
     type: string
-    sql:  COALESCE(
-            ${external_properties_raw}:"cengage:book:item:problem-type"
-            , ${external_properties_raw}:"cas:property:question:type"
-            )::STRING;;
+    sql:  UPPER(TRIM(
+            COALESCE(
+              SPLIT_PART(COALESCE(
+              ${external_properties_raw}:"cengage:book:item:problem-type"
+              , ${external_properties_raw}:"cas:property:question:type"
+              )::STRING, ':', -1)
+            ,${item.item_type})
+            ));;
   }
   dimension: container_type {
     group_label: "External Properties"
