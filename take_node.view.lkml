@@ -632,6 +632,7 @@ view: take_node {
   }
 
   dimension: course_key {
+    hidden: yes
     type: string
     #sql: split_part(${TABLE}.COURSE_URI, ':', -1)::string ;;
   }

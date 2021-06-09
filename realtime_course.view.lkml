@@ -83,6 +83,8 @@ view: realtime_course {
     where course_uri not in (select course_uri from realtime.course where course_uri is not null)
     ;;
 
+  # should there be an additional insert of course_uri from take_node ?
+
   # validate course_keys
     sql_step:
     update looker_scratch.realtime_course
@@ -192,6 +194,7 @@ view: realtime_course {
   dimension: original_course_key {
     description: "Course key before CNOW shadow course mapping"
     type: string
+    hidden: yes
   }
 
   dimension_group: end {
