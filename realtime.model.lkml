@@ -22,6 +22,7 @@ label: "Realtime - Source"
 
 
 explore: all_take_nodes {
+  view_label: "Take Node"
   from: take_node
   view_name: take_node
   label: "All Take Nodes"

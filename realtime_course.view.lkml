@@ -54,6 +54,10 @@ view: realtime_course {
             WHEN external_properties:"soa:property:courseKey":value IS NOT NULL THEN external_properties:"soa:property:courseKey":value
             WHEN course_uri like 'soa:%' THEN NULL
             ELSE split_part(course_uri, ':', -1) END) as course_key
+          ,UPPER(CASE
+            WHEN external_properties:"soa:property:courseKey":value IS NOT NULL THEN external_properties:"soa:property:courseKey":value
+            WHEN course_uri like 'soa:%' THEN NULL
+            ELSE split_part(course_uri, ':', -1) END) as original_course_key
         from realtime.course
       )
       select *
@@ -64,13 +68,17 @@ view: realtime_course {
 
  # insert missing course_uris
     sql_step:
-    insert into looker_scratch.realtime_course (course_uri, course_key)
+    insert into looker_scratch.realtime_course (course_uri, course_key, original_course_key)
     select distinct
       course_uri
       ,UPPER(CASE
             WHEN course_uri like 'soa:%' THEN NULL
             ELSE split_part(course_uri, ':', -1) END
             ) as course_key
+      ,UPPER(CASE
+            WHEN course_uri like 'soa:%' THEN NULL
+            ELSE split_part(course_uri, ':', -1) END
+            ) as original_course_key
     from looker_scratch.item_take_activities
     where course_uri not in (select course_uri from realtime.course where course_uri is not null)
     ;;
@@ -79,6 +87,7 @@ view: realtime_course {
     sql_step:
     update looker_scratch.realtime_course
       set course_key = NULL
+          , original_course_key = NULL
     where course_key not in (
           select course_key
           from prod.datavault.sat_coursesection
@@ -96,6 +105,7 @@ view: realtime_course {
                                               and scs._latest
     when matched then update
       set rc.course_key = UPPER(scs.course_key)
+          , rc.original_course_key = UPPER(scs.course_key)
     ;;
 
   # map cnow shadow courses
@@ -128,6 +138,7 @@ view: realtime_course {
                                               and scs._latest
     when matched then update
       set rc.course_key = UPPER(scs.course_key)
+          , rc.original_course_key = UPPER(scs.course_key)
     ;;
 
     sql_step:
@@ -174,6 +185,12 @@ view: realtime_course {
   }
 
   dimension: course_key {
+    description: "Course key after CNOW shadow course mapping"
+    type: string
+  }
+
+  dimension: original_course_key {
+    description: "Course key before CNOW shadow course mapping"
     type: string
   }
 
