@@ -40,7 +40,6 @@ view: realtime_course {
   view_label: "Course Details (from Real-time)"
 
   derived_table: {
-    publish_as_db_view: yes
     create_process: {
       sql_step:
       create or replace transient table looker_scratch.realtime_course
