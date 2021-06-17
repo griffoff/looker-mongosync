@@ -118,6 +118,7 @@ view: final_grade {
 view: curated_activity_take {
   extends: [final_grade]
   derived_table: {
+    publish_as_db_view: yes
     create_process: {
       sql_step:
       CREATE OR REPLACE TRANSIENT TABLE LOOKER_SCRATCH.curated_activity_take
